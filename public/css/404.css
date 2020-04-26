@@ -1,0 +1,16 @@
+body {
+  width: 430px;
+  font-family: Trebuchet MS;
+  color: #5d5d5d;
+  text-align: center;
+  height: 362px;
+  top: 50%;
+  position: absolute;
+  margin-top: -181px;
+  left: 50%;
+  margin-left: -215px;
+}
+
+img {
+  width: 200px;
+}
