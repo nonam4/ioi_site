@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<script src="js/auth.js"></script>
+
+		<link rel="stylesheet" href="css/auth.css">
+		<link rel="stylesheet" href="css/load.css">
+		<link href="icons/css/all.min.css" rel="stylesheet">
+
+		<meta charset="utf-8">
+		<meta name="theme-color" content="#121e32">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" href="img/logo.png">
+		<title>Mundo Eletronico</title>
+	</head>
+    <body>
+			<a class="download" title="Download coletor"
+					href="https://grupomundoeletronico.com.br/downloads">
+				<i class="fas fa-download"></i>
+			</a>
+
+			<div id="loadTelaCheia">
+				<img id="loadImg" src="img/logo.png">
+				<div id="loadContent" class="loading">
+					<div class="loader center"><span></span></div>
+				</div>
+			</div>
+
+			<div id="formLogin">
+				<img id="logo" src="img/logo.png"/>
+				<div>
+					<div class="group">
+						<input id="usuario" class="inpt" type="text" required>
+						<span class="highlight"></span>
+						<span class="bar"></span>
+						<label class="lbl">Usuario</label>
+					</div>
+					<div class="group">
+						<input id="senha" class="inpt" type="password" required onkeyup="enterPressed(event)">
+						<span class="highlight"></span>
+						<span class="bar"></span>
+						<label class="lbl">Senha</label>
+					</div>
+					<button type="button" id="loginButton" onclick="autenticar()">ENTRAR</button>
+				</div>
+			</div>
+    </body>
+</html>

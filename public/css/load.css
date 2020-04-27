@@ -1,0 +1,113 @@
+#loadTelaCheia ::after, #loadTelaCheia ::before, #loadParcial ::after, #loadParcial ::before {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#loadTelaCheia {
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all .2s ease-in-out !important;
+  background-color: white;
+  z-index: 999;
+}
+
+#loadParcial {
+  width: calc(100% - 250px);
+  height: 100vh;
+  left: 250px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all .2s ease-in-out !important;
+  opacity: 0;
+  background-color: white;
+  z-index: 999;
+}
+
+#loadTelaCheia img, #loadParcial img {
+  width: 250px;
+  margin: auto;
+  margin-bottom: 20px;
+}
+
+.loading {
+  width: fit-content;
+  margin: auto;
+  margin-top: 0px;
+}
+
+.loader {
+  display: block;
+	height: 32px;
+	width: 32px;
+	-webkit-animation: loader-1 3s linear infinite;
+	        animation: loader-1 3s linear infinite;
+}
+@-webkit-keyframes loader-1 {
+	0%   { -webkit-transform: rotate(0deg); }
+	100% { -webkit-transform: rotate(360deg); }
+}
+@keyframes loader-1 {
+	0%   { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+.loader span {
+	display: block;
+	position: absolute;
+	top: 0; left: 0;
+	bottom: 0; right: 0;
+	margin: auto;
+	height: 32px;
+	width: 32px;
+	clip: rect(16px, 32px, 32px, 0);
+	-webkit-animation: loader-2 1.5s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+	        animation: loader-2 1.5s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+}
+@-webkit-keyframes loader-2 {
+	0%   { -webkit-transform: rotate(0deg); }
+	100% { -webkit-transform: rotate(360deg); }
+}
+@keyframes loader-2 {
+	0%   { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+.loader span::before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0; left: 0;
+	bottom: 0; right: 0;
+	margin: auto;
+	height: 32px;
+	width: 32px;
+	border: 3px solid transparent;
+	border-top: 3px solid #3498db;
+	border-radius: 50%;
+	-webkit-animation: loader-3 1.5s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+	        animation: loader-3 1.5s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
+}
+@-webkit-keyframes loader-3 {
+	0%   { -webkit-transform: rotate(0deg); }
+	100% { -webkit-transform: rotate(360deg); }
+}
+@keyframes loader-3 {
+	0%   { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+.loader span::after {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0; left: 0;
+	bottom: 0; right: 0;
+	margin: auto;
+	height: 32px;
+	width: 32px;
+	border: 3px solid rgba(52,152,219,.15);
+	border-radius: 50%;
+}
