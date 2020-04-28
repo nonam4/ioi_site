@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 		<script src="js/auth.js"></script>
 
 		<link rel="stylesheet" href="css/auth.css">
@@ -15,20 +15,15 @@
 		<title>Mundo Eletronico</title>
 	</head>
     <body>
-			<a class="download" title="Download coletor"
-					href="https://grupomundoeletronico.com.br/downloads">
-				<i class="fas fa-download"></i>
-			</a>
-
-			<div id="loadTelaCheia">
-				<img id="loadImg" src="img/logo.png">
-				<div id="loadContent" class="loading">
+			<div id="load">
+				<img  src="img/logo.png">
+				<div class="loading">
 					<div class="loader center"><span></span></div>
 				</div>
 			</div>
 
-			<div id="formLogin">
-				<img id="logo" src="img/logo.png"/>
+			<div id="login">
+				<img src="img/logo.png"/>
 				<div>
 					<div class="group">
 						<input id="usuario" class="inpt" type="text" required>
@@ -42,8 +37,15 @@
 						<span class="bar"></span>
 						<label class="lbl">Senha</label>
 					</div>
-					<button type="button" id="loginButton" onclick="autenticar()">ENTRAR</button>
+					<button type="button" onclick="autenticar()">ENTRAR</button>
 				</div>
 			</div>
+
+			<a class="download" title="Central de downloads"
+					href="https://grupomundoeletronico.com.br/downloads">
+				<i class="fas fa-download"></i>
+			</a>
+
+			<div id="error"></div>
     </body>
 </html>

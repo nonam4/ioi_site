@@ -1,47 +1,66 @@
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  --bordas: #757575;
+	--principal: #0059b3;
+	--principalHover: #014487;
+	--principalLight: rgba(52,152,219,.15);
+	--textos: #5d5d5d;
+	--placeholders: #999;
+	--hover: rgba(0,0,0,.2);
+  --erro: #c0392b;
 }
 
-html, body{
+body {
 	font-family: Trebuchet MS !important;
 	font-size:14px !important;
-  height:100%;
-  margin: 0px;
   overflow: hidden;
-  width: 250px;
+  width: 100vw;
+	height: 100vh;
+	margin: 0;
 }
 
-#containerLoad {
+#load ::after, #load ::before {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#load {
   width: 100%;
-  text-align: center;
-  margin: auto;
+  height: 100%;
   position: absolute;
-  top: 50%;
-  transform: translateY(-55%);
-  color: #6f6f6f;
-	font-size: 15px;
-	font-weight: 550;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  z-index: 999;
+	transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
-#load{
-	position: absolute;
+#load img {
+  width: 250px;
+  margin: auto;
+  margin-bottom: 20px;
+}
+
+#login {
+  position: absolute;
   left: 50%;
   top: 50%;
   width: 250px;
   margin-left: -125px;
-  margin-top: -180px;
+  margin-top: -250px;
+  display: none;
+  opacity: 0;
+  text-align: center;
+  transition: 0.2s ease opacity;
+  -moz-transition: 0.2s ease opacity;
+  -webkit-transition: 0.2s ease opacity;
 }
 
-#loadSpinner{
-  margin-left: auto;
-  margin-right: auto;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #3498db;
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  animation: spin 0.7s linear infinite;
+#login img {
+  width: 250px;
+  margin-bottom: 30px;
 }
 
 #usuario {
@@ -52,192 +71,161 @@ html, body{
   margin-top: -2px;
 }
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+.group {
+  position: relative;
+  margin-bottom: 30px;
 }
 
-#logoLoad {
-    width: 250px;
-    margin-bottom: 16px;
+.inpt {
+  font-size: 14px;
+  padding: 10px 10px 10px 5px;
+  display: block;
+  width: 235px;
+  border: none;
+  border-bottom: 1px solid var(--bordas);
 }
 
-#formLogin {
+.inpt:focus {
+  outline: none;
+}
+
+.inpt:focus ~ .bar:before, .inpt:focus ~ .bar:after {
+  width: 50%;
+}
+
+.inpt:focus ~ .lbl, .inpt:valid ~ .lbl {
+  top: -20px;
+  font-size: 15px;
+  color: var(--principal);
+}
+
+.inpt:focus ~ .highlight {
+  -webkit-animation: inputHighlighter 0.3s ease;
+  -moz-animation: inputHighlighter 0.3s ease;
+  animation: inputHighlighter 0.3s ease;
+}
+
+.highlight {
+	position: absolute;
+  height: 60%;
+  width: 100px;
+  top: 25%;
+  left: 0;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.bar {
+	position: relative;
+  display: block;
+  width: 250px;
+}
+
+.bar:before, .bar:after {
+  content: '';
+  height: 2px;
+  width: 0;
+  bottom: 1px;
   position: absolute;
+  background: var(--principal);
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+}
+
+.bar:before {
   left: 50%;
-  top: 50%;
-  width: 250px;
-  margin-left: -125px;
-  margin-top: -250px;
-  display: none;
-  opacity: 0;
-  text-align: center;
 }
 
-#formLogin button {
-  transition: all .2s ease-in-out !important;
+.bar:after {
+  right: 50%;
 }
 
-#loginButton {
-  width: 250px;
+.lbl {
+  color: var(--placeholders);
+  font-size: 15px;
+  font-weight: normal;
+  position: absolute;
+  pointer-events: none;
+  left: 5px;
+  top: 10px;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+}
+
+#login button {
+	width: 250px;
   height: 35px;
-  background-color: #0059b3;
-  border:0px;
-  color: #fcfcfc;
+  background-color: var(--principal);
+  border: 0px;
+  color: white;
   margin: auto;
   border-radius: 2px;
   box-shadow:	0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 0 rgba(60,64,67,0.15);
   cursor: pointer;
+	transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
-#loginButton:hover {
-  background-color: #014487;
-}
-
-#logo {
-  width: 250px;
-  margin-bottom: 30px;
-}
-
-.group {
-  position:relative;
-  margin-bottom:30px;
-}
-
-.inpt {
-  font-size:14px;
-  padding:10px 10px 10px 5px;
-  display:block;
-  width: 235px;
-  border:none;
-  border-bottom:1px solid #757575;
-}
-
-.inpt:focus {
-  outline:none;
-}
-
-.inpt:disabled {
-  background-color: white;
-}
-/* LABEL ======================================= */
-.lbl {
-  color:#999;
-  font-size:15px;
-  font-weight:normal;
-  position:absolute;
-  pointer-events:none;
-  left:5px;
-  top:10px;
-  transition:0.2s ease all;
-  -moz-transition:0.2s ease all;
-  -webkit-transition:0.2s ease all;
-}
-
-/* active state */
-.inpt:focus ~ .lbl, .inpt:valid ~ .lbl {
-  top:-20px;
-  font-size:15px;
-  color:#5264AE;
-}
-
-/* BOTTOM BARS ================================= */
-.bar {
-   position:relative;
-   display:block;
-   width:250px;
-}
-
-.bar:before, .bar:after {
-  content:'';
-  height:2px;
-  width:0;
-  bottom:1px;
-  position:absolute;
-  background:#5264AE;
-  transition:0.2s ease all;
-  -moz-transition:0.2s ease all;
-  -webkit-transition:0.2s ease all;
-}
-
-.bar:before {
-  left:50%;
-}
-
-.bar:after {
-  right:50%;
-}
-
-/* active state */
-.inpt:focus ~ .bar:before, .inpt:focus ~ .bar:after {
-  width:50%;
-}
-
-/* HIGHLIGHTER ================================== */
-.highlight {
-  position:absolute;
-  height:60%;
-  width:100px;
-  top:25%;
-  left:0;
-  pointer-events:none;
-  opacity:0.5;
-}
-
-/* active state */
-.inpt:focus ~ .highlight {
-  -webkit-animation:inputHighlighter 0.3s ease;
-  -moz-animation:inputHighlighter 0.3s ease;
-  animation:inputHighlighter 0.3s ease;
-}
-
-/* ANIMATIONS ================ */
-@-webkit-keyframes inputHighlighter {
-	from { background:#5264AE; }
-  to 	{ width:0; background:transparent; }
-}
-@-moz-keyframes inputHighlighter {
-	from { background:#5264AE; }
-  to 	{ width:0; background:transparent; }
-}
-@keyframes inputHighlighter {
-	from { background:#5264AE; }
-  to 	{ width:0; background:transparent; }
+#login button:hover {
+  background-color: var(--principalHover);
 }
 
 .download {
 	position: fixed;
   bottom: 8px;
   right: 8px;
-  transition: all 0.2s linear;
   font-size: 20px;
-  color: #5d5d5d;
+  color: var(--textos);
   text-align: center;
   width: 32px;
   height: 32px;
   border-radius: 50%;
   cursor: pointer;
-  transition: all .2s ease-in-out !important;
+	transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
 .download i {
   padding: 5px;
 }
 
-.downloadBtn{
-	background-size: cover;
-  border: 0px;
-  cursor: pointer;
-  outline: none;
-  width: 100%;
-  height: 100%;
-  display: block;
+.download:hover{
+  background-color: var(--hover);
 }
 
-.download:hover{
-  background-color: rgba(0,0,0,.2);
+#error {
+  background-color: var(--erro);
+  color: white;
+  font-size: 14px;
+  width: 450px;
+  border-radius: 5px 5px 0px 0px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.5);
+  padding: 22px;
+  z-index: 99;
+  position: absolute;
+  bottom: -100px;
+  left: 50%;
+  margin-left: -225px;
+  text-align: center;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+}
+
+/* ANIMATIONS */
+@-webkit-keyframes inputHighlighter {
+	from { background: var(--principal); }
+  to { width: 0; background :transparent; }
+}
+@-moz-keyframes inputHighlighter {
+	from { background: var(--principal); }
+  to { width: 0; background: transparent; }
+}
+@keyframes inputHighlighter {
+	from { background: var(--principal); }
+  to { width: 0; background: transparent; }
 }

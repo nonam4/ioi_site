@@ -1,5 +1,3 @@
-const axios = require('axios')
-
 window.onload = function() {
 	//quando a página acabar de carregar o sistema checa se o usuario esta autenticado ou não
   var usuario = JSON.parse(localStorage.getItem('usuario'))
@@ -9,15 +7,7 @@ window.onload = function() {
     //window.location = "adm.html"
   } else {
     console.log("usuario precisa de autenticação")
-    setTimeout(function(){
-      document.getElementById("loadTelaCheia").style.opacity = "0"
-      document.getElementById("formLogin").style.display = "block"
-      document.getElementById("formLogin").style.opacity = "1"
-
-      setTimeout(function(){
-        document.getElementById("loadTelaCheia").style.display = "none"
-      }, 250)
-    }, 500)
+    esconderLoad()
   }
 }
 
@@ -30,23 +20,14 @@ function enterPressed(e){
 
 function autenticar() {
 
-  var usuario = document.getElementById("usuario")
-  var senha = document.getElementById("senha")
-  var button = document.getElementById("loginButton")
+  var usuario = document.getElementById("usuario").value
+  var senha = document.getElementById("senha").value
 
   if (usuario.length <= 3 || senha.length <= 4) {
-    alert("Usuario/Senha muito curto(s) ou inválido(s)")
+    error("Usuario/Senha muito curto(s) ou inválido(s)")
   } else {
-
-    document.getElementById("formLogin").style.opacity = "0"
-    document.getElementById("loadTelaCheia").style.display = "flex"
-    document.getElementById("loadTelaCheia").style.opacity = "1"
-
-    setTimeout(function(){
-      document.getElementById("formLogin").style.display = "none"
-    }, 250)
-
-    axios.request('').then((res) => {
+    mostrarLoad()
+    axios.get('https://us-central1-ioi-printers.cloudfunctions.net/autenticar?usuario=' + usuario + '&senha=' + senha).then(res => {
       console.log(res.data)
       if(res.data.autenticado) {
         var usuario = {
@@ -56,26 +37,51 @@ function autenticar() {
           empresa: res.data.empresa
         }
         localStorage.setItem('usuario', JSON.stringify(usuario))
+        window.location = "adm.html"
       } else {
-        document.getElementById("loadTelaCheia").style.opacity = "0"
-        document.getElementById("formLogin").style.display = "block"
-        document.getElementById("formLogin").style.opacity = "1"
-
+        esconderLoad()
         setTimeout(function(){
-          document.getElementById("loadTelaCheia").style.display = "none"
-          alert("Usuário/Senha incorreto(s)")
+          error("Usuário/Senha incorreto(s)")
         }, 250)
       }
     }).catch(err => {
       console.error(err)
-      document.getElementById("loadTelaCheia").style.opacity = "0"
-      document.getElementById("formLogin").style.display = "block"
-      document.getElementById("formLogin").style.opacity = "1"
-
+      esconderLoad()
       setTimeout(function(){
-        document.getElementById("loadTelaCheia").style.display = "none"
-        alert("Tente novamente mais tarde")
+        error("Tente novamente mais tarde")
       }, 250)
     })
   }
+}
+
+const mostrarLoad = () => {
+  document.getElementById("load").style.display = "flex"
+
+  setTimeout(function(){
+    document.getElementById("load").style.opacity = "1"
+    document.getElementById("login").style.opacity = "0"
+
+    setTimeout(function(){
+      document.getElementById("login").style.display = "none"
+    }, 250)
+  }, 50)
+}
+
+const esconderLoad = () => {
+  document.getElementById("login").style.display = "block"
+  document.getElementById("login").style.opacity = "1"
+  document.getElementById("load").style.opacity = "0"
+
+  setTimeout(function(){
+    document.getElementById("load").style.display = "none"
+  }, 250)
+}
+
+const error = (message) => {
+  document.getElementById("error").style.bottom = "0px"
+  document.getElementById("error").innerHTML = message
+
+  setTimeout(function(){
+    document.getElementById("error").style.bottom = "-100px"
+  }, 3000)
 }
