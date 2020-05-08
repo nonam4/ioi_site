@@ -1,51 +1,47 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-		<script src="js/auth.js"></script>
+		<script src='https://unpkg.com/axios/dist/axios.min.js'></script>
+		<script src='js/auth.js'></script>
 
-		<link rel="stylesheet" href="css/auth.css">
-		<link rel="stylesheet" href="css/load.css">
-		<link href="icons/css/all.min.css" rel="stylesheet">
+		<link rel='stylesheet' href='css/auth.css'>
+		<link rel='stylesheet' href='css/load.css'>
+		<link href='icons/css/all.min.css' rel='stylesheet'>
 
-		<meta charset="utf-8">
-		<meta name="theme-color" content="#121e32">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="icon" href="img/logo.png">
+		<meta charset='utf-8'>
+		<meta name='theme-color' content='#121e32'>
+		<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+		<link rel='icon' href='img/icon.png'>
 		<title>Mundo Eletronico</title>
 	</head>
-    <body>
-			<div id="load">
-				<img  src="img/logo.png">
-				<div class="loading">
-					<div class="loader center"><span></span></div>
+    <body onload='autenticacao()'>
+			<div id='load'>
+				<img  src='img/icon.png'>
+				<div class='loading'>
+					<div class='loader center'><span></span></div>
 				</div>
 			</div>
 
-			<div id="login">
-				<img src="img/logo.png"/>
+			<div id='login'>
+				<img src='img/icon.png'/>
 				<div>
-					<div class="group">
-						<input id="usuario" class="inpt" type="text" required>
-						<span class="highlight"></span>
-						<span class="bar"></span>
-						<label class="lbl">Usuario</label>
+					<div class='group'>
+						<input id='usuario' class='inpt' type='text' required onkeyup='enterPressed(event)'>
+						<span class='highlight'></span>
+						<span class='bar'></span>
+						<label class='lbl'>Usuario</label>
 					</div>
-					<div class="group">
-						<input id="senha" class="inpt" type="password" required onkeyup="enterPressed(event)">
-						<span class="highlight"></span>
-						<span class="bar"></span>
-						<label class="lbl">Senha</label>
+					<div class='group'>
+						<input id='senha' class='inpt' type='password' required onkeyup='enterPressed(event)'>
+						<span class='highlight'></span>
+						<span class='bar'></span>
+						<label class='lbl'>Senha</label>
 					</div>
-					<button type="button" onclick="autenticar()">ENTRAR</button>
+					<button type='button' onclick='autenticar()'>ENTRAR</button>
 				</div>
 			</div>
 
-			<a class="download" title="Central de downloads"
-					href="https://grupomundoeletronico.com.br/downloads">
-				<i class="fas fa-download"></i>
-			</a>
-
-			<div id="error"></div>
+			<a class='download' title='Central de downloads' href='downloads.html'><i class='fas fa-download'></i></a>
+			<div id='error'></div>
     </body>
 </html>

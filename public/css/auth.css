@@ -30,6 +30,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   background-color: white;
   z-index: 999;
 	transition: 0.2s ease all;
@@ -44,12 +45,11 @@ body {
 }
 
 #login {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 250px;
-  margin-left: -125px;
-  margin-top: -250px;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   display: none;
   opacity: 0;
   text-align: center;
@@ -74,6 +74,7 @@ body {
 .group {
   position: relative;
   margin-bottom: 30px;
+  width: 250px;
 }
 
 .inpt {

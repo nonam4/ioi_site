@@ -1,24 +1,27 @@
-window.onload = function() {
+const autenticacao = () => {
 	//quando a página acabar de carregar o sistema checa se o usuario esta autenticado ou não
-  var usuario = JSON.parse(localStorage.getItem('usuario'))
+  //var usuario = JSON.parse(localStorage.getItem('usuario'))
+  var usuario = null
 
   if(usuario != null){
     console.log("usuario autenticado")
-    //window.location = "adm.html"
+    setTimeout(function(){
+      window.location = "adm.html"
+    }, 250)
   } else {
     console.log("usuario precisa de autenticação")
     esconderLoad()
   }
 }
 
-function enterPressed(e){
+const enterPressed = (e) => {
 	var code = (e.keyCode ? e.keyCode : e.which)
 	if(code == 13) {
 		autenticar()
 	}
 }
 
-function autenticar() {
+const autenticar = () => {
 
   var usuario = document.getElementById("usuario").value
   var senha = document.getElementById("senha").value
@@ -28,7 +31,6 @@ function autenticar() {
   } else {
     mostrarLoad()
     axios.get('https://us-central1-ioi-printers.cloudfunctions.net/autenticar?usuario=' + usuario + '&senha=' + senha).then(res => {
-      console.log(res.data)
       if(res.data.autenticado) {
         var usuario = {
           nome: res.data.nome,
@@ -68,7 +70,7 @@ const mostrarLoad = () => {
 }
 
 const esconderLoad = () => {
-  document.getElementById("login").style.display = "block"
+  document.getElementById("login").style.display = "flex"
   document.getElementById("login").style.opacity = "1"
   document.getElementById("load").style.opacity = "0"
 
