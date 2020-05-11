@@ -1,0 +1,37 @@
+#menu {
+  display: none;
+}
+
+filtro section:nth-child(3), filtro section:nth-child(4) {
+  display: none;
+}
+
+leitura {
+  width: calc(50% - 12px);
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+#feedbackTrabalhos {
+  display: none;
+}
+
+body {
+  margin: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: fit-content;
+  width: 100vw;
+  color: black !important;
+}
+
+listagem {
+  margin: auto;
+  overflow: hidden;
+  height: 100%;
+
+}
+
+text--medium {
+  color: black;
+}

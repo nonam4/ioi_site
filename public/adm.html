@@ -5,11 +5,18 @@
 		<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.11/jquery.mask.min.js'></script>
 		<script src='https://unpkg.com/axios/dist/axios.min.js'></script>
 
-		<script src='js/auth.js'></script>
+		<script src='js/adm.js'></script>
+		<script src="js/masks.js"></script>
+		<script src="js/pdf.js"></script>
+		<script src="js/zip.js"></script>
+		<script src="js/logo.js"></script>
+		<script src="js/fileSaver.js"></script>
 
 		<link rel='stylesheet' href='css/adm.css'>
 		<link rel='stylesheet' href='css/load.css'>
+
 		<link href='icons/css/all.min.css' rel='stylesheet'>
+		<link rel="stylesheet" media="print" href="css/print.css" />
 
 		<meta charset='utf-8'>
 		<meta name='theme-color' content='#121e32'>
@@ -17,7 +24,7 @@
 		<link rel='icon' href='img/icon.png'>
 		<title>Mundo Eletronico</title>
 	</head>
-    <body onload=''>
+    <body onload='autenticacao()'>
 			<div id='load'>
 				<img src='img/icon.png'>
 				<div class='loading'>

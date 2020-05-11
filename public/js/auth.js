@@ -1,7 +1,7 @@
 const autenticacao = () => {
 	//quando a página acabar de carregar o sistema checa se o usuario esta autenticado ou não
-  //var usuario = JSON.parse(localStorage.getItem('usuario'))
-  var usuario = null
+  var usuario = JSON.parse(localStorage.getItem('usuario'))
+  //var usuario = null
 
   if(usuario != null){
     console.log("usuario autenticado")
