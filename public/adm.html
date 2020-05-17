@@ -6,13 +6,15 @@
 		<script src='https://unpkg.com/axios/dist/axios.min.js'></script>
 
 		<script src='js/adm.js'></script>
+		<script src='js/clientes.js'></script>
 		<script src="js/masks.js"></script>
 		<script src="js/pdf.js"></script>
 		<script src="js/zip.js"></script>
 		<script src="js/logo.js"></script>
-		<script src="js/fileSaver.js"></script>
+		<script src="js/filesaver.min.js"></script>
 
 		<link rel='stylesheet' href='css/adm.css'>
+		<link rel='stylesheet' href='css/clientes.css'>
 		<link rel='stylesheet' href='css/load.css'>
 
 		<link href='icons/css/all.min.css' rel='stylesheet'>
@@ -25,27 +27,331 @@
 		<title>Mundo Eletronico</title>
 	</head>
     <body onload='autenticacao()'>
-			<div id='load'>
-				<img src='img/icon.png'>
-				<div class='loading'>
-					<div class='loader center'><span></span></div>
+
+			<template id='tLoad'>
+				<div id='load'>
+					<img src='img/icon.png'>
+					<div class='loading'>
+						<div class='loader center'><span></span></div>
+					</div>
 				</div>
-			</div>
+			</template>
+
+			<template id="tFiltrosLeitura">
+				<filtro>
+					<section>
+						<div class='filtroTitulo'>Datas</div>
+				    <div class='filtroText'>
+							<select id='datasDeLeituras' onchange='alterarListagemLeituras()'></select>
+						</div>
+					</section>
+					<section>
+				    <div class='filtroTitulo'>Listando</div>
+						<div class='filtroText'>
+				    	<select id='filtrosDeLeituras' onchange='alterarListagemLeituras()'>
+								<option value='todas'>Todas</option>
+								<option value='excedentes'>Excedentes</option>
+								<option value='alertas'>Alertas</option>
+								<option value='excluidas'>Excluídas</option>
+							</select>
+						</div>
+					</section>
+					<section>
+						<div class='filtroTitulo'>Relatórios</div>
+						<div class='filtroText'>
+							<select id='relatorioFiltro'>
+								<option value='interno'>Interno</option>
+								<option value='todos'>Todos</option>
+							</select>
+							<i class="fas fa-file-download" id="gerarRelatorios" onclick="gerarRelatorios()"></i>
+						</div>
+					</section>
+					<section>
+						<legenda><div class="legenda"></div> Coletor desatualizado</legenda>
+						<legenda><div class="legenda"></div> Leituras em atraso</legenda>
+						<legenda><div class="legenda"></div> Tudo certo</legenda>
+					</section>
+				</filtro>
+			</template>
+
+			<template id="tLeitura">
+				<leitura>
+					<section class='leituraTitulo'>
+						<div id="nome" class='leituraTituloNome'></div>
+						<i class='fas fa-expand-arrows-alt'></i>
+					</section>
+					<section class='leituraDados'>
+			      <div class='leituraDadosLinha'>
+							<div class='leituraDadosContainer'>
+								<div class='leituraDadosTitulo'>Impresso</div>
+								<div id="impresso" class='leituraDadosTextoGrande'></div>
+			      	</div>
+							<div class='leituraDadosContainer'>
+								<div class='leituraDadosTitulo'>Excedentes</div>
+								<div id="excedentes" class='leituraDadosTextoGrande'></div>
+			      	</div>
+						</div>
+						<div class='leituraDadosLinha'>
+							<div class='leituraDadosContainer'>
+				      	<div class='leituraDadosTitulo'>Impressoras</div>
+								<div id="impressoras" class='leituraDadosTexto'></div>
+							</div>
+							<div class='leituraDadosContainer'>
+				      	<div class='leituraDadosTitulo'>Franquia</div>
+								<div id="franquia" class='leituraDadosTexto'></div>
+							</div>
+							<div class='leituraDadosContainer'>
+				      	<div class='leituraDadosTitulo'>Versão</div>
+								<div id="versao" class='leituraDadosTexto'></div>
+							</div>
+						</div>
+					</section>
+				</leitura>
+			</template>
+
+			<template id="tLeituraExpandida">
+				<div id="leituraExpandida">
+					<leituraExpandida>
+						<section id='titulo'>
+							<div id='nome'></div>
+							<div id='acoes'>
+								<i class="fas fa-user-edit" id='editCliente' title="Editar Cliente"></i>
+								<i class="fas fa-file-download" id='relatorio' title='Gerar Relatório'></i>
+								<i class='fas fa-save' id='salvar' title='Salvar Alterações'></i>
+				       	<i class='fas fa-times-square' title='Fechar' onclick='fecharLeitura()'></i>
+							</div>
+						</section>
+						<section id='conteudo'>
+							<filtro>
+								<section>
+									<div class='filtroTitulo'>Datas</div>
+							    <div class='filtroText'>
+										<select id='datasDeLeiturasExpandida'></select>
+									</div>
+								</section>
+								<section>
+									<div class='filtroTitulo'>Tipo de Franquia</div>
+									<div class='filtroText'>
+				        		<select id='tipoFranquia' onchange='alterarTipoFranquia(this)'>
+											<option value='ilimitado'>Ilimitada</option>
+				        			<option value='pagina'>Por página</option>
+											<option value='maquina'>Por máquina</option>
+										</select>
+				        	</div>
+								</section>
+								<section id='franquiaContainer'>
+									<div class='filtroTitulo'>Franquia</div>
+									<input class='simpleInput' id='franquiaValor' type='text' title='Franquia' placeholder='Digite aqui..'
+				        		onfocus='converterPaginaNumero(this)' onblur='converterNumeroPagina(this)'>
+								</section>
+								<section>
+				        	<div class='filtroTitulo'>Total Impresso</div>
+									<div class='filtroText' id='impresso'></div>
+								</section>
+								<section>
+									<div class='filtroTitulo'>Páginas Excedentes</div>
+				        	<div class='filtroText' id='excedentes'></div>
+				        </section>
+							</filtro>
+							<listagemImpressoras id='impressoras'></listagemImpressoras>
+							<div class='listagemRodape'>
+								<div id="chave" class='listagemRodapeItem'></div>
+								<div id="local" class='listagemRodapeItem'></div>
+								<div id="versao" class='listagemRodapeItem'></div>
+							</div>
+						</section>
+					</leituraExpandida>
+				</div>
+			</template>
+
+			<template id="tImpressora">
+				<impressora>
+					<section class='leituraTitulo'>
+						<div id='modelo' class='leituraTituloNome'></div>
+						<i id='deletar' class='fas fa-trash' title='Deletar impressora'></i>
+					</section>
+					<section class='leituraDados'>
+				    <div class='leituraDadosLinha'>
+							<div class='leituraDadosContainer'>
+								<div class='leituraDadosTitulo'>Setor</div>
+								<div class='leituraDadosTexto'>
+									<input class='simpleInput' type='text' id='setor' placeholder='Digite aqui..'></div>
+								</div>
+							</div>
+							<div class='leituraDadosLinha'>
+				   			<div class='leituraDadosContainer'><div class='leituraDadosTitulo'>Serial</div>
+								<div id='serial' class='leituraDadosTexto'></div>
+							</div>
+							<div class='leituraDadosContainer'>
+								<div class='leituraDadosTitulo'>IP</div>
+				    		<div id='ip' class='leituraDadosTexto'></div>
+							</div>
+							<div class='leituraDadosContainer'>
+				    		<div class='leituraDadosTitulo'>Impresso</div>
+								<div id='impresso' class='leituraDadosTexto'></div>
+							</div>
+						</div>
+						<div id='franquiaImpressora' class='leituraDadosLinha'>
+							<div id='franquiaContainer' class='leituraDadosContainer'>
+				    		<div class='leituraDadosTitulo'>Franquia</div>
+								<div class='leituraDadosTexto'>
+									<input class='simpleInput' id='franquia' type='text' title='Franquia' +
+				    				placeholder='Digite aqui..' onfocus='converterPaginaNumero(this)' onblur='converterNumeroPagina(this)'>
+				    		</div>
+							</div>
+							<div class='leituraDadosContainer'>
+								<div class='leituraDadosTitulo'>Excedentes</div>
+				    		<div class='leituraDadosTexto' id='excedentes'></div>
+							</div>
+						</div>
+				    <div class='leituraDadosLinha'>
+							<div class='leituraDadosContainer'>
+								<div class='leituraDadosTitulo'>Contador inicial</div>
+								<div id='inicial' class='leituraDadosTexto'></div>
+				    	</div>
+							<div class='leituraDadosContainer'>
+								<div class='leituraDadosTitulo'>Contador final</div>
+				    		<div id='final' class='leituraDadosTexto'></div>
+							</div>
+						</div>
+					</section>
+				</impressora>
+			</template>
+
+			<template id='tCliente'>
+				<div class='cliente'>
+					<div id='nome'></div>
+					<div id='chave'></div>
+					<i id='expandir' class='fas fa-expand-arrows-alt'></i>
+					<i id='excluir' class='fas fa-trash'></i>
+				</div>
+			</template>
+
+			<template id='tClienteExpandido'>
+				<div id='clienteExpandido'>
+					<clienteExpandido>
+						<section id='titulo'>
+							<div id='nome'>Cliente</div>
+							<div id='acoes'>
+								<i class='fas fa-print-search' id='printers' title='Ver impressoras'></i>
+								<i class='fas fa-save' id='salvar' title='Salvar dados'></i>
+								<i class='fas fa-times-square' title='Fechar' onclick='fecharCliente()'></i>
+							</div>
+						</section>
+						<section>
+							<div class='group'>
+								<input id='razaosocial' class='inpt' type='text' autocomplete='off' required title='Razão social'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>Razão social</label>
+							</div>
+						</section>
+						<section>
+							<div class='group'>
+								<input id='nomefantasia' class='inpt' type='text' autocomplete='off' required title='Nome fantasia'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>Nome fantasia</label>
+							</div>
+						</section>
+						<section>
+							<div class='group'>
+								<input id='cpfcnpj' class='inpt' type='text' autocomplete='off' required title='CPF/CNPJ'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>CPF/CNPJ</label>
+							</div>
+							<div class='group'>
+								<input id='email' class='inpt' type='text' autocomplete='off' required title='Email'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>Email</label>
+							</div>
+						</section>
+						<section>
+
+							<div class='group'>
+								<input id='telefone' class='inpt' type='text' autocomplete='off' required title='Telefone'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>Telefone</label>
+							</div>
+							<div class='group'>
+								<input id='celular' class='inpt' type='text' autocomplete='off' required title='Celular'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>Celular</label>
+							</div>
+						</section>
+						<section>
+							<div class='group'>
+								<input id='endereco' class='inpt' type='text' autocomplete='off' required title='Endereço'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>Endereço</label>
+							</div>
+							<div class='group'>
+								<input id='numero' class='inpt' type='text' autocomplete='off' required title='Numero'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>Numero</label>
+							</div>
+						</section>
+						<section>
+							<div class='group'>
+								<input id='bairro' class='inpt' type='text' autocomplete='off' required title='Bairro'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>Bairro</label>
+							</div>
+							<div class='group'>
+								<input id='cidade' class='inpt' type='text' autocomplete='off' required title='Cidade'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>Cidade</label>
+							</div>
+							<div class='group'>
+								<input id='estado' class='inpt' type='text' autocomplete='off' required title='Estado' maxlength='2'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>Estado</label>
+							</div>
+							<div class='group'>
+								<input id='cep' class='inpt' type='text' autocomplete='off' required title='CEP'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>CEP</label>
+							</div>
+						</section>
+						<section>
+							<div class='group'>
+								<input id='complemento' class='inpt' type='text' autocomplete='off' required title='Complemento'>
+								<span class='highlight'></span>
+								<span class='bar'></span>
+								<label class='lbl'>Complemento</label>
+							</div>
+						</section>
+					</chamadoExpandido>
+				</div>
+			</template>
+
 			<div id='menu'>
 				<div class='menu-group'>
 					<img src='img/icon.png'>Mundo Eletrônico
 				</div>
 				<div class='menu-group'>
+					<!--
 					<div class='menu-section'>
 							<div class='menu-titulo'>Geral</div>
 							<div class='menu-item' onclick=''><i class='fas fa-th-large'></i>Dashboard</div>
 							<div class='menu-item' onclick=''><i class='fas fa-building'></i>Empresa</div>
 							<div class='menu-item' onclick=''><i class='fas fa-boxes'></i>Estoque</div>
 					</div>
+				-->
 					<div class='menu-section'>
 							<div class='menu-titulo'>Clientes e Fornecedores</div>
-							<div class='menu-item' onclick=''><i class='fas fa-user-plus'></i>Cadastrar</div>
-							<div class='menu-item' onclick=''><i class='fas fa-users'></i>Listar</div>
+							<div class='menu-item' onclick='expandirCliente()'><i class='fas fa-user-plus'></i>Cadastrar</div>
+							<div class='menu-item' onclick='selecionarClientes()'><i class='fas fa-users'></i>Listar</div>
 					</div>
 					<div class='menu-section'>
 							<div class='menu-titulo'>Atendimentos</div>
@@ -54,7 +360,7 @@
 					</div>
 					<div class='menu-section'>
 							<div class='menu-titulo'>Impressoras</div>
-							<div class='menu-item' onclick=''><i class='fas fa-print-search'></i>Listar Impressoras</div>
+							<div class='menu-item' onclick='selecionarLeituras()'><i class='fas fa-print-search'></i>Listar Impressoras</div>
 					</div>
 				</div>
 				<div class='menu-group'>
@@ -69,187 +375,6 @@
 </html>
 
 <!--
-  <body >
-
-
-
-		<template id='tFiltrosLeitura'>
-			<filtro><section>
-					<div class='filtroTitulo'>Datas</div>
-			    <div class='filtroText'>
-						<select id='datasDeLeituras' onchange='alterarListagemLeituras()'></select>
-					</div>
-				</section>
-				<section>
-			    <div class='filtroTitulo'>Listando</div>
-					<div class='filtroText'>
-			    	<select id='filtrosDeLeituras' onchange='alterarListagemLeituras()'>
-							<option value='todas'>Todas</option>
-							<option value='excedentes'>Excedentes</option>
-							<option value='alertas'>Alertas</option>
-							<option value='excluidas'>Excluídas</option>
-						</select>
-					</div>
-				</section>
-				<section>
-					<div class='filtroTitulo'>Relatórios</div>
-					<div class='filtroText'>
-						<select id='relatoriFiltro'>
-							<option value='interno'>Interno</option>
-							<option value='todos'>Todos</option>
-						</select>
-						<i class='fas fa-file-download' id='gerarRelatorios' onclick='gerarRelatorios()'></i>
-					</div>
-				</section>
-				<section>
-					<legenda><div class='legenda'></div> Coletor desatualizado</legenda>
-					<legenda><div class='legenda'></div> Leituras em atraso</legenda>
-					<legenda><div class='legenda'></div> Coletando normalmente</legenda>
-				</section>
-			</filtro>
-		</template>
-
-		<template id='tLeitura'>
-			<leitura>
-				<section class='leituraTitulo'>
-					<div id='nome' class='leituraTituloNome'></div>
-					<i class='fas fa-expand-arrows-alt' onclick='expandirLeitura(this)'></i>
-				</section>
-				<section class='leituraDados'>
-		      <div class='leituraDadosLinha'>
-						<div class='leituraDadosContainer'>
-							<div class='leituraDadosTitulo'>Impresso</div>
-							<div id='impresso' class='leituraDadosTextoGrande'></div>
-		      	</div>
-						<div class='leituraDadosContainer'>
-							<div class='leituraDadosTitulo'>Excedentes</div>
-							<div id='excedentes' class='leituraDadosTextoGrande'></div>
-		      	</div>
-					</div>
-					<div class='leituraDadosLinha'>
-						<div class='leituraDadosContainer'>
-			      	<div class='leituraDadosTitulo'>Impressoras</div>
-							<div id='impressoras' class='leituraDadosTexto'></div>
-						</div>
-						<div class='leituraDadosContainer'>
-			      	<div class='leituraDadosTitulo'>Franquia</div>
-							<div id='franquia' class='leituraDadosTexto'></div>
-						</div>
-						<div class='leituraDadosContainer'>
-			      	<div class='leituraDadosTitulo'>Versão</div>
-							<div id='versao' class='leituraDadosTexto'></div>
-						</div>
-					</div>
-				</section>
-			</leitura>
-		</template>
-
-		<template id='tLeituraExpandida'>
-			<div id='leituraExpandida'>
-				<leituraExpandida>
-					<section id='titulo'>
-						<div id='nome'></div>
-						<div id='acoes'>
-							<i class='fas fa-user-edit' id='editCliente' title='Editar cliente'></i>
-							<i class='fas fa-file-download' id='relatorio' title='Gerar relatório'></i>
-							<i class='fas fa-save' id='salvar' title='Salvar dados'></i>
-			       	<i class='fas fa-times-square' title='Fechar' onclick='fecharLeituraExpandida()'></i>
-						</div>
-					</section>
-					<section id='conteudo'>
-						<filtro>
-							<section>
-								<div class='filtroTitulo'>Franquia</div>
-								<div class='filtroText'>
-			        		<select id='tipoFranquia' onchange='alterarTipoFranquia(this)'>
-										<option value='sem'>Ilimitada</option>
-			        			<option value='pagina'>Por página</option>
-										<option value='maquina'>Por máquina</option>
-									</select>
-			        	</div>
-							</section>
-							<section id='franquiaContainer'>
-								<div class='filtroTitulo'>Franquia</div>
-								<input class='simpleInput' id='franquiaValor' type='text' title='Franquia' placeholder='Digite aqui..'
-			        		onfocus='converterPaginaNumero(this)' onblur='converterNumeroPagina(this)'>
-							</section>
-							<section>
-			        	<div class='filtroTitulo'>Total impresso</div>
-								<div class='filtroText' id='impresso'></div>
-							</section>
-							<section>
-								<div class='filtroTitulo'>Páginas excedentes</div>
-			        	<div class='filtroText' id='excedentes'></div>
-			        </section>
-						</filtro>
-						<listagemImpressoras id='impressoras'></listagemImpressoras>
-						<div class='listagemRodape'>
-							<div id='chave' class='listagemRodapeItem'></div>
-							<div id='local' class='listagemRodapeItem'></div>
-							<div id='versao' class='listagemRodapeItem'></div>
-						</div>
-					</section>
-				</leituraExpandida>
-			</div>
-		</template>
-
-		<template id='tImpressora'>
-			<impressora>
-				<section class='leituraTitulo'>
-					<div id='modelo' class='leituraTituloNome'></div>
-					<i id='deletar' class='fas fa-trash' title='Deletar impressora'></i>
-				</section>
-				<section class='leituraDados'>
-			    <div class='leituraDadosLinha'>
-						<div class='leituraDadosContainer'>
-							<div class='leituraDadosTitulo'>Setor</div>
-							<div class='leituraDadosTexto'>
-								<input class='simpleInput' type='text' id='setor' placeholder='Digite aqui..'></div>
-							</div>
-						</div>
-						<div class='leituraDadosLinha'>
-			   			<div class='leituraDadosContainer'><div class='leituraDadosTitulo'>Serial</div>
-							<div id='serial' class='leituraDadosTexto'></div>
-						</div>
-						<div class='leituraDadosContainer'>
-							<div class='leituraDadosTitulo'>IP</div>
-			    		<div id='ip' class='leituraDadosTexto'></div>
-						</div>
-						<div class='leituraDadosContainer'>
-			    		<div class='leituraDadosTitulo'>Impresso</div>
-							<div id='impresso' class='leituraDadosTexto'></div>
-						</div>
-					</div>
-					<div id='franquiaImpressora' class='leituraDadosLinha'>
-						<div id='franquiaContainer' class='leituraDadosContainer'>
-			    		<div class='leituraDadosTitulo'>Franquia</div>
-							<div class='leituraDadosTexto'>
-								<input class='simpleInput' id='franquia' type='text' title='Franquia' +
-			    				placeholder='Digite aqui..' onfocus='converterPaginaNumero(this)' onblur='converterNumeroPagina(this)'>
-			    		</div>
-						</div>
-						<div class='leituraDadosContainer'>
-							<div class='leituraDadosTitulo'>Excedentes</div>
-			    		<div class='leituraDadosTexto' id='excedentes'></div>
-						</div>
-					</div>
-			    <div class='leituraDadosLinha'>
-						<div class='leituraDadosContainer'>
-							<div class='leituraDadosTitulo'>Contador inicial</div>
-							<div id='inicial' class='leituraDadosTexto'></div>
-			    	</div>
-						<div class='leituraDadosContainer'>
-							<div class='leituraDadosTitulo'>Contador final</div>
-			    		<div id='final' class='leituraDadosTexto'></div>
-						</div>
-			    	<div class='leituraDadosContainer'>
-							<div class='leituraDadosTitulo'>Última leitura</div>
-			    		<div id='ultima' class='leituraDadosTexto'></div>
-						</div>
-					</div>
-				</section>
-			</impressora>
-		</template>
 
 		<template id='tFiltrosChamado'>
 			<filtro id='filtrosChamados'>
@@ -446,99 +571,7 @@
 			</div>
 		</template>
 
-		<template id='tClienteExpandido'>
-			<div id='clienteExpandido'>
-				<clienteExpandido>
-					<section id='titulo'>
-						<div id='nome'>Cliente</div>
-						<div id='acoes'>
-							<i class='fas fa-print-search' id='printers' title='Ver impressoras' onclick=''></i>
-							<i class='fas fa-save' id='salvar' title='Salvar dados' onclick='salvarCliente(this)'></i>
-							<i class='fas fa-times-square' title='Fechar' onclick='fecharClienteExpandido()'></i>
-						</div>
-					</section>
-					<section>
-						<div class='inputHolder'>
-							<input class='input' id='razaosocial' type='text' autocomplete='off' required title='Razão social'>
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>Razão social</span>
-						</div>
-					</section>
-					<section>
-						<div class='inputHolder'>
-							<input class='input' id='nomefantasia' type='text' autocomplete='off' required title='Nome fantasia'>
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>Nome fantasia</span>
-						</div>
-					</section>
-					<section>
-						<div class='inputHolder'>
-							<input class='input' id='cpfcnpj' type='text' autocomplete='off' required title='CPF/CNPJ'>
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>CPF/CNPJ</span>
-						</div>
-						<div class='inputHolder'>
-							<input class='input' id='email' type='text' autocomplete='off' required title='Email'>
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>Email</span>
-						</div>
-					</section>
-					<section>
-						<div class='inputHolder'>
-							<input class='input' id='telefone' type='text' autocomplete='off' required title='Telefone'>
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>Telefone</span>
-						</div>
-						<div class='inputHolder'>
-							<input class='input' id='celular' type='text' autocomplete='off' required title='Celular'>
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>Celular</span>
-						</div>
-					</section>
-					<section>
-						<div class='inputHolder'>
-							<input class='input' id='endereco' type='text' autocomplete='off' required title='Endereço'>
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>Endereço</span>
-						</div>
-						<div class='inputHolder'>
-							<input class='input' id='numero' type='text' autocomplete='off' required title='Numero'>
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>Numero</span>
-						</div>
-					</section>
-					<section>
-						<div class='inputHolder'>
-							<input class='input' id='bairro' type='text' autocomplete='off' required title='Bairro'>
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>Bairro</span>
-						</div>
-						<div class='inputHolder'>
-							<input class='input' id='cidade' type='text' autocomplete='off' required title='Cidade'>
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>Cidade</span>
-						</div>
-						<div class='inputHolder'>
-							<input class='input' id='estado' type='text' autocomplete='off' required title='Estado' maxlength='2' >
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>Estado</span>
-						</div>
-						<div class='inputHolder'>
-							<input class='input' id='cep' type='text' autocomplete='off' required title='CEP'>
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>CEP</span>
-						</div>
-					</section>
-					<section>
-						<div class='inputHolder'>
-							<input class='input' id='complemento' type='text' autocomplete='off' required title='Complemento'>
-							<span class='inputHighlight'></span>
-							<span class='inputPlaceholder'>Complemento</span>
-						</div>
-					</section>
-				</chamadoExpandido>
-			</div>
-		</template>
+
   </body>
 </html>
 -->
