@@ -1136,9 +1136,15 @@ const salvarCliente = (cliente) => {
       cliente.endereco = new Object()
       cliente.id = data.getTime() + ""
       cliente.ativo = true
+
       cliente.franquia = {
         tipo: "ilimitado",
         valor: 0
+      }
+      cliente.fornecedor = false
+      var tipo = layout.querySelector("#tipoCliente").value
+      if(tipo == 'fornecedor') {
+        cliente.fornecedor = true
       }
       cliente.sistema = {
         local: btoa("Não Instalado"),
