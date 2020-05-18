@@ -1024,7 +1024,13 @@ const expandirCliente = (cliente) => {
   if(cliente != undefined) {
     layout.querySelector("clienteExpandido").id = cliente.index
     preencherCliente(cliente, layout)
+    if(cliente.fornecedor) {
+      layout.querySelector("#nome").innerHTML = "Editar Fornecedor"
+    } else {
+      layout.querySelector("#nome").innerHTML = "Editar Cliente"
+    }
   } else {
+    layout.querySelector("#nome").innerHTML = "Cadastrar Pessoa"
     layout.querySelector(".tipo").style.display = "block"
   }
   if(tela != "leituras" && cliente != undefined && cliente.ativo) {
