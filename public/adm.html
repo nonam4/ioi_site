@@ -42,13 +42,13 @@
 					<section>
 						<div class='filtroTitulo'>Datas</div>
 				    <div class='filtroText'>
-							<select id='datasDeLeituras' onchange='alterarListagemLeituras()'></select>
+							<select id='datasDeLeituras' onchange='alterarListagemLeitura()'></select>
 						</div>
 					</section>
 					<section>
 				    <div class='filtroTitulo'>Listando</div>
 						<div class='filtroText'>
-				    	<select id='filtrosDeLeituras' onchange='alterarListagemLeituras()'>
+							<select id='filtrosDeLeituras' onchange='alterarListagemLeitura()'>
 								<option value='todas'>Todas</option>
 								<option value='excedentes'>Excedentes</option>
 								<option value='alertas'>Alertas</option>
@@ -218,6 +218,23 @@
 				</impressora>
 			</template>
 
+			<template id='tPessoasContainer'>
+				<div class='pessoasContainer'>
+					<pessoasContainer>
+						<div class='pessoasTitulo'>Clientes Ativos</div>
+						<div class='pessoasListagem' id='ativos'></div>
+					</pessoasContainer>
+					<pessoasContainer>
+						<div class='pessoasTitulo'>Clientes Intivos</div>
+						<div class='pessoasListagem' id='inativos'></div>
+					</pessoasContainer>
+					<pessoasContainer>
+						<div class='pessoasTitulo'>Fornecedores</div>
+						<div class='pessoasListagem' id='fornecedores'></div>
+					</pessoasContainer>
+				</div>
+			</template>
+
 			<template id='tCliente'>
 				<div class='cliente'>
 					<div id='nome'></div>
@@ -245,6 +262,13 @@
 								<span class='bar'></span>
 								<label class='lbl'>Razão social</label>
 							</div>
+							<div class='group tipo'>
+								<label class='lbl'>Tipo</label>
+								<select id='tipoCliente'>
+									<option value='cliente'>Cliente</option>
+									<option value='fornecedor'>Fornecedor</option>
+								</select>
+							</div>
 						</section>
 						<section>
 							<div class='group'>
@@ -269,7 +293,6 @@
 							</div>
 						</section>
 						<section>
-
 							<div class='group'>
 								<input id='telefone' class='inpt' type='text' autocomplete='off' required title='Telefone'>
 								<span class='highlight'></span>
@@ -329,6 +352,143 @@
 								<span class='highlight'></span>
 								<span class='bar'></span>
 								<label class='lbl'>Complemento</label>
+							</div>
+						</section>
+						<section class='semana'>
+							<label class='semanalbl'>Horários</label>
+							<div class='group'>
+								<div class='semanaDia'>
+									<div>
+										<label for='domingo'>Domingo</label>
+										<input type='checkbox' id='domingo' name='domingo' onclick='mostrarHorarios(this)'>
+									</div>
+									<div class='horarios'>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='domingoDe1' value="08:00">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='domingoAte1' value="12:00">
+										</div>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='domingoDe2' value="13:30">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='domingoAte2' value="18:00">
+										</div>
+									</div>
+								</div>
+
+								<div class='semanaDia'>
+									<div>
+										<label for='segunda'>Segunda</label>
+										<input type='checkbox' id='segunda' name='segunda' onclick='mostrarHorarios(this)'>
+									</div>
+									<div class='horarios'>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='segundaDe1' value="08:00">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='segundaAte1' value="12:00">
+										</div>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='segundaDe2' value="13:30">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='segundaAte2' value="18:00">
+										</div>
+									</div>
+								</div>
+
+								<div class='semanaDia'>
+									<div>
+										<label for='terca'>Terça</label>
+										<input type='checkbox' id='terca' name='terca' onclick='mostrarHorarios(this)'>
+									</div>
+									<div class='horarios'>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='tercaDe1' value="08:00">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='tercaAte1' value="12:00">
+										</div>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='tercaDe2' value="13:30">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='tercaAte2' value="18:00">
+										</div>
+									</div>
+								</div>
+
+								<div class='semanaDia'>
+									<div>
+										<label for='quarta'>Quarta</label>
+										<input type='checkbox' id='quarta' name='quarta' onclick='mostrarHorarios(this)'>
+									</div>
+									<div class='horarios'>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='quartaDe1' value="08:00">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='quartaAte1' value="12:00">
+										</div>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='quartaDe2' value="13:30">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='quartaAte2' value="18:00">
+										</div>
+									</div>
+								</div>
+
+								<div class='semanaDia'>
+									<div>
+										<label for='quinta'>Quinta</label>
+										<input type='checkbox' id='quinta' name='quinta' onclick='mostrarHorarios(this)'>
+									</div>
+									<div class='horarios'>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='quintaDe1' value="08:00">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='quintaAte1' value="12:00">
+										</div>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='quintaDe2' value="13:30">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='quintaAte2' value="18:00">
+										</div>
+									</div>
+								</div>
+
+								<div class='semanaDia'>
+									<div>
+										<label for='sexta'>Sexta</label>
+										<input type='checkbox' id='sexta' name='sexta' onclick='mostrarHorarios(this)'>
+									</div>
+									<div class='horarios'>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='sextaDe1' value="08:00">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='sextaAte1' value="12:00">
+										</div>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='sextaDe2' value="13:30">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='sextaAte2' value="18:00">
+										</div>
+									</div>
+								</div>
+
+								<div class='semanaDia'>
+									<div>
+										<label for='sabado'>Sábado</label>
+										<input type='checkbox' id='sabado' name='sabado' onclick='mostrarHorarios(this)'>
+									</div>
+									<div class='horarios'>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='sabadoDe1' value="08:00">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='sabadoAte1' value="12:00">
+										</div>
+										<div class='horario'>
+											<input class='simpleInput hora' type='text' id='sabadoDe2' value="13:30">
+											<span>-</span>
+											<input class='simpleInput hora' type='text' id='sabadoAte2' value="18:00">
+										</div>
+									</div>
+								</div>
 							</div>
 						</section>
 					</chamadoExpandido>
