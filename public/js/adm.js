@@ -1,9 +1,10 @@
 //clientes, leituras, dashboard, atendimentos, suprimentos, empresa
-var tela = 'clientes'
+var tela = 'leituras'
 var feedbacks = 0
 
 //var dashboard
-//var usuarios
+var usuarios
+var tecnicos
 //var empresa
 //var estoque
 var clientes
@@ -35,7 +36,7 @@ const receberDados = (usuario) => {
     }
   }).then(res => {
       //dashboard = res.data.dashboard
-      //usuarios = res.data.usuarios
+      usuarios = res.data.usuarios
       //empresa = res.data.empresa
       //estoque = res.data.estoque
       clientes = res.data.clientes
@@ -65,7 +66,7 @@ const listagem = (criarFiltros) => {
         listagemClientes()
         break
       case "atendimentos":
-        if(criarFiltros) { filtrosAtendimentos() }
+        //if(criarFiltros) { filtrosAtendimentos() }
         listagemAtendimentos()
         break
     }
@@ -84,7 +85,7 @@ const mostrarLoad = (el) => {
 }
 
 const esconderLoad = () => {
-  var load = document.getElementById("load")
+  var load = document.body.querySelector("#load")
   load.style.opacity = "0"
 
   setTimeout(function(){
@@ -98,7 +99,7 @@ const error = (message) => {
 
   setTimeout(function(){
     document.getElementById("error").style.bottom = "-100px"
-  }, 3000)
+  }, 7000)
 }
 
 const feedback = (a) => {
@@ -165,22 +166,23 @@ const listagemLeituras = () => {
   var filtroSelecionado = filtros.options[filtros.selectedIndex].value
   var interfaces = new DocumentFragment()
 
-  clientes.forEach((cliente, index) => {
-    cliente.index = index
+  for(var x = 0; x < Object.keys(clientes).length; x++) {
+    var cliente = clientes[Object.keys(clientes)[x]]
+
     if(cliente.ativo && cliente.impressoras != undefined && Object.keys(cliente.impressoras).length > 0) {
       cliente = preparLeiturasParaListagem(cliente)
 
       if(filtroSelecionado == "todas") {
-        interfaces.appendChild(criarInterfaceLeitura(cliente))
+        interfaces.appendChild(criarInterfaceLeitura(cliente, true))
       } else if(filtroSelecionado == "alertas" && (cliente.sistema.versao != versao || cliente.impressoras.atraso)){
-        interfaces.appendChild(criarInterfaceLeitura(cliente))
+        interfaces.appendChild(criarInterfaceLeitura(cliente, true))
       } else if(filtroSelecionado == "excedentes" && cliente.excedentes > 0){
-        interfaces.appendChild(criarInterfaceLeitura(cliente))
+        interfaces.appendChild(criarInterfaceLeitura(cliente, true))
       } else if(filtroSelecionado == "excluidas"  && cliente.impressoras.inativas) {
-        interfaces.appendChild(criarInterfaceLeitura(cliente))
+        interfaces.appendChild(criarInterfaceLeitura(cliente, false))
       }
     }
-  })
+  }
   document.getElementById("listagem").appendChild(interfaces)
 }
 
@@ -252,12 +254,15 @@ const preparLeiturasParaListagem = (cliente) => {
   return cliente
 }
 
-const criarInterfaceLeitura = (cliente) => {
+const criarInterfaceLeitura = (cliente, ativas) => {
   var leitura = document.getElementById("tLeitura").content.cloneNode(true)
-  leitura.querySelector(".leituraTitulo").querySelector("i").onclick = () => {expandirLeitura(cliente)}
+  
+  leitura.querySelector(".leituraTitulo").querySelector("i").onclick = ((cliente) => {
+    return function(){expandirLeitura(cliente)}
+  })(cliente)
 
   //id principal
-  leitura.querySelector("leitura").id = cliente.index
+  leitura.querySelector("leitura").id = cliente.id
   if(cliente.sistema.versao == "Não instalado" || cliente.sistema.versao != versao){
     leitura.querySelector(".leituraTitulo").style.backgroundColor = "var(--atraso)";
   } else if(cliente.impressoras.atraso) {
@@ -268,18 +273,41 @@ const criarInterfaceLeitura = (cliente) => {
   //define a versão do coletor
   leitura.querySelector("#versao").innerHTML = cliente.sistema.versao
   //define o numero de impressoras (precisa subtrair 2 do length pois tem duas variáveis definidas junto)
-  leitura.querySelector("#impressoras").innerHTML = Object.keys(clientes[0].impressoras).length - 2
-  //define o numero de excedentes
-  leitura.querySelector("#excedentes").innerHTML = cliente.excedentes + " págs"
+  leitura.querySelector("#impressoras").innerHTML = pegarQuantidadeImpressoras(ativas, cliente.impressoras)
+  
+  if(ativas) {
+    //define o numero de excedentes
+    leitura.querySelector("#excedentes").innerHTML = cliente.excedentes + " págs"
+  } else {
+    leitura.querySelector("#excedentes").innerHTML = "Excluídas"
+  }
+  
   //define a franquia
   if(cliente.franquia.tipo == "ilimitado") {
     leitura.querySelector("#franquia").innerHTML = "S/F"
   } else {
     leitura.querySelector("#franquia").innerHTML = cliente.franquia.valor + " págs"
   }
-  //define o total impresso
-  leitura.querySelector("#impresso").innerHTML = cliente.impresso + " págs"
+  if(ativas) {
+    //define o total impresso
+    leitura.querySelector("#impresso").innerHTML = cliente.impresso + " págs"
+  } else {
+    leitura.querySelector("#impresso").innerHTML = "Excluídas"
+  }
   return leitura
+}
+
+const pegarQuantidadeImpressoras = (ativas, impressoras) => {
+  var count = 0
+
+  for(var x = 0; x < Object.keys(impressoras).length; x++) {
+    var impressora = impressoras[Object.keys(impressoras)[x]]
+
+    if(impressora.modelo != undefined && impressora.ativa == ativas) {
+      count ++
+    }
+  }
+  return count
 }
 
 /*
@@ -294,7 +322,6 @@ const expandirLeitura = (cliente) => {
 
   var expandida = document.getElementById("tLeituraExpandida").content.cloneNode(true)
   expandida.querySelector("#editCliente").onclick = () => {expandirCliente(cliente)}
-
   expandida.querySelector("#salvar").onclick = () => {salvarLeituras(cliente)}
   expandida.querySelector("#relatorio").onclick = () => {gerarRelatorio(cliente)}
   //define o nome na leitura expandida
@@ -314,11 +341,12 @@ const expandirLeitura = (cliente) => {
   var impressoras = cliente.impressoras
   for(var x = 0; x < Object.keys(impressoras).length; x++) {
     var impressora = impressoras[Object.keys(impressoras)[x]]
-
-    if(listagem == "excluidas" && !impressora.ativa) {
-      interfaces.appendChild(criarInterfaceImpressora(cliente, impressora, true, x, data))
-    } else if(impressora.ativa && listagem != "excluidas") {
-      interfaces.appendChild(criarInterfaceImpressora(cliente, impressora, false, x, data))
+    if(impressora.modelo != undefined) {
+      if(listagem == "excluidas" && !impressora.ativa) {
+        interfaces.appendChild(criarInterfaceImpressora(impressora, true, data))
+      } else if(impressora.ativa && listagem != "excluidas") {
+        interfaces.appendChild(criarInterfaceImpressora(impressora, false, data))
+      }
     }
   }
   expandida.querySelector("#impressoras").appendChild(interfaces)
@@ -385,7 +413,7 @@ const fecharLeitura = () => {
 /*
 * cria a interface da leitura expandida
 */
-const criarInterfaceImpressora = (cliente, impressora, excluidas, index, listagem) => {
+const criarInterfaceImpressora = (impressora, excluidas, listagem) => {
 
   var data = listagem.split('-')[1] + '/' + listagem.split('-')[0]
 
@@ -393,6 +421,12 @@ const criarInterfaceImpressora = (cliente, impressora, excluidas, index, listage
   layout.querySelector("impressora").id = impressora.serial
   layout.querySelector("#modelo").innerHTML = impressora.modelo
   layout.querySelector("#deletar").onclick = (element) => {alterarStatusImpressora(element, impressora)}
+  /*
+  layout.querySelector("#deletar").onclick = ((element, impressora) => {
+    return function(){alterarStatusImpressora(element, impressora)}
+  })(impressora)
+  */
+
   layout.querySelector("#setor").value = impressora.setor
   layout.querySelector("#serial").innerHTML = impressora.serial
   layout.querySelector("#serial").title = impressora.serial
@@ -402,7 +436,7 @@ const criarInterfaceImpressora = (cliente, impressora, excluidas, index, listage
   layout.querySelector("#franquia").value = impressora.franquia + " págs"
   layout.querySelector("#excedentes").innerHTML = impressora.excedentes + " págs"
 
-  if(impressora.leituras[listagem] != undefined) {
+  if(impressora.leituras != undefined && impressora.leituras[listagem] != undefined) {
     layout.querySelector("#inicial").innerHTML = impressora.leituras[listagem].inicial.dia + '/' + data + ' - ' + impressora.leituras[listagem].inicial.valor + " págs"
     layout.querySelector("#final").innerHTML = impressora.leituras[listagem].final.dia + '/' + data + ' - ' + impressora.leituras[listagem].final.valor + " págs"
   } else {
@@ -413,7 +447,7 @@ const criarInterfaceImpressora = (cliente, impressora, excluidas, index, listage
   if(excluidas) {
     layout.querySelector("#deletar").className = "fas fa-trash-restore"
     layout.querySelector("#deletar").title = "Restaurar impressora"
-    layout.querySelector(".leituraTitulo").style.backgroundColor = "var(--corCancelar)"
+    layout.querySelector(".leituraTitulo").style.backgroundColor = "var(--erro)"
   }
 
   return layout
@@ -535,13 +569,15 @@ const alterarListagemLeituraExpandida = (cliente) => {
 
     var interfaces = new DocumentFragment()
     var impressoras = cliente.impressoras
-    for(var x = 0; x < Object.keys(impressoras).length; x++) {
-      var impressora = impressoras[Object.keys(impressoras)[x]]
-      if(impressora.ativa) {
-        interfaces.appendChild(criarInterfaceImpressora(cliente, impressora, false, x, listagem))
+    if(impressoras != undefined && impressoras != null) {
+      for(var x = 0; x < Object.keys(impressoras).length; x++) {
+        var impressora = impressoras[Object.keys(impressoras)[x]]
+        if(impressora.ativa) {
+          interfaces.appendChild(criarInterfaceImpressora(impressora, false, listagem))
+        }
       }
+      expandida.querySelector("#impressoras").appendChild(interfaces)
     }
-    expandida.querySelector("#impressoras").appendChild(interfaces)
     esconderLoad()
   }, 300)
 }
@@ -635,17 +671,16 @@ const alterarStatusImpressora = (layout, impressora) => {
     impressora.ativa = false
     layout.path[0].className = "fas fa-trash-restore"
     layout.path[0].title = "Restaurar impressora"
-    layout.path[0].parentNode.style.backgroundColor = "var(--atraso)"
+    layout.path[0].parentNode.style.backgroundColor = "var(--erro)"
   }
 }
 
 const salvarLeituras = (cliente) => {
 
   var leitura = document.getElementById("leituraExpandida")
-  var index = cliente.index
 
   //mostra um load dentro da leitura enquanto não atualiza as informações
-  mostrarLoad(document.getElementById(index))
+  mostrarLoad(document.getElementById(cliente.id))
   var load = document.getElementById("load")
   load.style.height = "inherit"
   load.style.width = "calc(25% - 12px)"
@@ -657,7 +692,6 @@ const salvarLeituras = (cliente) => {
   //deleta os dados locais que não precisam serem salvos no DB
   delete cliente.excedentes
   delete cliente.impresso
-  delete cliente.index
   delete cliente.impressoras.atraso
   delete cliente.impressoras.inativas
 
@@ -699,12 +733,19 @@ const salvarLeituras = (cliente) => {
     feedbacks--
     feedback(false)
     if(tela == "leituras") {
-      cliente.index = index
       preparLeiturasParaListagem(cliente)
-      var novaListagem = criarInterfaceLeitura(cliente)
+
+      var filtros = document.getElementById("filtrosDeLeituras")
+      var filtroSelecionado = filtros.options[filtros.selectedIndex].value
+      var novaListagem
+      if(filtroSelecionado == "excluidas") {
+        novaListagem = criarInterfaceLeitura(cliente, false)
+      } else {
+        novaListagem = criarInterfaceLeitura(cliente, true)
+      }
       esconderLoad()
       setTimeout(() => {
-        document.getElementById("listagem").replaceChild(novaListagem, document.getElementById(String(index)))
+        document.getElementById("listagem").replaceChild(novaListagem, document.getElementById(cliente.id))
       }, 100)
     }
   }).catch(err => {
@@ -854,7 +895,9 @@ const gerarRelatorios = () => {
   var relatorioSelect = document.getElementById("relatorioFiltro").value
   var doc = new jsPDF('p', 'mm', [297, 210])
   var line = 30
-  clientes.forEach(cliente => {
+  
+  for(var x = 0; x < Object.keys(clientes).length; x++) {
+    var cliente = clientes[Object.keys(clientes)[x]]
     if(cliente.impressoras != undefined && Object.keys(cliente.impressoras).length > 0){
       if(relatorioSelect == "todos") {
         salvar = true
@@ -943,7 +986,7 @@ const gerarRelatorios = () => {
         line = incrementLine(doc, line, 8)
       }
     }
-  })
+  }
 
   feedbacks--
   if(salvar) {
@@ -979,14 +1022,21 @@ const listagemClientes = () => {
   var inativos = new DocumentFragment()
   var fornecedores = new DocumentFragment()
 
-  clientes.forEach((cliente, index) => {
-    cliente.index = index
+  for(var x = 0; x < Object.keys(clientes).length; x++) {
+    var cliente = clientes[Object.keys(clientes)[x]]
     var interface = document.getElementById("tCliente").content.cloneNode(true)
-    interface.querySelector("#expandir").onclick = () => {expandirCliente(cliente)}
-    interface.querySelector("#excluir").onclick = () => {excluirCliente(cliente)}
+
+    interface.querySelector("#expandir").onclick = ((cliente) => {
+      return function(){expandirCliente(cliente)}
+    })(cliente)
+
+    interface.querySelector("#excluir").onclick = ((cliente) => {
+      return function(){excluirCliente(cliente)}
+    })(cliente)
+
     interface.querySelector(".cliente").id = cliente.id
     interface.querySelector("#nome").innerHTML = cliente.nomefantasia
-    interface.querySelector("#chave").innerHTML = "Chave do cliente: " + cliente.id
+    interface.querySelector("#chave").innerHTML = "Chave: " + cliente.id
 
     if(!cliente.ativo) {
       interface.querySelector("#excluir").className = "fas fa-trash-restore"
@@ -998,12 +1048,11 @@ const listagemClientes = () => {
         ativos.appendChild(interface)
       }
     }
-  })
+  }
   container.querySelector("#ativos").appendChild(ativos)
   container.querySelector("#inativos").appendChild(inativos)
   container.querySelector("#fornecedores").appendChild(fornecedores)
   document.getElementById("listagem").appendChild(container)
-
 }
 
 const expandirCliente = (cliente) => {
@@ -1022,7 +1071,7 @@ const expandirCliente = (cliente) => {
   }
 
   if(cliente != undefined) {
-    layout.querySelector("clienteExpandido").id = cliente.index
+    layout.querySelector("clienteExpandido").id = cliente.id
     preencherCliente(cliente, layout)
     if(cliente.fornecedor) {
       layout.querySelector("#nome").innerHTML = "Editar Fornecedor"
@@ -1156,7 +1205,6 @@ const salvarCliente = (cliente) => {
         local: btoa("Não Instalado"),
         versao: "Não Instalado"
       }
-      var index = clientes.length
       clientes.push(cliente)
     }
 
@@ -1198,11 +1246,9 @@ const salvarCliente = (cliente) => {
 
 const gravarCliente = (cliente) => {
 
-  var index = cliente.index
   //deleta os dados locais que não precisam serem salvos no DB
   delete cliente.excedentes
   delete cliente.impresso
-  delete cliente.index
 
   if(cliente.franquia.tipo == "maquina" || cliente.franquia.tipo == "ilimitado") {
     cliente.franquia.valor = 0

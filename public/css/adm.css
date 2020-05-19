@@ -9,14 +9,12 @@
 	--hover: rgba(0,0,0,.2);
   --erro: #c0392b;
   --feedback: #323232;
-
   --menu: #1a1a1a;
   --menuTextos: rgba(255,255,255,.8);
   --menuScroll: #8a9bb2 rgba(0,0,0,0);
   --menuLight: #3b434e;
-
-  --atraso: #c0392b; /*vermelho escuro*/
-  --alerta: #f1c40f; /*amarelo*/
+  --alerta: #f1c40f;
+  --resolvido: #13ba5a;
 }
 
 body {
@@ -429,7 +427,7 @@ legenda {
 }
 
 legenda:nth-of-type(1) .legenda {
-  background-color: var(--atraso);
+  background-color: var(--erro);
 }
 
 legenda:nth-of-type(2) .legenda {
@@ -799,8 +797,8 @@ pessoasContainer {
   padding: 2px 0px;
 }
 
-#inativos {
-  max-height: 140px;
+#inativos, #feitos, .tec {
+  max-height: 177px;
 }
 
 #fornecedores {
@@ -832,7 +830,7 @@ pessoasContainer {
 }
 
 .cliente #chave {
-  min-width: 180px;
+  min-width: 124px;
   font-size: 12px;
   color: var(--titulos);
   border-right: solid 1px var(--bordas);

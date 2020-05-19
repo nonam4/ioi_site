@@ -1,163 +1,187 @@
-/*
-* cria os filtros dos chamados
-*/
-const criarFiltrosDeChamados = () => {
-
-  var filtros = document.getElementById("tFiltrosChamado").content.cloneNode(true);
-
-  var responsaveis = filtros.querySelector("#responsavel");
-  tecnicos.sort(function(a, b){
-	    if(a < b) return -1;
-	    if(a > b) return 1;
-	    return 0;
-	});
-  for(var x = 0; x < tecnicos.length; x++) {
-
-    var tecnico = document.createElement("option");
-    tecnico.value = tecnicos[x].nome.toLowerCase();
-    tecnico.innerHTML = tecnicos[x].nome;
-
-    responsaveis.appendChild(tecnico);
-  }
-
-/*
-  var selectCidades = filtros.querySelector("#cidade");
-  cidades.sort(function(a, b){
-	    if(a < b) return -1;
-	    if(a > b) return 1;
-	    return 0;
-	});
-  for(var x = 0; x < cidades.length; x++) {
-
-    var cidade = document.createElement("option");
-    cidade.value = cidades[x].toLowerCase();
-    cidade.innerHTML = cidades[x];
-
-    selectCidades.appendChild(cidade);
-  }
-  */
-  document.getElementById("listagem").appendChild(filtros);
-}
-
-/*
-* lista os chamados de acordo com os filtros e cria a interface
-*/
-const prepararListagemChamados = () => {
-
-  const busca = document.getElementById("busca").value.toLowerCase();
-
-  for(var x = 0; x < chamados.length; x++) {
-    var chamado = chamados[x];
-
-    if(busca.length <= 0){
-      filtrarChamado(chamado);
-    } else if(chamado.cliente.toLowerCase().indexOf(busca) > -1 || chamado.motivo.toLowerCase().indexOf(busca) > -1) {
-      filtrarChamado(chamado);
-    }
+//limpa tudo, cria os filtros e lista de atendimentos do zero
+const selecionarAtendimentos = () => {
+  if(tela != "atendimentos") {
+    tela = "atendimentos"
+    document.getElementById("listagem").innerHTML = ""
+    listagem(false)
   }
 }
 
-const filtrarChamado = (chamado) => {
+const listagemAtendimentos = () => {
+  var atFeitos = {}
+  var atAberto = {}
+  for(var x = 0; x < Object.keys(usuarios).length; x++) {
+    var usuario = usuarios[Object.keys(usuarios)[x]]
+    usuario.atendimentos = {}
+  }
 
-  const filtros = document.getElementById("listagem").querySelector("#filtrosChamados");
-  const statusSelect = filtros.querySelector("#status");
-  const status = statusSelect.options[statusSelect.selectedIndex].value;
-  const setorSelect = filtros.querySelector("#setor");
-  const setor = setorSelect.options[setorSelect.selectedIndex].value;
-  const responsavelSelect =  filtros.querySelector("#responsavel");
-  const responsavel= responsavelSelect.options[responsavelSelect.selectedIndex].value;
-  //const cidadeSelect = filtros.querySelector("#cidade");
-  //const cidade = cidadeSelect.options[cidadeSelect.selectedIndex].value;
-  var interfaces = new DocumentFragment();
+  for(var x = 0; x < Object.keys(atendimentos).length; x++) {
+    var atendimento = atendimentos[Object.keys(atendimentos)[x]]
+    atendimento.dados = clientes[atendimento.cliente]
 
+    if(atendimento.dados != undefined) {
+      if(atendimento.feito) {
+    
+        atFeitos[atendimento.id] = atendimento
 
-/*
-  if(responsavel == "todos") {
-    if(cidade == "todas") {
-      if(status == "aberto" && chamado.status != "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      } else if(status == "feitos" && chamado.status == "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
+      } else if(atendimento.responsavel == "") {
+      
+        atAberto[atendimento.id] = atendimento
       }
-    } else if(chamado.endereco.cidade.toLowerCase() == cidade){
-      if(status == "aberto" && chamado.status != "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      } else if(status == "feitos" && chamado.status == "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      }
-    }
-  } else if(chamado.responsavel.toLowerCase() == responsavel){
-    if(cidade == "todas") {
-      if(status == "aberto" && chamado.status != "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      } else if(status == "feitos" && chamado.status == "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      }
-    } else if(chamado.endereco.cidade.toLowerCase() == cidade){
-      if(status == "aberto" && chamado.status != "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      } else if(status == "feitos" && chamado.status == "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
+                       
+      for(var y = 0; y < Object.keys(usuarios).length; y++) {
+        var usuario = usuarios[Object.keys(usuarios)[y]]
+    
+        if(atendimento.responsavel == usuario.nome) {
+          atendimento.tecnico = usuario
+          usuario.atendimentos[atendimento.id] = atendimento
+        }
       }
     }
   }
-*/
+  
+  var container = document.getElementById("tAtendimentosContainer").content.cloneNode(true)
 
-  if(responsavel == "todos") {
-    if(setor == "todos") {
-      if(status == "aberto" && chamado.status != "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      } else if(status == "feitos" && chamado.status == "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
+  for(var y = 0; y < Object.keys(atAberto).length; y++) {
+    var atendimento = atAberto[Object.keys(atAberto)[y]]
+
+    container.querySelector("#abertos").appendChild(criarInterfaceChamado(atendimento))
+  }
+ 
+  for(var x = 0; x < Object.keys(usuarios).length; x++) {
+    var usuario = usuarios[Object.keys(usuarios)[x]]
+    const ordered = {}
+    Object.keys(usuario.atendimentos).sort((a, b) => {
+      return usuario.atendimentos[b].ordem - usuario.atendimentos[a].ordem
+    }).forEach((key) => {
+    ordered[key] = usuario.atendimentos[key]
+    })
+    usuario.atendimentos = ordered
+
+    for(var y = 0; y < Object.keys(usuario.atendimentos).length; y++) {
+      var atendimento = usuario.atendimentos[Object.keys(usuario.atendimentos)[y]]
+
+      if(container.querySelector("#" + usuario.usuario) == null) {
+        var layout = document.createElement("pessoasContainer")
+        layout.innerHTML = "<div class='pessoasTitulo ordem'>" + usuario.nome + 
+                        "</div><div class='pessoasListagem tec' id='" + usuario.usuario + "'></div>"
+  
+        container.querySelector(".pessoasContainer").appendChild(layout)
+        Sortable.create(container.querySelector("#" + usuario.usuario), {animation: 150})
       }
-    } else if(setor == chamado.setor) {
-      if(status == "aberto" && chamado.status != "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      } else if(status == "feitos" && chamado.status == "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      }
-    }
-  } else if(chamado.responsavel.toLowerCase() == responsavel){
-    if(setor == "todos") {
-      if(status == "aberto" && chamado.status != "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      } else if(status == "feitos" && chamado.status == "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      }
-    } else if(setor == chamado.setor) {
-      if(status == "aberto" && chamado.status != "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      } else if(status == "feitos" && chamado.status == "Feito") {
-        interfaces.appendChild(criarInterfaceChamado(chamado));
-      }
+      container.querySelector("#" + usuario.usuario).appendChild(criarInterfaceChamado(atendimento))
     }
   }
+ 
+  var feitos = document.createElement("pessoasContainer")
+  feitos.innerHTML = "<div class='pessoasTitulo'>Feitos</div><div class='pessoasListagem' id='feitos'></div>"
 
-  document.getElementById("listagem").appendChild(interfaces);
+  for(var y = 0; y < Object.keys(atFeitos).length; y++) {
+    var atendimento = atFeitos[Object.keys(atFeitos)[y]]   
+
+    feitos.querySelector("#feitos").appendChild(criarInterfaceChamado(atendimento))
+  }
+
+  container.querySelector(".pessoasContainer").appendChild(feitos)
+  document.getElementById("listagem").appendChild(container)
 }
 
-const criarInterfaceChamado = (chamado) => {
-  var interface = document.getElementById("tChamado").content.cloneNode(true);
-  interface.querySelector(".chamado").id = chamado.id;
-  if(chamado.status == "Atendido"){
-    interface.querySelector(".chamado").classList.add("atendido");
-  } else if (chamado.status == "Retorno") {
-    interface.querySelector(".chamado").classList.add("retorno");
+//determina se o sistema já pode gravar a ordem dos atendimentos 
+//ou se o usuario continua editando
+var timeout
+const criarInterfaceChamado = (atendimento) => {
+  var interface = document.getElementById("tAtendimento").content.cloneNode(true)
+  interface.querySelector("atendimento").id = atendimento.id
+  if(atendimento.feito){
+    interface.querySelector("atendimento").className.add("atendido")
   }
 
-  if(chamado.status == "Feito") {
-    interface.querySelector("#data").innerHTML = chamado.horaFinal;
+  if(atendimento.feito) {
+    var data = atendimento.datas.fim.split("-")
+    interface.querySelector("#data").innerHTML = data[2] + "/" + data[1] + "/" + data[0]
   } else {
-    interface.querySelector("#data").innerHTML = chamado.horaInicio;
+    var data = atendimento.datas.inicio.split("-")
+    interface.querySelector("#data").innerHTML = data[2] + "/" + data[1] + "/" + data[0]
   }
 
-  interface.querySelector("#cliente").innerHTML = chamado.cliente;
-  interface.querySelector("#responsavel").innerHTML = chamado.responsavel;
-  interface.querySelector("#cidade").innerHTML = chamado.endereco.cidade;
-  interface.querySelector("#motivo").innerHTML = chamado.motivo;
+  interface.querySelector("#cliente").innerHTML = atendimento.dados.nomefantasia
+  interface.querySelector("#cidade").innerHTML = atendimento.dados.endereco.cidade
+  
+  var motivo = ""
+  atendimento.motivo.forEach(el => {
+    motivo = motivo + el + " - "
+  })
+  interface.querySelector("#motivo").innerHTML = motivo
 
-  return interface;
+  //quando começar o drag'n'drop limpa o timeout e espera mais 5s para tentar gravar
+  interface.querySelector("atendimento").ondragstart = () => {
+    clearTimeout(timeout)
+  }
+  interface.querySelector("atendimento").ondragend = () => {
+    timeout = setTimeout(function(){
+      if(tela == "atendimentos") {
+        salvarOrdemAtendimentos(atendimento.tecnico)
+      } else {
+        feedbacks--
+        error("As alterações na ordem dos atendimentos foram perdidas por mudança de tela. Tente novamente!")
+      }
+    }, 5000)
+  }
+
+  return interface
 }
+
+const salvarOrdemAtendimentos = (responsavel) => {
+
+  var novaOrdem = document.body.querySelector("#" + responsavel.usuario).children
+  if(novaOrdem.length > 1) {
+
+    var ordenacao = {}
+
+    for(var x = 0; x < novaOrdem.length; x++) {
+      var el = novaOrdem[x]
+  
+      var ordem = atendimentos[el.id]
+      ordem.ordem = x
+      ordenacao[ordem.id] = ordem
+    }
+    gravarOrdem(ordenacao)
+  }
+}
+
+const gravarOrdem = (ordem) => {
+  
+  console.log(ordem)
+  /*
+  feedbacks++
+  feedback(true)
+  var usuario = JSON.parse(localStorage.getItem('usuario'))
+  axios.request('https://us-central1-ioi-printers.cloudfunctions.net/gravarOrdem', {
+    params: {
+      usuario: usuario.usuario,
+      senha: usuario.senha,
+      ordens: JSON.stringify(ordem)
+    }
+  }).then(res => {
+    feedbacks--
+    feedback(false)
+  }).catch(err => {
+    feedbacks--
+    console.error(err)
+    error("Erro ao gravar os dados. Recarregue a página e tente novamente!")
+  })
+  */
+}
+
+
+
+
+
+
+
+
+
+
 
 /*
 * altera a listagem dos chamados

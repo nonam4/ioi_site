@@ -10,10 +10,15 @@
 		<script src="js/pdf.js"></script>
 		<script src="js/zip.js"></script>
 		<script src="js/logo.js"></script>
+		<script src="js/sortable.js"></script>
 		<script src="js/filesaver.min.js"></script>
 
 		<link rel='stylesheet' href='css/adm.css'>
 		<link rel='stylesheet' href='css/load.css'>
+
+		<script src='js/chamados.js'></script>
+		<link rel='stylesheet' href='css/chamados.css'>
+		
 
 		<link href='icons/css/all.min.css' rel='stylesheet'>
 		<link rel="stylesheet" media="print" href="css/print.css" />
@@ -237,7 +242,7 @@
 				<div class='cliente'>
 					<div id='nome'></div>
 					<div id='chave'></div>
-					<i id='expandir' class='fas fa-expand-arrows-alt'></i>
+					<i id='expandir' class='fas fa-expand-arrows-alt' onclick=''></i>
 					<i id='excluir' class='fas fa-trash'></i>
 				</div>
 			</template>
@@ -493,6 +498,121 @@
 				</div>
 			</template>
 
+			<template id='tFiltrosChamado'>
+				<filtro id='filtrosChamados'>
+					<section>
+						<div class='filtroTitulo'>Status</div>
+						<div class='filtroText'>
+						   <select id='status' onchange='alterarListagemChamados()'>
+								<option value='aberto'>Em aberto</option>
+								<option value='feitos'>Feitos</option>
+							</select>
+						</div>
+					</section>
+					<section>
+						<div class='filtroTitulo'>Responsável</div>
+						<div class='filtroText'>
+							<select id='responsavel' onchange='alterarListagemChamados()'>
+							 	<option value='todos'>Todos</option>
+							</select>
+						</div>
+					</section>
+					<section>
+						<div class='filtroTitulo'>Setor</div>
+						<div class='filtroText'>
+							<select id='setor' onchange='alterarListagemChamados()'>
+							 	<option value='todos'>Todos</option>
+							</select>
+						</div>
+					</section>
+				</filtro>
+			</template>
+
+			<template id='tAtendimentosContainer'>
+				<div class='pessoasContainer'>
+					<pessoasContainer>
+						<div class='pessoasTitulo'>Em aberto</div>
+						<div class='pessoasListagem' id='abertos'></div>
+					</pessoasContainer>
+				</div>
+			</template>
+	
+			<template id='tAtendimento'>
+				<atendimento>
+					<section id='data'></section>
+					<section id='cliente'></section>
+					<section id='cidade'></section>
+					<section id='motivo'></section>
+					<i class='fas fa-edit'></i>
+					<i class='fas fa-check'></i>
+				</atendimento>
+			</template>
+	
+			<template id='tChamadoExpandido'>
+				<div id='chamadoExpandido'>
+					<chamadoExpandido>
+						<section id='titulo'>
+							<div id='nome'>Chamado</div>
+							<div id='acoes'>
+								<i class='fas fa-save' id='salvar' title='Salvar dados' onclick='salvarChamado(this)'></i>
+								<i class='fas fa-times-square' title='Fechar' onclick='fecharChamadoExpandido()'></i>
+							</div>
+						</section>
+						<section>
+							<div class='chamadoClienteHolder'>
+								<div class='inputHolder'>
+									<input class='input' id='cliente' type='text' autocomplete='off' required title='Cliente'>
+									<span class='inputHighlight'></span>
+									<span class='inputPlaceholder'>Cliente..</span>
+									<div id='autocomplete' class='autocomplete'></div>
+								</div>
+								<i class='fas fa-user-edit' id='editCliente' title='Editar cliente'></i>
+							</div>
+						</section>
+						<section id='dados'>
+							<div id='endereco'></div>
+							<div id='telefone'></div>
+							<div id='chave'></div>
+						</section>
+						<section>
+							<div class='chamadoSelectHolder'>
+								<div>Responsável</div>
+								<select id='responsavel'>
+									<option value=''></option>
+								</select>
+							</div>
+							<div class='chamadoSelectHolder'>
+								<div>Setor</div>
+								<select id='setor'>
+									<option value='locacao'>Locação</option>
+									<option value='ti'>TI</option>
+								</select>
+							</div>
+							<div class='chamadoSelectHolder'>
+								<div>Status</div>
+								<select id='status'>
+									<option value='Aberto'>Aberto</option>
+									<option value='Feito'>Feito</option>
+								</select>
+							</div>
+						</section>
+						<section id='informacao'>
+							<div class='informacaoContainer' id='tipoManutencao'>
+								<div class='inputHolder'>
+									<textarea class='inputArea' cols='50' rows='5' id='motivo' type='text' required title='Motivo'></textarea>
+									<span class='inputAreaHighlight'></span>
+									<span class='inputAreaPlaceholder'>Motivo..</span>
+								</div>
+							</div>
+							<div class='informacaoContainer' id='tipoSuprimento'>
+	
+								<i class='fas fa-plus-circle' onclick='adicionarSuprimentoNaLista(this)'></i>
+							</div>
+						</section>
+					</chamadoExpandido>
+				</div>
+			</template>
+
 			<div id='menu'>
 				<div class='menu-group'>
 					<img src='img/icon.png'>Mundo Eletrônico
@@ -514,7 +634,7 @@
 					<div class='menu-section'>
 							<div class='menu-titulo'>Atendimentos</div>
 							<div class='menu-item' onclick=''><i class='fas fa-file-plus'></i>Novo Atendimento</div>
-							<div class='menu-item' onclick=''><i class='fas fa-ballot-check'></i>Listar Atendimentos</div>
+							<div class='menu-item' onclick='selecionarAtendimentos()'><i class='fas fa-ballot-check'></i>Listar Atendimentos</div>
 					</div>
 					<div class='menu-section'>
 							<div class='menu-titulo'>Impressoras</div>
@@ -533,114 +653,6 @@
 </html>
 
 <!--
-
-		<template id='tFiltrosChamado'>
-			<filtro id='filtrosChamados'>
-				<section>
-					<div class='filtroTitulo'>Status</div>
-					<div class='filtroText'>
-			   		<select id='status' onchange='alterarListagemChamados()'>
-							<option value='aberto'>Em aberto</option>
-			     		<option value='feitos'>Feitos</option>
-						</select>
-					</div>
-				</section>
-				<section>
-					<div class='filtroTitulo'>Responsável</div>
-					<div class='filtroText'>
-						<select id='responsavel' onchange='alterarListagemChamados()'>
-			     		<option value='todos'>Todos</option>
-						</select>
-					</div>
-				</section>
-				<section>
-					<div class='filtroTitulo'>Setor</div>
-					<div class='filtroText'>
-						<select id='setor' onchange='alterarListagemChamados()'>
-			     		<option value='todos'>Todos</option>
-							<option value='locacao'>Locação</option>
-							<option value='ti'>TI</option>
-						</select>
-					</div>
-				</section
-			</filtro>
-		</template>
-
-		<template id='tChamado'>
-			<chamado class='chamado' onclick=''>
-				<section id='data'></section>
-				<section id='cliente'></section>
-				<section id='responsavel'></section>
-				<section id='cidade'></section>
-				<section id='motivo'></section>
-				<i class='fas fa-expand-arrows-alt' onclick='expandirChamado(true, this)'></i>
-			</chamado>
-		</template>
-
-		<template id='tChamadoExpandido'>
-			<div id='chamadoExpandido'>
-				<chamadoExpandido>
-					<section id='titulo'>
-						<div id='nome'>Chamado</div>
-						<div id='acoes'>
-							<i class='fas fa-save' id='salvar' title='Salvar dados' onclick='salvarChamado(this)'></i>
-							<i class='fas fa-times-square' title='Fechar' onclick='fecharChamadoExpandido()'></i>
-						</div>
-					</section>
-					<section>
-						<div class='chamadoClienteHolder'>
-							<div class='inputHolder'>
-								<input class='input' id='cliente' type='text' autocomplete='off' required title='Cliente'>
-								<span class='inputHighlight'></span>
-								<span class='inputPlaceholder'>Cliente..</span>
-								<div id='autocomplete' class='autocomplete'></div>
-							</div>
-							<i class='fas fa-user-edit' id='editCliente' title='Editar cliente'></i>
-						</div>
-					</section>
-					<section id='dados'>
-						<div id='endereco'></div>
-						<div id='telefone'></div>
-						<div id='chave'></div>
-					</section>
-					<section>
-						<div class='chamadoSelectHolder'>
-							<div>Responsável</div>
-							<select id='responsavel'>
-								<option value=''></option>
-							</select>
-						</div>
-						<div class='chamadoSelectHolder'>
-							<div>Setor</div>
-							<select id='setor'>
-								<option value='locacao'>Locação</option>
-								<option value='ti'>TI</option>
-							</select>
-						</div>
-						<div class='chamadoSelectHolder'>
-							<div>Status</div>
-							<select id='status'>
-								<option value='Aberto'>Aberto</option>
-								<option value='Feito'>Feito</option>
-							</select>
-						</div>
-					</section>
-					<section id='informacao'>
-						<div class='informacaoContainer' id='tipoManutencao'>
-							<div class='inputHolder'>
-								<textarea class='inputArea' cols='50' rows='5' id='motivo' type='text' required title='Motivo'></textarea>
-								<span class='inputAreaHighlight'></span>
-								<span class='inputAreaPlaceholder'>Motivo..</span>
-							</div>
-						</div>
-						<div class='informacaoContainer' id='tipoSuprimento'>
-
-							<i class='fas fa-plus-circle' onclick='adicionarSuprimentoNaLista(this)'></i>
-						</div>
-					</section>
-				</chamadoExpandido>
-			</div>
-		</template>
 
 		<template id='tSuprimento'>
 			<div class='suprimentoHolder'>
@@ -710,26 +722,7 @@
 							</section>
 						</suprimento>
 					</section>
-
-					<section id='salvamento'>
-						<div>
-							<button id='cancelar' onclick='fecharEstoqueExpandido()'>Cancelar</button>
-							<button id='salvar' onclick='salvarNovoEstoque(this)'>Salvar</button>
-						</div>
-					</section>
 				</estoqueExpandido>
 			</div>
 		</template>
-
-		<template id='tCliente'>
-			<div class='cliente'>
-				<div id='nome'></div>
-				<div id='chave'></div>
-				<i class='fas fa-expand-arrows-alt' onclick='expandirCliente(true, this)'></i>
-			</div>
-		</template>
-
-
-  </body>
-</html>
 -->
