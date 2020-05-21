@@ -153,8 +153,6 @@ const salvarOrdemAtendimentos = (responsavel) => {
 }
 
 const gravarAtendimentos = (atendimentos) => {
-  
-  console.log(atendimentos)
 
   feedbacks++
   feedback(true)
