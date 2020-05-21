@@ -14,7 +14,7 @@ const listagemAtendimentos = () => {
     var usuario = usuarios[Object.keys(usuarios)[x]]
     usuario.atendimentos = {}
   }
-
+ 
   for(var x = 0; x < Object.keys(atendimentos).length; x++) {
     var atendimento = atendimentos[Object.keys(atendimentos)[x]]
     atendimento.dados = clientes[atendimento.cliente]
@@ -50,11 +50,12 @@ const listagemAtendimentos = () => {
  
   for(var x = 0; x < Object.keys(usuarios).length; x++) {
     var usuario = usuarios[Object.keys(usuarios)[x]]
-    const ordered = {}
+    var ordered = {}
+
     Object.keys(usuario.atendimentos).sort((a, b) => {
-      return usuario.atendimentos[b].ordem - usuario.atendimentos[a].ordem
-    }).forEach((key) => {
-    ordered[key] = usuario.atendimentos[key]
+      return usuario.atendimentos[a].ordem - usuario.atendimentos[b].ordem
+    }).forEach(key => {
+      ordered[key] = usuario.atendimentos[key]
     })
     usuario.atendimentos = ordered
 
@@ -113,10 +114,12 @@ const criarInterfaceChamado = (atendimento) => {
   })
   interface.querySelector("#motivo").innerHTML = motivo
 
+
   //quando começar o drag'n'drop limpa o timeout e espera mais 5s para tentar gravar
   interface.querySelector("atendimento").ondragstart = () => {
     clearTimeout(timeout)
   }
+
   interface.querySelector("atendimento").ondragend = () => {
     timeout = setTimeout(function(){
       if(tela == "atendimentos") {
@@ -133,34 +136,34 @@ const criarInterfaceChamado = (atendimento) => {
 
 const salvarOrdemAtendimentos = (responsavel) => {
 
-  var novaOrdem = document.body.querySelector("#" + responsavel.usuario).children
-  if(novaOrdem.length > 1) {
+  var container = document.body.querySelector("#" + responsavel.usuario).children
+  if(container.length > 1) {
 
-    var ordenacao = {}
-
-    for(var x = 0; x < novaOrdem.length; x++) {
-      var el = novaOrdem[x]
+    for(var x = 0; x < container.length; x++) {
+      var el = container[x]
   
-      var ordem = atendimentos[el.id]
-      ordem.ordem = x
-      ordenacao[ordem.id] = ordem
+      var atendimento = responsavel.atendimentos[el.id]
+      atendimento.ordem = x + 1
+
+      delete atendimento.dados
+      delete atendimento.tecnico
     }
-    gravarOrdem(ordenacao)
+    gravarAtendimentos(responsavel.atendimentos)
   }
 }
 
-const gravarOrdem = (ordem) => {
+const gravarAtendimentos = (atendimentos) => {
   
-  console.log(ordem)
-  /*
+  console.log(atendimentos)
+
   feedbacks++
   feedback(true)
   var usuario = JSON.parse(localStorage.getItem('usuario'))
-  axios.request('https://us-central1-ioi-printers.cloudfunctions.net/gravarOrdem', {
+  axios.request('https://us-central1-ioi-printers.cloudfunctions.net/gravarAtendimentos', {
     params: {
       usuario: usuario.usuario,
       senha: usuario.senha,
-      ordens: JSON.stringify(ordem)
+      atendimentos: JSON.stringify(atendimentos)
     }
   }).then(res => {
     feedbacks--
@@ -170,7 +173,6 @@ const gravarOrdem = (ordem) => {
     console.error(err)
     error("Erro ao gravar os dados. Recarregue a página e tente novamente!")
   })
-  */
 }
 
 

@@ -191,7 +191,8 @@ const preparLeiturasParaListagem = (cliente) => {
   var datas = document.getElementById("datasDeLeituras")
   var listagem = datas.options[datas.selectedIndex].value
 
-  if(cliente.franquia.valor == undefined || cliente.franquia.valor == null) {
+  if(cliente.franquia.valor == undefined || cliente.franquia.valor == null 
+    || cliente.franquia.tipo == "maquina" || cliente.franquia.tipo == "ilimitado") {
     cliente.franquia.valor = 0
   }
 
@@ -705,21 +706,23 @@ const salvarLeituras = (cliente) => {
   var impressoras = cliente.impressoras
   for(var x = 0; x < Object.keys(impressoras).length; x++) {
     var impressora = impressoras[Object.keys(impressoras)[x]]
-    document.querySelectorAll('impressora').forEach(el => {
-      if(el.id == impressora.serial) {
-        //deleta os dados locais que não precisam serem salvos no DB
-        delete impressora.excedentes
-        delete impressora.impresso
-        delete impressora.serial
-        impressora.setor = el.querySelector("#setor").value
-        if(cliente.franquia.tipo == "maquina") {
-          impressora.franquia = parseInt(el.querySelector("#franquia").value.replace(/ págs/g , ""))
-        } else {
-          impressora.franquia = 0
-        }
-      }
-    })
+    //deleta os dados locais que não precisam serem salvos no DB
+    delete impressora.excedentes
+    delete impressora.impresso
+    delete impressora.serial
   }
+
+  document.querySelectorAll('impressora').forEach(el => {
+    var impressora = impressoras[el.id]
+
+    impressora.setor = el.querySelector("#setor").value
+      if(cliente.franquia.tipo == "maquina") {
+        impressora.franquia = parseInt(el.querySelector("#franquia").value.replace(/ págs/g , ""))
+      } else {
+        impressora.franquia = 0
+      }
+  })
+
   feedbacks++
   feedback(true)
   var usuario = JSON.parse(localStorage.getItem('usuario'))
