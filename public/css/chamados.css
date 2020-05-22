@@ -16,12 +16,20 @@ atendimento {
   border-color: white !important;
 }
 
+atendimento span {
+  font-size: 10px;
+  color: var(--principal);
+  position: absolute;
+  top: 0;
+}
+
 atendimento section {
+  position: relative;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding: 4px 0px;
-  line-height: 22px;
+  padding: 0px;
+  padding-top: 14px;
   cursor: default;
 }
 
@@ -51,12 +59,14 @@ atendimento section:nth-of-type(3) {
 atendimento section:nth-of-type(4) {
   width: 100%;
   border-right: solid 1px var(--bordas);
-  margin-right: 5px; 
+  padding-right: 5px; 
+  margin-right: 5px;
 }
 
 atendimento i {
   cursor: pointer;
   min-width: 20px;
+  max-height: 20px;
   font-size: 18px;
   text-align: center;
   padding: 5px;

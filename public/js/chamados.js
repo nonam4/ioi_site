@@ -99,20 +99,24 @@ const criarInterfaceChamado = (atendimento) => {
 
   if(atendimento.feito) {
     var data = atendimento.datas.fim.split("-")
-    interface.querySelector("#data").innerHTML = data[2] + "/" + data[1] + "/" + data[0]
+    interface.querySelector("#data").innerHTML = "<span>Feito em</span>" + data[2] + "/" + data[1] + "/" + data[0]
   } else {
     var data = atendimento.datas.inicio.split("-")
-    interface.querySelector("#data").innerHTML = data[2] + "/" + data[1] + "/" + data[0]
+    interface.querySelector("#data").innerHTML = "<span>Início</span>" + data[2] + "/" + data[1] + "/" + data[0]
   }
 
-  interface.querySelector("#cliente").innerHTML = atendimento.dados.nomefantasia
-  interface.querySelector("#cidade").innerHTML = atendimento.dados.endereco.cidade
+  interface.querySelector("#cliente").innerHTML = "<span>Cliente</span>" + atendimento.dados.nomefantasia
+  interface.querySelector("#cidade").innerHTML = "<span>Cidade</span>" + atendimento.dados.endereco.cidade
   
   var motivo = ""
-  atendimento.motivo.forEach(el => {
-    motivo = motivo + el + " - "
+  atendimento.motivo.forEach((el, index) => {
+    if(index < atendimento.motivo.length - 1) {
+      motivo = motivo + el + " - "
+    } else {
+      motivo = motivo + el
+    }
   })
-  interface.querySelector("#motivo").innerHTML = motivo
+  interface.querySelector("#motivo").innerHTML = "<span>Motivo</span>" + motivo
 
 
   //quando começar o drag'n'drop limpa o timeout e espera mais 5s para tentar gravar

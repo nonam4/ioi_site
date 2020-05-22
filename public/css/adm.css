@@ -11,7 +11,7 @@
   --feedback: #323232;
   --menu: #1a1a1a;
   --menuTextos: rgba(255,255,255,.8);
-  --menuScroll: #8a9bb2 rgba(0,0,0,0);
+  --menuScroll: #8a9bb2;
   --menuLight: #3b434e;
   --alerta: #f1c40f;
   --resolvido: #13ba5a;
@@ -175,9 +175,18 @@ body {
   transition: 0.2s ease all;
   -moz-transition: 0.2s ease all;
   -webkit-transition: 0.2s ease all;
+}
 
-  scrollbar-width: thin;
-  scrollbar-color var(--menuScroll);
+.menu-group::-webkit-scrollbar {
+  width: 8px;
+  border-radius: 4px;
+  background: rgba(0,0,0,0);
+  padding-right: 2px;
+}
+
+.menu-group::-webkit-scrollbar-thumb {
+  background: var(--menuScroll);
+  -webkit-border-radius: 1ex;
 }
 
 .menu-group img {
@@ -282,6 +291,17 @@ body {
   align-items: flex-start;
   padding-right: 4px;
   position: relative;
+}
+
+#listagem::-webkit-scrollbar {
+  width: 12px;
+  border-radius: 6px;
+  background: white;
+}
+
+#listagem::-webkit-scrollbar-thumb {
+  background: #aaa;
+  -webkit-border-radius: 1ex;
 }
 
 #feedback {
@@ -446,6 +466,9 @@ leitura {
   margin: 4px 4px 4px 8px;
   box-shadow: 0 2px 5px rgba(0,0,0,.5);
   border-radius: 4px;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
 leitura i {
@@ -785,7 +808,7 @@ pessoasContainer {
 }
 
 .pessoasTitulo {
-  color: var(--textos);
+  color: var(--principal);
   font-size: 22px;
   padding: 8px;
 }
@@ -793,8 +816,19 @@ pessoasContainer {
 .pessoasListagem {
   overflow: hidden;
   overflow-y: scroll;
-  max-height: 448px;
+  max-height: 442px;
   padding: 2px 0px;
+}
+
+.pessoasListagem::-webkit-scrollbar {
+  width: 12px;
+  border-radius: 6px;
+  background: white;
+}
+
+.pessoasListagem::-webkit-scrollbar-thumb {
+  background: #aaa;
+  -webkit-border-radius: 1ex;
 }
 
 #inativos, #feitos, .tec {

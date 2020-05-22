@@ -234,10 +234,10 @@ const preparLeiturasParaListagem = (cliente) => {
           //precisa adicionar + 1 no dia pois senão se o valor for 10 pegará o dia 9
           var b = new Date(listagem + "-" + (parseInt(impressora.leituras[listagem].final.dia) + 1))
 
-          if(Math.ceil(Math.abs(a - b) / (1000 * 3600 * 24)) > 5){
+          if(Math.ceil(Math.abs(a - b) / (1000 * 3600 * 24)) > 5 && impressora.ativa){
             cliente.impressoras.atraso = true
           }
-        } else {
+        } else if(impressora.ativa) {
           cliente.impressoras.atraso = true
         }
         if(!impressora.ativa) {
@@ -540,10 +540,10 @@ const alterarListagemLeituraExpandida = (cliente) => {
           //precisa adicionar + 1 no dia pois senão se o valor for 10 pegará o dia 9
           var b = new Date(listagem + "-" + (parseInt(impressora.leituras[listagem].final.dia) + 1))
 
-          if(Math.ceil(Math.abs(a - b) / (1000 * 3600 * 24)) > 5){
+          if(Math.ceil(Math.abs(a - b) / (1000 * 3600 * 24)) > 5 && impressora.ativa){
             cliente.impressoras.atraso = true
           }
-        } else {
+        } else if(impressora.ativa) {
           cliente.impressoras.atraso = true
         }
         if(!impressora.ativa) {
@@ -746,9 +746,17 @@ const salvarLeituras = (cliente) => {
       } else {
         novaListagem = criarInterfaceLeitura(cliente, true)
       }
-      esconderLoad()
       setTimeout(() => {
-        document.getElementById("listagem").replaceChild(novaListagem, document.getElementById(cliente.id))
+        if(parseInt(novaListagem.querySelector("#impressoras").innerHTML) > 0) {
+          esconderLoad()
+          document.getElementById("listagem").replaceChild(novaListagem, document.getElementById(cliente.id))
+        } else {
+          var el = document.getElementById(cliente.id)
+          el.style.opacity = "0"
+          setTimeout(() => {
+            el.remove()
+          }, 250)
+        }
       }, 100)
     }
   }).catch(err => {
