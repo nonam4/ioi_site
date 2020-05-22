@@ -1050,7 +1050,7 @@ const listagemClientes = () => {
     interface.querySelector("#chave").innerHTML = "Chave: " + cliente.id
 
     if(!cliente.ativo) {
-      interface.querySelector("#excluir").className = "fas fa-trash-restore"
+      interface.querySelector("#excluir").className = "fas fa-trash-restore green"
       inativos.appendChild(interface)
     } else {
       if(cliente.fornecedor) {
