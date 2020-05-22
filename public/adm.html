@@ -494,38 +494,8 @@
 								</div>
 							</div>
 						</section>
-					</chamadoExpandido>
+					</clienteExpandido>
 				</div>
-			</template>
-
-			<template id='tFiltrosChamado'>
-				<filtro id='filtrosChamados'>
-					<section>
-						<div class='filtroTitulo'>Status</div>
-						<div class='filtroText'>
-						   <select id='status' onchange='alterarListagemChamados()'>
-								<option value='aberto'>Em aberto</option>
-								<option value='feitos'>Feitos</option>
-							</select>
-						</div>
-					</section>
-					<section>
-						<div class='filtroTitulo'>Responsável</div>
-						<div class='filtroText'>
-							<select id='responsavel' onchange='alterarListagemChamados()'>
-							 	<option value='todos'>Todos</option>
-							</select>
-						</div>
-					</section>
-					<section>
-						<div class='filtroTitulo'>Setor</div>
-						<div class='filtroText'>
-							<select id='setor' onchange='alterarListagemChamados()'>
-							 	<option value='todos'>Todos</option>
-							</select>
-						</div>
-					</section>
-				</filtro>
 			</template>
 
 			<template id='tAtendimentosContainer'>
@@ -543,28 +513,29 @@
 					<section id='cliente'></section>
 					<section id='cidade'></section>
 					<section id='motivo'></section>
-					<i class='fas fa-edit'></i>
-					<i class='fas fa-check green'></i>
+					<i id='expandir' class='fas fa-file-edit'></i>
+					<i id='concluido' class='fas fa-file-check green'></i>
 				</atendimento>
 			</template>
 	
-			<template id='tChamadoExpandido'>
-				<div id='chamadoExpandido'>
-					<chamadoExpandido>
+			<template id='tAtendimentoExpandido'>
+				<div id='atendimentoExpandido'>
+					<atendimentoExpandido>
 						<section id='titulo'>
-							<div id='nome'>Chamado</div>
+							<div id='nome'>Atendimento</div>
 							<div id='acoes'>
-								<i class='fas fa-save' id='salvar' title='Salvar dados' onclick='salvarChamado(this)'></i>
-								<i class='fas fa-times-square' title='Fechar' onclick='fecharChamadoExpandido()'></i>
+								<i class='fas fa-save' id='salvar' title='Salvar dados'></i>
+								<i class='fas fa-times-square' title='Fechar' onclick='fecharAtendimento()'></i>
 							</div>
 						</section>
 						<section>
-							<div class='chamadoClienteHolder'>
-								<div class='inputHolder'>
-									<input class='input' id='cliente' type='text' autocomplete='off' required title='Cliente'>
-									<span class='inputHighlight'></span>
-									<span class='inputPlaceholder'>Cliente..</span>
-									<div id='autocomplete' class='autocomplete'></div>
+							<div class='atendimentoCliente'>
+								<div class='group'>
+									<input class='inpt' id='cliente' type='text' autocomplete='off' required title='Cliente'>
+									<span class='highlight'></span>
+									<span class='bar'></span>
+									<label class='lbl'>Cliente</label>
+									<div class='autocomplete'></div>
 								</div>
 								<i class='fas fa-user-edit' id='editCliente' title='Editar cliente'></i>
 							</div>
@@ -575,20 +546,13 @@
 							<div id='chave'></div>
 						</section>
 						<section>
-							<div class='chamadoSelectHolder'>
+							<div class='atendimentoSelect'>
 								<div>Responsável</div>
 								<select id='responsavel'>
 									<option value=''></option>
 								</select>
 							</div>
-							<div class='chamadoSelectHolder'>
-								<div>Setor</div>
-								<select id='setor'>
-									<option value='locacao'>Locação</option>
-									<option value='ti'>TI</option>
-								</select>
-							</div>
-							<div class='chamadoSelectHolder'>
+							<div class='atendimentoSelect'>
 								<div>Status</div>
 								<select id='status'>
 									<option value='Aberto'>Aberto</option>
@@ -596,20 +560,38 @@
 								</select>
 							</div>
 						</section>
-						<section id='informacao'>
-							<div class='informacaoContainer' id='tipoManutencao'>
-								<div class='inputHolder'>
-									<textarea class='inputArea' cols='50' rows='5' id='motivo' type='text' required title='Motivo'></textarea>
-									<span class='inputAreaHighlight'></span>
-									<span class='inputAreaPlaceholder'>Motivo..</span>
-								</div>
-							</div>
-							<div class='informacaoContainer' id='tipoSuprimento'>
-	
-								<i class='fas fa-plus-circle' onclick='adicionarSuprimentoNaLista(this)'></i>
-							</div>
+						<section id='motivos'>
+							<div class='label'>Motivos</div>
+							<div class='motivos-dots'></div>
+							<div class='motivo-list'></div>
 						</section>
-					</chamadoExpandido>
+					</atendimentoExpandido>
+				</div>
+			</template>
+
+			<template id='tAtendimentoMotivo'>
+				<div class='motivo'>
+					<div class='motivo-dots'></div>
+					<div class='group motivos'>
+						<input class='inpt motivo-texto' id='primeiro' type='text' autocomplete='off' required title='Motivo'>
+						<span class='highlight'></span>
+						<span class='bar'></span>
+						<label class='lbl'>Motivo</label>
+						<div class='autocomplete'></div>
+					</div>
+					<div class='group motivos quantidade'>
+						<input class='inpt motivo-quantidade' type='number' autocomplete='off' required title='Quantidade' min='1' value='1'>
+						<span class='highlight'></span>
+						<span class='bar'></span>
+						<label class='lbl'>Quantidade</label>
+					</div>
+				</div>
+			</template>
+
+			<template id='tAtendimentoAdicionar'>
+				<div class='motivo add'>
+					<div class='motivo-dots add'></div>
+					<i class='fas fa-plus' onclick='adicionarMotivo(this)' title='Adicionar Motivo'></i>
 				</div>
 			</template>
 
@@ -633,8 +615,8 @@
 					</div>
 					<div class='menu-section'>
 							<div class='menu-titulo'>Atendimentos</div>
-							<div class='menu-item' onclick=''><i class='fas fa-file-plus'></i>Novo Atendimento</div>
-							<div class='menu-item' onclick='selecionarAtendimentos()'><i class='fas fa-ballot-check'></i>Listar Atendimentos</div>
+							<div class='menu-item' onclick='expandirAtendimento()'><i class='fas fa-file-plus'></i>Novo Atendimento</div>
+							<div class='menu-item' onclick='selecionarAtendimentos()'><i class='fas fa-file-alt'></i>Listar Atendimentos</div>
 					</div>
 					<div class='menu-section'>
 							<div class='menu-titulo'>Impressoras</div>

@@ -82,100 +82,114 @@ atendimento i:hover {
   background-color: var(--hover);
 }
 
-
-
-
-
-
-.chamadoClienteHolder {
-  width: 100%;
-  margin-bottom: 6px;
-  position: relative;
-  display: flex;
-}
-
-.chamadoClienteHolder i {
-  border-radius: 18px;
-  padding: 8px;
-  text-align: center;
-  font-size: 18px;
-  cursor: pointer !important;
-  margin-right: -3px;
-  opacity: 0;
-  min-width: 0px;
-  max-width: 0px;
-  margin-left: 8px;
-  height: 20px;
-}
-
-.chamadoClienteHolder i:hover {
-  background-color: var(--hover);
-}
-
-#chamadoExpandido {
+#atendimentoExpandido {
   position: absolute;
   left: 0px;
   top: 0px;
   width: 100vw;
   height: 100vh;
   background-color: rgba(0,0,0,.65);
-  z-index: 1000;
+  z-index: 996;
   align-items: center;
   display: flex;
   opacity: 0;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
-chamadoExpandido {
+atendimentoExpandido {
   width: 75%;
-  height: 85%;
-  min-width: 910px;
-  min-height: 600px;
+  height: 600px;
+  min-width: 800px;
   background-color: white;
   margin: auto;
   display: flex;
   flex-direction: column;
   position: relative;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
-chamadoExpandido select {
+atendimentoExpandido select {
   border: none;
   border-bottom: solid 1px var(--bordas);
   outline: none;
   width: 100%;
   font-weight: 600 !important;
-  color: var(--corTextos);
+  color: var(--textos);
   font-size: 14px;
   height: 30px;
 }
 
-chamadoExpandido select:disabled {
+atendimentoExpandido select:disabled {
   cursor: default !important;
 }
 
-chamadoExpandido select option {
+atendimentoExpandido select option {
   text-align-last: center;
 }
 
-chamadoExpandido section {
-  padding: 0px 12px 0px 12px;
-  margin-top: 32px;
-  width: calc(100% - 24px) !important;
+atendimentoExpandido section {
+  padding-top: 32px;
+  width: 100%;
   display: flex;
 }
 
+atendimentoExpandido section:nth-of-type(4) {
+  padding-top: 8px;
+  width: 100%;
+  display: flex;
+}
+
+.atendimentoCliente {
+  width: 100%;
+  margin-bottom: 6px;
+  position: relative;
+  display: flex;
+}
+
+.atendimentoCliente i {
+  opacity: 0;
+  min-width: 0px;
+  max-width: 0px;
+  max-height: 0px;
+  cursor: pointer;
+  font-size: 18px;
+  text-align: center;
+  padding: 5px;
+  border-radius: 50%;
+  margin-right: 8px;
+  line-height: 20px !important;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+}
+
+.atendimentoCliente i:hover {
+  background-color: var(--hover);
+}
+
 #dados {
-  padding: 0px 12px 0px 12px;
+  padding: 0px 8px;
   font-size: 12px;
-  color: var(--corTitulos);
+  color: var(--titulos);
   flex-direction: column;
   margin-top: 0px;
+  width: calc(100% - 16px);
+  opacity: 0;
+  height: 0px;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
 #dados div {
   padding: 1px 0px 2px 0px;
 }
 
-chamadoExpandido #titulo {
+atendimentoExpandido #titulo {
   width: calc(100% - 16px) !important;
   padding: 4px 8px;
   font-size: 20px;
@@ -186,114 +200,202 @@ chamadoExpandido #titulo {
   margin: 0
 }
 
-chamadoExpandido #nome {
+atendimentoExpandido #nome {
   width: 100%;
   line-height: 33.6px;
 }
 
-chamadoExpandido #acoes {
+atendimentoExpandido #acoes {
   display: flex;
 }
 
-chamadoExpandido #acoes i {
-  border-radius: 18px;
+atendimentoExpandido #acoes i {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
   padding: 8px;
   text-align: center;
   font-size: 18px;
   cursor: pointer !important;
-  margin-right: -3px;
-  margin-left: -3px;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
-chamadoExpandido #acoes i:hover {
+atendimentoExpandido #acoes i:hover {
   background-color: var(--hover);
 }
 
+/*
 #dados {
   height: 0px;
   opacity: 0;
 }
+*/
 
-.chamadoSelectHolder div {
+.atendimentoSelect {
+  padding: 8px;
+}
+
+.atendimentoSelect div {
   color: var(--textos);
   height: 30px;
   width: 100%;
 }
 
-.chamadoSelectHolder:nth-of-type(1) {
+.atendimentoSelect:nth-of-type(1) {
   width: 100%;
-  padding-right: 16px;
 }
 
-.chamadoSelectHolder:nth-of-type(2) {
+.atendimentoSelect:nth-of-type(2) {
   min-width: 300px;
-  padding-right: 16px;
 }
 
-.chamadoSelectHolder:nth-of-type(3) {
-  min-width: 200px;
-}
-.chamadoSelectHolder:nth-of-type(4) {
-  min-width: 150px;
-}
-
-#informacao {
-  overflow: hidden;
-  max-height: 300px;
-  overflow-y: auto;
+#motivos {
+  height: fit-content;
+  max-height: 308px;
+  position: relative;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
-#informacao i {
-  font-size: 24px;
-  color: var(--titulos);
-  cursor: pointer;
+#motivos .label {
+  color: var(--principal);
+  font-size: 14px;
+  position: absolute;
+  top: 12px;
+  left: 8px;
+}
+
+.motivos-dots {
+  height: 100%;
+  width: 1px;
+  border-right: dashed 2px var(--dots);
+  margin-left: 8px;
+}
+
+.motivos {
+  margin-top: 32px;
+  padding-top: 1px;
+}
+
+.motivo-list {
   width: 100%;
-  text-align: center;
+  overflow: hidden;
+  max-height: 308px;
+  overflow-y: auto;
+  height: fit-content;
 }
 
-#informacao i:hover {
+.motivo-list::-webkit-scrollbar {
+  width: 8px;
+  border-radius: 4px;
+  background: rgba(0,0,0,0);
+  padding-right: 2px;
+}
+
+.motivo-list::-webkit-scrollbar-thumb {
+  background: var(--menuScroll);
+}
+
+.motivo-list i {
   color: var(--textos);
+  cursor: pointer;
+  min-width: 20px;
+  max-height: 20px;
+  font-size: 18px;
+  text-align: center;
+  padding: 5px;
+  border-radius: 50%;
+  margin-left: 8px;
+  line-height: 20px !important;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
-.informacaoContainer {
-  display: block;
-  min-width: 100%;
-  padding-top: 16px;
-  margin-right: 12px;
-  max-height: 250px;
+.motivo-list i:hover {
+  background-color: var(--hover);
 }
 
-.informacaoContainer:nth-of-type(2) {
+.motivo {
+  width: calc(100% - 2px); 
+  margin-bottom: 6px;
+  margin-left: 2px;
+  display: flex;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+}
+
+.motivo-dots {
+  min-width: 12px;
+  max-width: 12px;
+  margin: 50px 0px auto 0px;
+  height: 1px;
+  border-bottom: dashed 2px var(--dots);
+}
+
+.add {
+  margin: 14px 0px auto 0px;
+}
+
+.quantidade {
+  /*width: 100px;*/
+  width: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
   opacity: 0;
-  display: none;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
 .autocomplete {
 	height: auto;
 	max-height: 250px;
-  z-index: 999;
+  z-index: 997;
   overflow: hidden;
   overflow-y: auto;
   position: absolute;
-  top: 36px;
+  top: 38px;
   width: 100%;
   background-color: white;
 }
 
 .autocomplete div {
+  color: var(--textos);
   padding: 10px;
   cursor: pointer;
   height: 18px;
-  background-color: #fff;
+  background-color: white;
   border-bottom: 1px solid var(--bordas);
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
 .autocomplete div:hover {
 
   background-color: var(--hover);
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
 .autocomplete-active {
   background-color: var(--principal) !important;
   color: #fff;
 }
+
+.autocomplete::-webkit-scrollbar {
+  width: 12px;
+  border-radius: 6px;
+  background: white;
+}
+
+.autocomplete::-webkit-scrollbar-thumb {
+  background: #aaa;
+}
+

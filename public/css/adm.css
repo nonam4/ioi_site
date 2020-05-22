@@ -5,7 +5,6 @@
 	--principalLight: rgba(52,152,219,.15);
 	--textos: #5d5d5d;
   --titulos: #aaa;
-	--placeholders: #999;
 	--hover: rgba(0,0,0,.2);
   --erro: #c0392b;
   --feedback: #323232;
@@ -15,6 +14,7 @@
   --menuLight: #3b434e;
   --alerta: #f1c40f;
   --resolvido: #13ba5a;
+  --dots: #ccc;
 }
 
 body {
@@ -91,7 +91,7 @@ body {
 .highlight {
 	position: absolute;
   height: 60%;
-  width: 100px;
+  width: 100%;
   top: 25%;
   left: 0;
   pointer-events: none;
@@ -125,7 +125,7 @@ body {
 }
 
 .lbl {
-  color: var(--placeholders);
+  color: var(--titulos);
   font-size: 15px;
   font-weight: normal;
   position: absolute;
@@ -194,7 +194,6 @@ body {
 
 .menu-group::-webkit-scrollbar-thumb {
   background: var(--menuScroll);
-  -webkit-border-radius: 1ex;
 }
 
 .menu-group img {
@@ -309,7 +308,6 @@ body {
 
 #listagem::-webkit-scrollbar-thumb {
   background: #aaa;
-  -webkit-border-radius: 1ex;
 }
 
 #feedback {
@@ -836,7 +834,6 @@ pessoasContainer {
 
 .pessoasListagem::-webkit-scrollbar-thumb {
   background: #aaa;
-  -webkit-border-radius: 1ex;
 }
 
 #inativos, #feitos, .tec {
