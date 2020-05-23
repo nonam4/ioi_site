@@ -580,7 +580,7 @@
 						<div class='autocomplete'></div>
 					</div>
 					<div class='group motivos quantidade'>
-						<input class='inpt motivo-quantidade' type='number' autocomplete='off' required title='Quantidade' min='1' value='1'>
+						<input class='inpt motivo-quantidade' type='text' maxlength='3' autocomplete='off' required title='Quantidade' min='1' value='1'>
 						<span class='highlight'></span>
 						<span class='bar'></span>
 						<label class='lbl'>Quantidade</label>
@@ -625,7 +625,7 @@
 				</div>
 				<div class='menu-group'>
 					<a class='download' title='Central de downloads' href='downloads.html'><i class='fas fa-download'></i></a>
-					<i class='fas fa-sign-out' title='Logout' onclick=''></i>
+					<i class='fas fa-sign-out' title='Logout' onclick='logout()'></i>
 				</div>
 			</div>
 			<div id='listagem'></div>
@@ -633,78 +633,3 @@
 			<div id='error'></div>
     </body>
 </html>
-
-<!--
-
-		<template id='tSuprimento'>
-			<div class='suprimentoHolder'>
-				<div class='chamadoSelectHolder'>
-					<div>Modelo do suprimento</div>
-					<select id='suprimento' onchange='alterarTipoSuprimento(this)'>
-						<option value=''></option>
-					</select>
-				</div>
-				<div class='chamadoSelectHolder'>
-					<div>Quantidade</div>
-					<input id='quantidade' class='simpleInput' type='number' title='Quantidade' value='1' min='1' max='1'>
-				</div>
-				<i class='fas fa-minus-circle' onclick='removerSuprimentoDaLista(this)'></i>
-			</div>
-		</template>
-
-		<template id='tSuprimentoListagem'>
-			<suprimento>
-				<section>
-					<div>
-						<div>Modelo do suprimento</div>
-						<input id='modelo' class='simpleInput' type='text' title='Modelo'>
-					</div>
-					<i class='fas fa-save' onclick='salvarEstoque(this)'></i>
-				</section>
-				<section>
-					<div>
-						<div>Quantidade atual</div>
-						<input id='quantidade' class='simpleInput' type='number' title='Quantidade atual' min='0'>
-					</div>
-					<div>
-						<div>Quantidade mínima</div>
-						<input id='minimo' class='simpleInput' type='number' title='Quantidade mínima'min='1'>
-					</div>
-					<div>
-						<div>Valor de venda</div>
-						<input id='valor' class='valor simpleInput' type='text' title='Valor de venda'>
-					</div>
-				</section>
-			</suprimento>
-		</template>
-
-		<template id='tEstoqueExpandido'>
-			<div id='estoqueExpandido'>
-				<estoqueExpandido>
-					<section id='titulo'>
-						<div>Cadastrar suprimento</div>
-					</section>
-					<section>
-						<suprimentoExpandido>
-							<section>
-								<div>Modelo do suprimento</div>
-								<input id='modelo' class='simpleInput' type='text' title='Modelo'>
-							</section>
-							<section>
-								<div>Quantidade atual</div>
-								<input id='quantidade' class='simpleInput' type='number' title='Quantidade atual' min='1'>
-							</section>
-							<section>
-								<div>Quantidade mínima</div>
-								<input id='minimo' class='simpleInput' type='number' title='Quantidade mínima'min='1'>
-							</section>
-							<section>
-								<div>Valor de venda</div>
-								<input id='valor' class='valor simpleInput' type='text' title='Valor de venda'>
-							</section>
-						</suprimento>
-					</section>
-				</estoqueExpandido>
-			</div>
-		</template>
--->

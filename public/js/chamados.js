@@ -175,7 +175,7 @@ const salvarOrdemAtendimentos = responsavel => {
 }
 
 const gravarAtendimentos = atendimentos => {
-
+  console.log(atendimentos)
   feedbacks++
   feedback(true)
   var usuario = JSON.parse(localStorage.getItem('usuario'))
@@ -188,6 +188,12 @@ const gravarAtendimentos = atendimentos => {
   }).then(res => {
     feedbacks--
     feedback(false)
+    if(tela == 'atendimentos') {
+      document.getElementById('listagem').innerHTML = ''
+      setTimeout(() => {
+        listagem(false)
+      }, 300)
+    }
   }).catch(err => {
     feedbacks--
     console.error(err)
@@ -198,6 +204,8 @@ const gravarAtendimentos = atendimentos => {
 const expandirAtendimento = atendimento => {
 
   var layout = document.getElementById('tAtendimentoExpandido').content.cloneNode(true)
+  layout.querySelector('#salvar').onclick = () => {salvarAtendimento(atendimento)}
+
   var nomes = layout.querySelector('#cliente')
   autoCompleteClientes(nomes)
 
@@ -333,8 +341,7 @@ const autoCompleteMotivos = input => {
       if (suprimento.modelo.toLowerCase().indexOf( val.toLowerCase() ) > -1) {
         /* cria uma div para cada item que tenha correspondencia */
         b = document.createElement('DIV')
-        /* faz as letras coincidentes em negrito */
-        b.innerHTML = suprimento.modelo
+        b.innerHTML = suprimento.modelo + ' - Em estoque: ' + suprimento.quantidade + ' unidades'
         /* cria um input invisivel que vai segurar o valor do item */
         b.innerHTML += "<input type='hidden' value='" + suprimento.id + "'>"
         /* executa a função quando for clicado na div do item */
@@ -388,6 +395,7 @@ const preencherAtendimento = (atendimento, layout) => {
     status.options[1].selected = true
   }
 
+  $('.motivo-quantidade').mask('000')
   atendimento.motivo.forEach(motivo => {
     var el = document.getElementById('tAtendimentoMotivo').content.cloneNode(true)
 
@@ -398,7 +406,9 @@ const preencherAtendimento = (atendimento, layout) => {
       var suprimento = suprimentoPorModelo(modelo)
 
       el.querySelector('.motivo-texto').value = modelo
+      el.querySelector('.motivo-texto').onclick = element => {element.path[0].blur()}
       el.querySelector('.motivo-quantidade').value = quantidade
+      el.querySelector('.motivo-quantidade').onclick = element => {element.path[0].blur()}
       mostrarQuantidades(el.querySelector('.motivo-texto'), suprimento, false)
     } else {
       el.querySelector('.motivo-texto').value = motivo
@@ -413,8 +423,18 @@ const suprimentoPorModelo = modelo => {
   for(var x = 0; x < Object.keys(suprimentos).length; x++) {
     var suprimento = suprimentos[Object.keys(suprimentos)[x]]
 
-    if(suprimento.modelo = modelo) {
+    if(suprimento.modelo == modelo) {
       return suprimento
+    }
+  }
+}
+
+const clientePorNome = nome => {
+  for(var x = 0; x < Object.keys(clientes).length; x++) {
+    var cliente = clientes[Object.keys(clientes)[x]]
+
+    if(cliente.nomefantasia == nome || cliente.razaosocial == nome) {
+      return cliente
     }
   }
 }
@@ -432,6 +452,10 @@ const mostrarQuantidades = (el, suprimento, alterarQuantidade) => {
     input.value = suprimento.quantidade
   }
   input.max = suprimento.quantidade
+
+  if(suprimento.quantidade == 0) {
+    input.min = 0
+  }
 }
 
 const adicionarMotivo = el => {
@@ -476,4 +500,103 @@ const mostrarDadosCliente = (cliente, input) => {
     
   dados.style.height = 'fit-content'
   dados.style.opacity = '1'
+}
+
+const salvarAtendimento = atendimento => {
+  var layout = document.body.querySelector('atendimentoExpandido')
+  var cliente = clientePorNome(layout.querySelector('#cliente').value)
+  var motivos = layout.querySelectorAll('.motivo-texto')
+  var erro = false
+  //só vai baixar do estoque se for um atendimento novo ou se a quantidade for diferente
+  var editando = true
+
+  var data = new Date()
+  var ano = data.getFullYear()
+  var mes = data.getMonth() + 1
+  if (mes < 10) { mes = "0" + mes }
+  var dia = data.getDate()
+  if (dia < 10) { dia = "0" + dia }
+
+  if(atendimento == undefined) {
+    editando = false
+    atendimento = new Object()
+    atendimento.id = data.getTime() + ''
+
+    if(layout.querySelector('#status').value == "Aberto") {
+      atendimento.feito = false
+      atendimento.datas = {
+        inicio: ano + '-' + mes + '-' + dia
+      }
+    }
+    atendimento.ordem = 0
+  }
+
+  if(cliente == undefined) {
+    error('Cliente inválido ou não cadastrado!')
+    erro = true
+  } else {
+    atendimento.cliente = cliente.id
+  }
+  
+  if(!erro) {
+    for(var x = 0; x < Object.keys(atendimentos).length; x++) {
+      var at = atendimentos[Object.keys(atendimentos)[x]]
+      
+      if(at.cliente == atendimento.cliente && (at.responsavel == '' 
+        || at.responsavel == layout.querySelector('#responsavel').value) 
+        && !at.feito && at.id != atendimento.id) {
+
+        error('Já existe um atendimento em aberto para esse cliente!')
+        erro = true
+        break
+      }
+    }
+  }
+  
+  if(!erro) {
+    for(var x = 0; x < motivos.length; x++) {
+      var motivo = motivos[x]
+  
+      if(motivo.value == '' && motivos.length < 2) {
+        error('Motivo muito curto ou vazio!')
+        erro = true
+        break
+      }
+    }
+  }
+
+  if(!erro) {
+    atendimento.motivo = []
+    for(var x = 0; x < motivos.length; x++) {
+      var motivo = motivos[x]
+      var suprimento = suprimentoPorModelo(motivo.value)
+
+      if(suprimento != undefined) {
+        //caso o motivo seja um toner ou suprimento
+        var quantidade = motivo.parentNode.parentNode.querySelector('.motivo-quantidade')
+        atendimento.motivo.push(suprimento.modelo + ' - Quantidade: ' + quantidade.value)
+        if(!editando) { suprimento.quantidade = suprimento.quantidade - quantidade.value }
+
+      } else if(motivo.value != '') {
+
+        atendimento.motivo.push(motivo.value)
+      }
+    }
+
+    atendimento.responsavel = layout.querySelector('#responsavel').value
+    if(layout.querySelector('#status').value == "Feito") {
+      atendimento.feito = true
+      atendimento.datas = {
+        inicio: atendimento.datas.inicio,
+        fim: ano + '-' + mes + '-' + dia
+      }
+    }
+
+    fecharAtendimento()
+    atendimentos[atendimento.id] = atendimento
+    
+    delete atendimento.dados
+    delete atendimento.tecnico
+    gravarAtendimentos({[atendimento.id]: atendimento})
+  }
 }

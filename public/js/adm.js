@@ -27,16 +27,20 @@ const autenticacao = () => {
   mostrarLoad(document.body)
   //quando a página acabar de carregar o sistema checa se o usuario esta autenticado ou não
   var usuario = JSON.parse(localStorage.getItem('usuario'))
-  //var usuario = null
-
   if(usuario != null){
     receberDados(usuario)
   } else {
     error('Você não deveria estar aqui. Redirecionando para a autenticação!')
     setTimeout(() => {
       window.location = 'auth.html'
-    }, 3000)
+    }, 7000)
   }
+}
+
+const logout = () => {
+  localStorage.setItem('usuario', null)
+  mostrarLoad(document.body)
+  window.location = 'auth.html'
 }
 
 const receberDados = usuario => {
@@ -47,6 +51,17 @@ const receberDados = usuario => {
       senha: usuario.senha
     }
   }).then(res => {
+    if(res.data.auth.autenticado) {
+
+      var usuario = {
+        nome: res.data.auth.nome,
+        usuario: res.data.auth.usuario,
+        senha: res.data.auth.senha,
+        empresa: res.data.auth.empresa,
+        permissao: res.data.auth.permissao
+      }
+      localStorage.setItem('usuario', JSON.stringify(usuario))
+      
       //dashboard = res.data.dashboard
       usuarios = res.data.usuarios
       //empresa = res.data.empresa
@@ -54,9 +69,14 @@ const receberDados = usuario => {
       clientes = res.data.clientes
       atendimentos = res.data.atendimentos
       versao = res.data.versao
-
       document.getElementById('menu').style.opacity = '1'
       listagem(true)
+    } else {
+      error('Você não deveria estar aqui. Redirecionando para a autenticação!')
+      setTimeout(() => {
+        window.location = 'auth.html'
+      }, 7000)
+    }
   }).catch(err => {
     esconderLoad()
     setTimeout(() => {
@@ -78,7 +98,6 @@ const listagem = criarFiltros => {
         listagemClientes()
         break
       case 'atendimentos':
-        //if(criarFiltros) { filtrosAtendimentos() }
         listagemAtendimentos()
         break
     }
@@ -1128,8 +1147,14 @@ const excluirCliente = cliente => {
 
   if(cliente.ativo) {
     if(confirm('Deseja desativar o cliente? Isso NÂO vai excluir os dados!')) {
-      cliente.ativo = false
-      gravarCliente(cliente)
+      
+      var usuario = JSON.parse(localStorage.getItem('usuario'))
+      if(usuario.permissao.excluir) {
+        cliente.ativo = false
+        gravarCliente(cliente)
+      } else {
+        error('Usuário sem permissão para fazer isso!')
+      }
     }
   } else {
     if(confirm('Deseja reativar o cliente?')) {
@@ -1301,9 +1326,7 @@ const gravarCliente = cliente => {
     feedback(false)
     if(tela == 'clientes') {
       document.getElementById('listagem').innerHTML = ''
-      setTimeout(() => {
-        listagem(false)
-      }, 300)
+      listagem(false)
     }
   }).catch(err => {
     feedbacks--

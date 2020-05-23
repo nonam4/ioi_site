@@ -1,13 +1,11 @@
 const autenticacao = () => {
 	//quando a página acabar de carregar o sistema checa se o usuario esta autenticado ou não
   var usuario = JSON.parse(localStorage.getItem('usuario'))
-
   if(usuario != null){
     setTimeout(function(){
       window.location = "adm.html"
     }, 250)
   } else {
-    console.log("usuario precisa de autenticação")
     esconderLoad()
   }
 }
@@ -34,7 +32,8 @@ const autenticar = () => {
           nome: res.data.nome,
           usuario: res.data.usuario,
           senha: res.data.senha,
-          empresa: res.data.empresa
+          empresa: res.data.empresa,
+          permissao: res.data.permissao
         }
         localStorage.setItem('usuario', JSON.stringify(usuario))
         window.location = "adm.html"
