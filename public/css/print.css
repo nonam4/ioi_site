@@ -2,6 +2,14 @@
   display: none;
 }
 
+filtro {
+  width: 100%;
+}
+
+filtro section:nth-child(2) {
+  border-right: 0;
+}
+
 filtro section:nth-child(3), filtro section:nth-child(4) {
   display: none;
 }
@@ -12,7 +20,7 @@ leitura {
   margin-bottom: 12px;
 }
 
-#feedbackTrabalhos {
+#feedback, #error, #load {
   display: none;
 }
 
@@ -21,17 +29,12 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   height: fit-content;
-  width: 100vw;
-  color: black !important;
+  width: 100%;
 }
 
 listagem {
   margin: auto;
   overflow: hidden;
   height: 100%;
-
-}
-
-text--medium {
-  color: black;
+  width: 100%;
 }
