@@ -70,8 +70,7 @@ const receberDados = usuario => {
       atendimentos = res.data.atendimentos
       versao = res.data.versao
       document.getElementById('menu').style.opacity = '1'
-      //listagem(true)
-      console.log(clientes)
+      listagem(true)
     } else {
       error('Você não deveria estar aqui. Redirecionando para a autenticação!')
       setTimeout(() => {
