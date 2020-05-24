@@ -65,12 +65,13 @@ const receberDados = usuario => {
       //dashboard = res.data.dashboard
       usuarios = res.data.usuarios
       //empresa = res.data.empresa
-      //estoque = res.data.estoque
+      //suprimentos = res.data.suprimentos
       clientes = res.data.clientes
       atendimentos = res.data.atendimentos
       versao = res.data.versao
       document.getElementById('menu').style.opacity = '1'
-      listagem(true)
+      //listagem(true)
+      console.log(clientes)
     } else {
       error('Você não deveria estar aqui. Redirecionando para a autenticação!')
       setTimeout(() => {
@@ -759,30 +760,38 @@ const salvarLeituras = cliente => {
     }
   }).then(res => {
     feedbacks--
-    feedback(false)
-    if(tela == 'leituras') {
-      preparLeiturasParaListagem(cliente)
-
-      var filtros = document.getElementById('filtrosDeLeituras')
-      var filtroSelecionado = filtros.options[filtros.selectedIndex].value
-      var novaListagem
-      if(filtroSelecionado == 'excluidas') {
-        novaListagem = criarInterfaceLeitura(cliente, false)
+    if(res.auth.autenticado) {
+      if(auth.erro) {
+        error(auth.msg)
       } else {
-        novaListagem = criarInterfaceLeitura(cliente, true)
-      }
-      setTimeout(() => {
-        if(parseInt(novaListagem.querySelector('#impressoras').innerHTML) > 0) {
-          esconderLoad()
-          document.getElementById('listagem').replaceChild(novaListagem, document.getElementById(cliente.id))
-        } else {
-          var el = document.getElementById(cliente.id)
-          el.style.opacity = '0'
+        feedback(false)
+        if(tela == 'leituras') {
+          preparLeiturasParaListagem(cliente)
+    
+          var filtros = document.getElementById('filtrosDeLeituras')
+          var filtroSelecionado = filtros.options[filtros.selectedIndex].value
+          var novaListagem
+          if(filtroSelecionado == 'excluidas') {
+            novaListagem = criarInterfaceLeitura(cliente, false)
+          } else {
+            novaListagem = criarInterfaceLeitura(cliente, true)
+          }
           setTimeout(() => {
-            el.remove()
-          }, 250)
+            if(parseInt(novaListagem.querySelector('#impressoras').innerHTML) > 0) {
+              esconderLoad()
+              document.getElementById('listagem').replaceChild(novaListagem, document.getElementById(cliente.id))
+            } else {
+              var el = document.getElementById(cliente.id)
+              el.style.opacity = '0'
+              setTimeout(() => {
+                el.remove()
+              }, 250)
+            }
+          }, 100)
         }
-      }, 100)
+      }
+    } else {
+      error('Tivemos algum problema com a autenticação. Recarregue a página e tente novamente!')
     }
   }).catch(err => {
     feedbacks--
@@ -1323,7 +1332,15 @@ const gravarCliente = cliente => {
     }
   }).then(res => {
     feedbacks--
-    feedback(false)
+    if(res.auth.autenticado) {
+      if(auth.erro) {
+        error(auth.msg)
+      } else {
+        feedback(false)
+      }
+    } else {
+      error('Tivemos algum problema com a autenticação. Recarregue a página e tente novamente!')
+    }
   }).catch(err => {
     feedbacks--
     console.error(err)
@@ -1573,7 +1590,15 @@ const gravarAtendimentos = atendimentos => {
     }
   }).then(res => {
     feedbacks--
-    feedback(false)
+    if(res.auth.autenticado) {
+      if(auth.erro) {
+        error(auth.msg)
+      } else {
+        feedback(false)
+      }
+    } else {
+      error('Tivemos algum problema com a autenticação. Recarregue a página e tente novamente!')
+    }
   }).catch(err => {
     feedbacks--
     console.error(err)
