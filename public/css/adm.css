@@ -39,7 +39,8 @@ body {
   font-size: 14px;
   color: var(--textos);
   width: 100%;
-  font-weight: 600;
+  font-weight: 400;
+  font-family: "Trebuchet MS";
   text-align: center;
   margin: -8px 0px 0px 0px;
   border: 0px;
@@ -1407,7 +1408,7 @@ atendimentoExpandido #acoes i:hover {
 }
 
 #motivos {
-  height: fit-content;
+  height: 308px;
   max-height: 308px;
   position: relative;
   transition: 0.2s ease all;
@@ -1440,7 +1441,7 @@ atendimentoExpandido #acoes i:hover {
   overflow: hidden;
   max-height: 308px;
   overflow-y: auto;
-  height: fit-content;
+  height: 308px;
 }
 
 .motivo-list::-webkit-scrollbar {
@@ -1497,7 +1498,6 @@ atendimentoExpandido #acoes i:hover {
 }
 
 .quantidade {
-  /*width: 100px;*/
   width: 0px;
   margin-left: 0px;
   margin-right: 0px;

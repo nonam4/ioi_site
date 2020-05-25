@@ -15,6 +15,9 @@
 		<link rel='stylesheet' href='css/adm.css'>
 		<link rel='stylesheet' href='css/load.css'>
 
+		<script src='js/suprimentos.js'></script>
+		<link rel='stylesheet' href='css/suprimentos.css'>
+
 		<link href='icons/css/all.min.css' rel='stylesheet'>
 		<link rel="stylesheet" media="print" href="css/print.css" />
 
@@ -590,19 +593,44 @@
 				</div>
 			</template>
 
+			<template id='tSurpimentosContainer'>
+				<div class='pessoasContainer'>
+					<pessoasContainer>
+						<div class='pessoasTitulo'>Suprimentos</div>
+						<div class='pessoasListagem suprimentos' id='suprimentos'>
+						</div>
+					</pessoasContainer>
+				</div>
+			</template>
+
+			<template id='tSurpimento'>
+				<suprimento>
+					<section id='modelo'></section>
+					<section id='minimo'></section>
+					<section id='quantidade'></section>
+					<i id='salvar' class='fas fa-check'></i>
+				</suprimento>
+			</template>
+
+			<template id='tSuprimentoAdicionar'>
+				<div class='sups add'>
+					<i class='fas fa-plus' onclick='adicionarSuprimento(this)' title='Adicionar Novo Suprimento'></i>
+				</div>
+			</template>
+
 			<div id='menu'>
 				<div class='menu-group'>
 					<img src='img/icon.png'>Mundo Eletrônico
 				</div>
 				<div class='menu-group'>
-					<!--
 					<div class='menu-section'>
 							<div class='menu-titulo'>Geral</div>
+							<!--
 							<div class='menu-item' onclick=''><i class='fas fa-th-large'></i>Dashboard</div>
 							<div class='menu-item' onclick=''><i class='fas fa-building'></i>Empresa</div>
-							<div class='menu-item' onclick=''><i class='fas fa-boxes'></i>Estoque</div>
+							-->
+							<div class='menu-item' onclick='selecionarSuprimentos()'><i class='fas fa-boxes'></i>Suprimentos</div>
 					</div>
-				-->
 					<div class='menu-section'>
 							<div class='menu-titulo'>Clientes e Fornecedores</div>
 							<div class='menu-item' onclick='expandirCliente()'><i class='fas fa-user-plus'></i>Cadastrar</div>

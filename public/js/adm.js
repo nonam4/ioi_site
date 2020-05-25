@@ -1,24 +1,11 @@
 //clientes, leituras, dashboard, atendimentos, suprimentos, empresa
-var tela = 'leituras'
+var tela = 'suprimentos'
 var feedbacks = 0
 
 //var dashboard
 var usuarios
 //var empresa
-var suprimentos = {
-  "0000000000000": {
-    modelo: "Toner 283",
-    quantidade: "20",
-    minimo: 5,
-    id: "0000000000000"
-  },
-  "0000000000001": {
-    modelo: "Toner 285/278",
-    quantidade: "15",
-    minimo: 5, 
-    id: "0000000000001"
-  }
-}
+var suprimentos
 var clientes
 var atendimentos
 var versao
@@ -65,7 +52,7 @@ const receberDados = usuario => {
       //dashboard = res.data.dashboard
       usuarios = res.data.usuarios
       //empresa = res.data.empresa
-      //suprimentos = res.data.suprimentos
+      suprimentos = res.data.suprimentos
       clientes = res.data.clientes
       atendimentos = res.data.atendimentos
       versao = res.data.versao
@@ -99,6 +86,9 @@ const listagem = criarFiltros => {
         break
       case 'atendimentos':
         listagemAtendimentos()
+        break
+      case 'suprimentos':
+        listagemSuprimentos()
         break
     }
     esconderLoad()
@@ -759,9 +749,9 @@ const salvarLeituras = cliente => {
     }
   }).then(res => {
     feedbacks--
-    if(res.auth.autenticado) {
-      if(auth.erro) {
-        error(auth.msg)
+    if(res.data.autenticado) {
+      if(res.data.erro) {
+        error(res.data.msg)
       } else {
         feedback(false)
         if(tela == 'leituras') {
@@ -1331,9 +1321,9 @@ const gravarCliente = cliente => {
     }
   }).then(res => {
     feedbacks--
-    if(res.auth.autenticado) {
-      if(auth.erro) {
-        error(auth.msg)
+    if(res.data.autenticado) {
+      if(res.data.erro) {
+        error(res.data.msg)
       } else {
         feedback(false)
       }
@@ -1553,7 +1543,7 @@ const criarInterfaceAtendimento = atendimento => {
         feedbacks--
         error('As alterações na ordem dos atendimentos foram perdidas por mudança de tela. Tente novamente!')
       }
-    }, 3000)}
+    }, 4000)}
   })(timeout)
 
   return interface
@@ -1589,9 +1579,9 @@ const gravarAtendimentos = atendimentos => {
     }
   }).then(res => {
     feedbacks--
-    if(res.auth.autenticado) {
-      if(auth.erro) {
-        error(auth.msg)
+    if(res.data.autenticado) {
+      if(res.data.erro) {
+        error(res.data.msg)
       } else {
         feedback(false)
       }
@@ -1864,10 +1854,9 @@ const mostrarQuantidades = (el, suprimento, alterarQuantidade) => {
   if(parseInt(input.value) > parseInt(suprimento.quantidade) && alterarQuantidade) {
     input.value = suprimento.quantidade
   }
-  input.max = suprimento.quantidade
 
   if(suprimento.quantidade == 0) {
-    input.min = 0
+    input.value = 0
   }
 }
 
@@ -1922,6 +1911,7 @@ const salvarAtendimento = atendimento => {
   var erro = false
   //só vai baixar do estoque se for um atendimento novo
   var editando = true
+  var atualizarSuprimentos = false
 
   var data = new Date()
   var ano = data.getFullYear()
@@ -1976,21 +1966,31 @@ const salvarAtendimento = atendimento => {
   }
 
   if(!erro) {
-    atendimento.motivo = []
+    var motivoLocal = []
     for(var x = 0; x < motivos.length; x++) {
       var motivo = motivos[x]
       var suprimento = suprimentoPorModelo(motivo.value)
 
       if(suprimento != undefined) {
+        atualizarSuprimentos = true
         //caso o motivo seja um toner ou suprimento
-        var quantidade = motivo.parentNode.parentNode.querySelector('.motivo-quantidade')
-        atendimento.motivo.push(suprimento.modelo + ' - Quantidade: ' + quantidade.value)
-        if(!editando) { suprimento.quantidade = suprimento.quantidade - quantidade.value }
-
+        var quantidade = parseInt(motivo.parentNode.parentNode.querySelector('.motivo-quantidade').value)
+        if(quantidade > suprimento.quantidade) {
+          error('A quantidade de toner não pode ser maior que a quantidade em estoque!')
+          erro = true
+          break
+        } else {
+          motivoLocal.push(suprimento.modelo + ' - Quantidade: ' + quantidade)
+          if(!editando) { 
+            suprimento.quantidade = suprimento.quantidade - quantidade 
+            conferirQuantidadeSuprimento(suprimento)
+          }
+        }
       } else if(motivo.value != '') {
-        atendimento.motivo.push(motivo.value)
+        motivoLocal.push(motivo.value)
       }
     }
+    atendimento.motivo = motivoLocal
 
     atendimento.responsavel = layout.querySelector('#responsavel').value
     if(layout.querySelector('#status').value == "Feito") {
@@ -2007,11 +2007,14 @@ const salvarAtendimento = atendimento => {
       }
     }
 
-    fecharAtendimento()
-    atendimentos[atendimento.id] = atendimento
-  
-    delete atendimento.dados
-    delete atendimento.tecnico
-    gravarAtendimentos({[atendimento.id]: atendimento})
+    if(!erro) {
+      fecharAtendimento()
+      atendimentos[atendimento.id] = atendimento
+    
+      delete atendimento.dados
+      delete atendimento.tecnico
+      if(atualizarSuprimentos) { gravarSuprimentos() }
+      gravarAtendimentos({[atendimento.id]: atendimento})
+    }
   }
 }
