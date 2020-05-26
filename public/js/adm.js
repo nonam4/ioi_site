@@ -1245,7 +1245,7 @@ const salvarCliente = cliente => {
         local: btoa('Não Instalado'),
         versao: 'Não Instalado'
       }
-      clientes.push(cliente)
+      clientes[cliente.id] = cliente
     }
 
     cliente.nomefantasia = toTitleCase(layout.querySelector('#nomefantasia').value)
