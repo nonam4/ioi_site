@@ -1554,3 +1554,127 @@ atendimentoExpandido #acoes i:hover {
   background: #aaa;
 }
 
+.suprimentos {
+  max-height: calc(100vh - 60px);
+}
+
+suprimento {
+  height: 36px;
+  width: calc(100% - 12px);
+  margin: 4px 4px 4px 8px;
+  padding-top: 6px;
+  display: flex;
+  font-size: 14px;
+  border-radius: 21px;
+  box-shadow: 0 2px 5px rgba(0,0,0,.3);
+  color: var(--textos);
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+}
+
+suprimento span {
+  font-size: 10px;
+  color: var(--principal);
+  position: absolute;
+  top: 0;
+}
+
+suprimento section {
+  position: relative;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0px;
+  padding-top: 14px;
+  cursor: default;
+  margin-bottom: 6px;
+}
+
+suprimento section:nth-of-type(1) {
+  width: 100%;
+  margin-left: 16px;
+  margin-right: 8px;
+  border-right: solid 1px var(--bordas);
+
+}
+
+suprimento section:nth-of-type(2) {
+  min-width: 100px;
+  margin-right: 8px;
+  padding-right: 8px;
+  border-right: solid 1px var(--bordas);
+}
+
+suprimento section:nth-of-type(3) {
+  min-width: 100px;
+  margin-right: 8px;
+  padding-right: 8px;
+  border-right: solid 1px var(--bordas);
+}
+
+suprimento .simpleInput {
+  width: 100%;
+  border-bottom: none;
+  text-align: left;
+  text-transform: capitalize;
+  margin: 0px;
+  padding: 0px;
+}
+
+suprimento i {
+  cursor: pointer;
+  min-width: 20px;
+  max-height: 20px;
+  font-size: 18px;
+  text-align: center;
+  padding: 5px;
+  border-radius: 50%;
+  margin-right: 5px;
+  line-height: 20px !important;
+  transition: 0.2s ease all, 0.1s ease opacity;
+  -moz-transition: 0.2s ease all, 0.1s ease opacity;
+  -webkit-transition: 0.2s ease all, 0.1s ease opacity;
+}
+
+suprimento i:hover {
+  background-color: var(--hover);
+}
+
+.suprimento {
+  margin: 0px;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+}
+
+.sups {
+  height: fit-content;
+  margin: 4px 4px 4px 13px;
+  display: flex;
+  font-size: 18px;
+  color: var(--textos);
+  padding: 5px;
+  text-align: center;
+}
+
+.sups i {
+  padding: 5px;
+  border-radius: 50%;
+  width: 20px;
+  line-height: 20px;
+  height: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+}
+
+.sups i:hover {
+  background-color: var(--hover);
+}
+
+.acabando {
+  color: var(--erro)
+}
