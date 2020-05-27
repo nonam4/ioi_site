@@ -1393,25 +1393,20 @@ const listagemAtendimentos = () => {
  
   for(var x = 0; x < Object.keys(atendimentos).length; x++) {
     var atendimento = atendimentos[Object.keys(atendimentos)[x]]
-    atendimento.dados = clientes[atendimento.cliente]
 
-    if(atendimento.dados != undefined) {
-      if(atendimento.feito) {
+    if(atendimento.feito) {
+      atFeitos[atendimento.id] = atendimento
+
+    } else if(atendimento.responsavel == '') {
+      atAberto[atendimento.id] = atendimento
+
+    } else {
+      for(var y = 0; y < Object.keys(usuarios).length; y++) {
+        var usuario = usuarios[Object.keys(usuarios)[y]]
     
-        atFeitos[atendimento.id] = atendimento
-
-      } else if(atendimento.responsavel == '') {
-      
-        atAberto[atendimento.id] = atendimento
-
-      } else {
-        for(var y = 0; y < Object.keys(usuarios).length; y++) {
-          var usuario = usuarios[Object.keys(usuarios)[y]]
-      
-          if(atendimento.responsavel == usuario.nome) {
-            atendimento.tecnico = usuario
-            usuario.atendimentos[atendimento.id] = atendimento
-          }
+        if(atendimento.responsavel == usuario.nome) {
+          atendimento.tecnico = usuario
+          usuario.atendimentos[atendimento.id] = atendimento
         }
       }
     }
