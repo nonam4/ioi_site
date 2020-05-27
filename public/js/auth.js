@@ -82,5 +82,5 @@ const error = (message) => {
 
   setTimeout(function(){
     document.getElementById("error").style.bottom = "-100px"
-  }, 3000)
+  }, 7000)
 }
