@@ -486,6 +486,19 @@ const criarInterfaceImpressora = (impressora, excluidas, listagem) => {
     layout.querySelector('#final').innerHTML = 'Sem Registro'
   }
 
+  if(impressora.tinta.capacidade != 'ilimitado') {
+
+    layout.querySelector('#capacidade').value = impressora.tinta.capacidade
+    layout.querySelector('#nivel').innerHTML = impressora.tinta.nivel + '%'
+
+    layout.querySelector('#abastecimento').onclick = (impressora => {
+      return () => { encherTinta(impressora) }
+    })(impressora)
+  } else {
+    layout.querySelector('#capacidade').value = 'ilimitado'
+    layout.querySelector('#nivel').innerHTML = '∞'
+  }
+
   if(excluidas) {
     layout.querySelector('#deletar').className = 'fas fa-trash-restore'
     layout.querySelector('#deletar').title = 'Restaurar impressora'
@@ -493,6 +506,14 @@ const criarInterfaceImpressora = (impressora, excluidas, listagem) => {
   }
 
   return layout
+}
+
+const encherTinta = (impressora) => {
+  impressora.tinta.cheio = impressora.tinta.cheio + impressora.tinta.impresso
+  impressora.tinta.impresso = 0
+  impressora.tinta.nivel = 100
+
+  document.getElementById(impressora.serial).querySelector('#nivel').innerHTML = '100%'
 }
 
 /*
@@ -806,11 +827,18 @@ const salvarLeituras = cliente => {
     var impressora = impressoras[el.id]
 
     impressora.setor = el.querySelector('#setor').value
-      if(cliente.franquia.tipo == 'maquina') {
-        impressora.franquia = parseInt(el.querySelector('#franquia').value.replace(/ págs/g , ''))
-      } else {
-        impressora.franquia = 0
-      }
+
+    if(el.querySelector('#capacidade').value == 'ilimitado') {
+      impressora.tinta.capacidade = el.querySelector('#capacidade').value
+    } else {
+      impressora.tinta.capacidade = Number(el.querySelector('#capacidade').value)
+    }
+
+    if(cliente.franquia.tipo == 'maquina') {
+      impressora.franquia = parseInt(el.querySelector('#franquia').value.replace(/ págs/g , ''))
+    } else {
+      impressora.franquia = 0
+    }
   })
 
   feedbacks++

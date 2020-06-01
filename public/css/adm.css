@@ -767,6 +767,7 @@ impressora .leituraDadosLinha:nth-child(5) .leituraDadosContainer {
 
 .tinta img {
   margin-top: -5px;
+  cursor: pointer;
 }
 
 impressora i {
