@@ -381,10 +381,14 @@ filtro section:nth-child(3) {
 }
 
 filtro section:nth-child(4) {
-  border-right: solid 0px var(--bordas);
+  border-right: solid 1px var(--bordas);
 }
 
 filtro section:nth-child(5) {
+  border-right: solid 1px var(--bordas);
+}
+
+filtro section:nth-child(6) {
   border-right: solid 0px var(--bordas);
 }
 
@@ -394,6 +398,8 @@ filtro section:nth-child(5) {
   width: 100%;
   text-align: center;
   margin: 0px 0px 8px 0px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .filtroText{
@@ -403,6 +409,8 @@ filtro section:nth-child(5) {
   font-weight: 600;
   text-align: center;
   margin: 8px 0px 0px 0px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .filtroText select {
@@ -559,6 +567,18 @@ leitura .leituraDadosLinha:nth-child(1) .leituraDadosContainer {
   width: 100%;
   max-width: 33.33%;
   padding: 0px 4px 0px 4px;
+}
+
+.tintas {
+  width: 0px;
+  padding: 0px;
+  opacity: 0;
+  display: none;
+}
+
+.leituraDadosContainer img {
+  width: 30px;
+  margin-bottom: -8px;
 }
 
 .leituraDadosTitulo {
@@ -735,6 +755,18 @@ impressora .leituraDadosLinha:nth-child(3) .leituraDadosContainer {
 
 impressora .leituraDadosLinha:nth-child(4) .leituraDadosContainer {
   max-width: 50%;
+}
+
+impressora .leituraDadosLinha:nth-child(5) .leituraDadosContainer {
+  max-width: 50%;
+}
+
+.tinta select{
+  margin-top: 4px;
+}
+
+.tinta img {
+  margin-top: -5px;
 }
 
 impressora i {

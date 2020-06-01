@@ -217,10 +217,15 @@ const preparLeiturasParaListagem = cliente => {
     cliente.franquia.valor = 0
   }
 
+  if(cliente.franquia.preco == undefined || cliente.franquia.preco == null) {
+    cliente.franquia.preco = 0
+  }
+
   cliente.impresso = 0
   cliente.excedentes = 0
   cliente.impressoras.atraso = false
   cliente.impressoras.inativas = false
+  cliente.abastecimento = false
   var impressoras = cliente.impressoras
 
   if(impressoras != undefined && impressoras != null) {
@@ -250,11 +255,14 @@ const preparLeiturasParaListagem = cliente => {
             cliente.excedentes = cliente.excedentes + impressora.excedentes
           }
 
+          if(impressora.tinta.capacidade != 'ilimitado' && impressora.tinta.impresso >= impressora.tinta.capacidade) {
+            cliente.abastecimento = true
+          }
+
           //checa se o ultimo dia de leitura foi a mais de 5 dias atrás
           var a = new Date()
           //precisa adicionar + 1 no dia pois senão se o valor for 10 pegará o dia 9
           var b = new Date(listagem + '-' + (parseInt(impressora.leituras[listagem].final.dia) + 1))
-
           if(Math.ceil(Math.abs(a - b) / (1000 * 3600 * 24)) > 5 && impressora.ativa){
             cliente.impressoras.atraso = true
           }
@@ -297,6 +305,14 @@ const criarInterfaceLeitura = (cliente, ativas) => {
   //define o numero de impressoras (precisa subtrair 2 do length pois tem duas variáveis definidas junto)
   leitura.querySelector('#impressoras').innerHTML = pegarQuantidadeImpressoras(ativas, cliente.impressoras)
   
+  if(cliente.abastecimento) {
+    leitura.querySelector('.tintas').style.width = '100%'
+    leitura.querySelector('.tintas').style.maxWidth = '33.33%'
+    leitura.querySelector('.tintas').style.padding = '0px 4px 0px 4px'
+    leitura.querySelector('.tintas').style.display = 'block'
+    leitura.querySelector('.tintas').style.opacity = '1'
+  }
+
   if(ativas) {
     //define o numero de excedentes
     leitura.querySelector('#excedentes').innerHTML = cliente.excedentes + ' págs'
@@ -343,6 +359,7 @@ const expandirLeitura = cliente => {
   var data = datas.options[datas.selectedIndex].value
 
   var expandida = document.getElementById('tLeituraExpandida').content.cloneNode(true)
+  expandida.querySelector('leituraexpandida').id = cliente.id
   expandida.querySelector('#editCliente').onclick = () => {expandirCliente(cliente)}
   expandida.querySelector('#salvar').onclick = () => {salvarLeituras(cliente)}
   expandida.querySelector('#relatorio').onclick = () => {gerarRelatorio(cliente)}
@@ -352,8 +369,17 @@ const expandirLeitura = cliente => {
   expandida.querySelector('#datasDeLeiturasExpandida').onchange = () => {alterarListagemLeituraExpandida(cliente)}
   //define o total impresso
   expandida.querySelector('#impresso').innerHTML = cliente.impresso + ' págs'
+  //define o valor por excedentes
+  expandida.querySelector('#excedenteValor').value = cliente.franquia.preco
   //define o valor dos excedentes
-  expandida.querySelector('#excedentes').innerHTML = cliente.excedentes + ' págs'
+  $('#excedenteValor').mask('0,00', {reverse: true})
+  var valor
+  if(cliente.franquia.tipo == 'ilimitado') {
+    valor = (cliente.franquia.preco * cliente.impresso).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+  } else {
+    valor = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+  }
+  expandida.querySelector('#excedentes').innerHTML = cliente.excedentes + ' págs - ' + valor
   //define dados do rodapé
   expandida.querySelector('#chave').innerHTML = 'Chave do cliente: ' + cliente.id
   expandida.querySelector('#local').innerHTML = 'Local inst. do coletor: ' + atob(cliente.sistema.local)
@@ -607,19 +633,40 @@ const alterarTipoFranquia = elemento => {
   //vai pra section com id de conteudo
   var container = elemento.parentNode.parentNode.parentNode.parentNode
   var section = container.querySelector('#franquiaContainer')
+  var valores = container.querySelector('#valoresContainer')
+  var excedentes = container.querySelector('#excedenteContainer')
   var impressoras = container.querySelectorAll('impressora')
+
+  var cliente = clientes[container.parentNode.id]
+  var valor
+  if(tipo == 'ilimitado') {
+    valor = (cliente.franquia.preco * cliente.impresso).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+  } else {
+    valor = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+  }
 
   if(tipo == 'pagina') {
 
+    valores.querySelector('.filtroTitulo').innerHTML = 'Valor Excedente'
+    container.querySelector('#excedentes').innerHTMl = cliente.excedentes + ' págs - ' + valor
+    container.querySelector('#impresso').innerHTML = cliente.impresso + ' págs'
+
+    valores.style.borderRight = "solid 1px var(--bordas)"
     section.style.display = 'block'
+    excedentes.style.display = 'block'
     setTimeout(() => {
       section.style.width = '100%'
       section.style.paddingRight = '12px'
       section.style.paddingLeft = '12px'
       section.style.opacity = '1'
+      
+      excedentes.style.width = '100%'
+      excedentes.style.paddingRight = '12px'
+      excedentes.style.paddingLeft = '12px'
+      excedentes.style.opacity = '1'
     }, 10)
 
-    impressoras.forEach((impressora) => {
+    impressoras.forEach(impressora => {
 
       var dados = impressora.querySelector('#franquiaImpressora')
       dados.style.height = '0px'
@@ -633,15 +680,30 @@ const alterarTipoFranquia = elemento => {
 
   } else if (tipo == 'maquina'){
 
+    valores.querySelector('.filtroTitulo').innerHTML = 'Valor Excedente'
+    container.querySelector('#excedentes').innerHTMl = cliente.excedentes + ' págs - ' + valor
+    container.querySelector('#impresso').innerHTML = cliente.impresso + ' págs'
+
+    valores.style.borderRight = "solid 1px var(--bordas)"
     section.style.width = '0px'
     section.style.paddingRight = '0px'
     section.style.paddingLeft = '0px'
     section.style.opacity = '0'
+
     setTimeout(() => {
       section.style.display = 'none'
     }, 250)
 
-    impressoras.forEach((impressora) => {
+    excedentes.style.display = 'block'
+    setTimeout(() => {
+      
+      excedentes.style.width = '100%'
+      excedentes.style.paddingRight = '12px'
+      excedentes.style.paddingLeft = '12px'
+      excedentes.style.opacity = '1'
+    }, 10)
+
+    impressoras.forEach(impressora => {
 
       var dados = impressora.querySelector('#franquiaImpressora')
       dados.style.display = 'flex'
@@ -654,15 +716,25 @@ const alterarTipoFranquia = elemento => {
     })
   } else if (tipo == 'ilimitado') {
 
+    valores.querySelector('.filtroTitulo').innerHTML = 'Valor Página'
+    container.querySelector('#impresso').innerHTML = cliente.impresso + ' págs - ' + valor
+    
+    valores.style.borderRight = "solid 0px var(--bordas)"
     section.style.width = '0px'
     section.style.paddingRight = '0px'
     section.style.paddingLeft = '0px'
     section.style.opacity = '0'
+
+    excedentes.style.width = '0px'
+    excedentes.style.paddingRight = '0px'
+    excedentes.style.paddingLeft = '0px'
+    excedentes.style.opacity = '0'
     setTimeout(() => {
       section.style.display = 'none'
+      excedentes.style.display = 'none'
     }, 250)
 
-    impressoras.forEach((impressora) => {
+    impressoras.forEach(impressora => {
 
       var dados = impressora.querySelector('#franquiaImpressora')
       dados.style.height = '0px'
@@ -710,6 +782,7 @@ const salvarLeituras = cliente => {
   delete cliente.impresso
   delete cliente.impressoras.atraso
   delete cliente.impressoras.inativas
+  delete cliente.abastecimento
 
   cliente.franquia.tipo = leitura.querySelector('#tipoFranquia').value
   if(cliente.franquia.tipo == 'maquina' || cliente.franquia.tipo == 'ilimitado') {
@@ -717,6 +790,8 @@ const salvarLeituras = cliente => {
   } else {
     cliente.franquia.valor = leitura.querySelector('#franquiaValor').value.replace(/ págs/g , '')
   }
+
+  cliente.franquia.preco = Number(leitura.querySelector('#excedenteValor').value.replace(/,/g, '.'))
 
   var impressoras = cliente.impressoras
   for(var x = 0; x < Object.keys(impressoras).length; x++) {
@@ -796,7 +871,6 @@ const gerarRelatorio = cliente => {
   var dataParaListagem = document.getElementById('datasDeLeiturasExpandida')
   var dataInvertida = dataParaListagem.options[dataParaListagem.selectedIndex].value
   var dataSplit = dataInvertida.split('-')
-  var dataDeListagem = meses[parseInt(dataSplit[1])] + '/' + dataSplit[0]
   feedbacks++
   feedback(true)
   var doc = dadosDoRelatorio(cliente, dataParaListagem)
@@ -938,22 +1012,27 @@ const gerarRelatorios = () => {
         doc = dadosDoRelatorio(cliente, dataParaListagem)
         zip.file(cliente.nomefantasia + ' - ' + dataSplit[1] + '_' + dataSplit[0] + '.pdf', doc.output('blob'))
 
-      } else if(relatorioSelect == 'interno' && cliente.excedentes > 0) {
+      } else if(relatorioSelect == 'interno' && (cliente.excedentes > 0 || cliente.franquia.tipo == 'ilimitado')) {
 
+        var valor = cliente.franquia.preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
         salvar = true
         doc.setFontSize(14)
         textWidth = doc.getStringUnitWidth(cliente.nomefantasia) * doc.internal.getFontSize() / doc.internal.scaleFactor
         textOffset = (210 - textWidth) / 2
         doc.text(textOffset, line, cliente.nomefantasia)
         line = incrementLine(doc, line, 9)
+        doc.setFontSize(12)
 
         if(cliente.franquia.tipo == 'maquina'){
+
+          var valorTotal = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+          doc.text(20, line, 'Valor por excedente: ' + valor + ' - Excedentes: ' + cliente.excedentes + ' páginas - Valor excedentes: ' + valorTotal)
+          line = incrementLine(doc, line, 9)
 
           var impressoras = cliente.impressoras
           for(var x = 0; x < Object.keys(impressoras).length; x++) {
             var impressora = impressoras[Object.keys(impressoras)[x]]
             if(impressora.ativa) {
-              doc.setFontSize(12)
               doc.text(20, line, impressora.modelo + ' - ' + impressora.serial)
               line = incrementLine(doc, line, 5)
               doc.text(20, line, 'Setor: ' + impressora.setor + ' - IP: ' + impressora.ip)
@@ -978,13 +1057,17 @@ const gerarRelatorios = () => {
           }
         } else {
           if(cliente.franquia.tipo == 'pagina'){
-            doc.text(20, line, 'Franquia contratada: ' + cliente.franquia + ' páginas - Impressões contabilizadas: ' + cliente.impresso + ' páginas')
+            doc.text(20, line, 'Franquia contratada: ' + cliente.franquia.valor + ' páginas - Impressões contabilizadas: ' + cliente.impresso + ' páginas')
             line = incrementLine(doc, line, 5)
-            doc.text(20, line, 'Páginas excedentes: ' + cliente.excedentes + ' páginas')
+            var valorTotal = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+            doc.text(20, line, 'Valor por excedente: ' + valor + ' - Excedentes: ' + cliente.excedentes + ' páginas - Valor excedentes: ' + valorTotal)
             line = incrementLine(doc, line, 10)
 
           } else {
             doc.text(20, line, 'Franquia contratada: Ilimitada - Impressões contabilizadas: ' + cliente.impresso + ' páginas')
+            line = incrementLine(doc, line, 5)
+            var valorTotal = (cliente.franquia.preco * cliente.impresso).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+            doc.text(20, line, 'Valor por página: ' + valor + ' - Valor total: ' + valorTotal)
             line = incrementLine(doc, line, 10)
           }
 
@@ -992,7 +1075,6 @@ const gerarRelatorios = () => {
           for(var x = 0; x < Object.keys(impressoras).length; x++) {
             var impressora = impressoras[Object.keys(impressoras)[x]]
             if(impressora.ativa) {
-              doc.setFontSize(12)
               doc.text(20, line, impressora.modelo + ' - ' + impressora.serial)
               line = incrementLine(doc, line, 5)
               doc.text(20, line, 'Setor: ' + impressora.setor + ' - IP: ' + impressora.ip)
@@ -1298,6 +1380,7 @@ const gravarCliente = cliente => {
   if(impressoras != undefined && Object.keys(impressoras).length > 0) {
     delete cliente.impressoras.atraso
     delete cliente.impressoras.inativas
+    delete cliente.abastecimento
     for(var x = 0; x < Object.keys(impressoras).length; x++) {
       var impressora = impressoras[Object.keys(impressoras)[x]]
       //deleta os dados locais que não precisam serem salvos no DB

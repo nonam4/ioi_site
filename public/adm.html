@@ -79,27 +79,31 @@
 						<i class='fas fa-expand-arrows-alt'></i>
 					</section>
 					<section class='leituraDados'>
-			      <div class='leituraDadosLinha'>
+			      		<div class='leituraDadosLinha'>
 							<div class='leituraDadosContainer'>
 								<div class='leituraDadosTitulo'>Impresso</div>
 								<div id="impresso" class='leituraDadosTextoGrande'></div>
-			      	</div>
+							</div>
 							<div class='leituraDadosContainer'>
 								<div class='leituraDadosTitulo'>Excedentes</div>
 								<div id="excedentes" class='leituraDadosTextoGrande'></div>
-			      	</div>
+							</div>
+							<div class='leituraDadosContainer tintas'>
+								<div class='leituraDadosTitulo'>Alerta</div>
+								<img src='img/cmyk.png' id="abastecimento" class='leituraDadosTextoGrande'/>
+							</div>
 						</div>
 						<div class='leituraDadosLinha'>
 							<div class='leituraDadosContainer'>
-				      	<div class='leituraDadosTitulo'>Impressoras</div>
+				      			<div class='leituraDadosTitulo'>Impressoras</div>
 								<div id="impressoras" class='leituraDadosTexto'></div>
 							</div>
 							<div class='leituraDadosContainer'>
-				      	<div class='leituraDadosTitulo'>Franquia</div>
+				      			<div class='leituraDadosTitulo'>Franquia</div>
 								<div id="franquia" class='leituraDadosTexto'></div>
 							</div>
 							<div class='leituraDadosContainer'>
-				      	<div class='leituraDadosTitulo'>Versão</div>
+				      			<div class='leituraDadosTitulo'>Versão</div>
 								<div id="versao" class='leituraDadosTexto'></div>
 							</div>
 						</div>
@@ -123,33 +127,37 @@
 							<filtro>
 								<section>
 									<div class='filtroTitulo'>Datas</div>
-							    <div class='filtroText'>
+							    		<div class='filtroText'>
 										<select id='datasDeLeiturasExpandida'></select>
 									</div>
 								</section>
 								<section>
 									<div class='filtroTitulo'>Tipo de Franquia</div>
 									<div class='filtroText'>
-				        		<select id='tipoFranquia' onchange='alterarTipoFranquia(this)'>
+				        				<select id='tipoFranquia' onchange='alterarTipoFranquia(this)'>
 											<option value='ilimitado'>Ilimitada</option>
-				        			<option value='pagina'>Por página</option>
+				        					<option value='pagina'>Por página</option>
 											<option value='maquina'>Por máquina</option>
 										</select>
-				        	</div>
+				        			</div>
 								</section>
 								<section id='franquiaContainer'>
 									<div class='filtroTitulo'>Franquia</div>
 									<input class='simpleInput' id='franquiaValor' type='text' title='Franquia' placeholder='Digite aqui..'
-				        		onfocus='converterPaginaNumero(this)' onblur='converterNumeroPagina(this)'>
+				        			onfocus='converterPaginaNumero(this)' onblur='converterNumeroPagina(this)'>
 								</section>
 								<section>
-				        	<div class='filtroTitulo'>Total Impresso</div>
+				        			<div class='filtroTitulo'>Total Impresso</div>
 									<div class='filtroText' id='impresso'></div>
 								</section>
-								<section>
+								<section id='valoresContainer'>
+									<div class='filtroTitulo'>Valor Excedente</div>
+									<input class='simpleInput' id='excedenteValor' type='text' title='Valor por excedente' placeholder='00,00'>
+								</section>
+								<section id='excedenteContainer'>
 									<div class='filtroTitulo'>Páginas Excedentes</div>
-				        	<div class='filtroText' id='excedentes'></div>
-				        </section>
+									<div class='filtroText' id='excedentes'></div>
+								</section>
 							</filtro>
 							<listagemImpressoras id='impressoras'></listagemImpressoras>
 							<div class='listagemRodape'>
@@ -169,47 +177,67 @@
 						<i id='deletar' class='fas fa-trash' title='Deletar impressora'></i>
 					</section>
 					<section class='leituraDados'>
-				    <div class='leituraDadosLinha'>
+						<div class='leituraDadosLinha'>
 							<div class='leituraDadosContainer'>
 								<div class='leituraDadosTitulo'>Setor</div>
 								<div class='leituraDadosTexto'>
-									<input class='simpleInput' type='text' id='setor' placeholder='Digite aqui..'></div>
+									<input class='simpleInput' type='text' id='setor' placeholder='Digite aqui..'>
 								</div>
 							</div>
-							<div class='leituraDadosLinha'>
-				   			<div class='leituraDadosContainer'><div class='leituraDadosTitulo'>Serial</div>
+						</div>
+						<div class='leituraDadosLinha'>
+				   			<div class='leituraDadosContainer'>
+							   	<div class='leituraDadosTitulo'>Serial</div>
 								<div id='serial' class='leituraDadosTexto'></div>
 							</div>
 							<div class='leituraDadosContainer'>
 								<div class='leituraDadosTitulo'>IP</div>
-				    		<div id='ip' class='leituraDadosTexto'></div>
+								<div id='ip' class='leituraDadosTexto'></div>
 							</div>
 							<div class='leituraDadosContainer'>
-				    		<div class='leituraDadosTitulo'>Impresso</div>
+								<div class='leituraDadosTitulo'>Impresso</div>
 								<div id='impresso' class='leituraDadosTexto'></div>
 							</div>
 						</div>
 						<div id='franquiaImpressora' class='leituraDadosLinha'>
 							<div id='franquiaContainer' class='leituraDadosContainer'>
-				    		<div class='leituraDadosTitulo'>Franquia</div>
+				    			<div class='leituraDadosTitulo'>Franquia</div>
 								<div class='leituraDadosTexto'>
 									<input class='simpleInput' id='franquia' type='text' title='Franquia' +
 				    				placeholder='Digite aqui..' onfocus='converterPaginaNumero(this)' onblur='converterNumeroPagina(this)'>
-				    		</div>
+				    			</div>
 							</div>
 							<div class='leituraDadosContainer'>
 								<div class='leituraDadosTitulo'>Excedentes</div>
-				    		<div class='leituraDadosTexto' id='excedentes'></div>
+				    			<div class='leituraDadosTexto' id='excedentes'></div>
 							</div>
 						</div>
-				    <div class='leituraDadosLinha'>
+						<div class='leituraDadosLinha tinta'>
+							<div class='leituraDadosContainer'>
+								<div class='leituraDadosTitulo'>Capacidade</div>
+								<select id='capacidade'>
+									<option value='ilimitado'>Não controlado</option>
+									<option value='2000'>2000 págs</option>
+									<option value='5000'>5000 págs</option>
+									<option value='10000'>10000 págs</option>
+									<option value='15000'>15000 págs</option>
+								</select>
+				    		</div>
+							<div class='leituraDadosContainer'>
+								<div class='leituraDadosTitulo'>
+									<img src='img/cmyk.png' id="abastecimento" class='leituraDadosTextoGrande'/>
+								</div>
+				    			<div id='nivel' class='leituraDadosTexto'>100%</div>
+							</div>
+						</div>
+				    	<div class='leituraDadosLinha'>
 							<div class='leituraDadosContainer'>
 								<div class='leituraDadosTitulo'>Contador inicial</div>
 								<div id='inicial' class='leituraDadosTexto'></div>
-				    	</div>
+				    		</div>
 							<div class='leituraDadosContainer'>
 								<div class='leituraDadosTitulo'>Contador final</div>
-				    		<div id='final' class='leituraDadosTexto'></div>
+				    			<div id='final' class='leituraDadosTexto'></div>
 							</div>
 						</div>
 					</section>
