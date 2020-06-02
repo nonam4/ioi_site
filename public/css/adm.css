@@ -1,5 +1,5 @@
 :root {
-  --bordas: #757575;
+  --bordas: #d4d4d4;
 	--principal: #0059b3;
 	--principalHover: #014487;
 	--principalLight: rgba(52,152,219,.15);
@@ -44,7 +44,7 @@ body {
   text-align: center;
   margin: -8px 0px 0px 0px;
   border: 0px;
-  border-bottom: solid 1px var(--titulos);
+  border-bottom: solid 1px var(--bordas);
   padding-bottom: 4px;
   outline: none;
   cursor: text !important;
@@ -432,7 +432,7 @@ filtro section:nth-child(6) {
   height: 20px;
   margin-left: 8px;
   line-height: 20px;
-  border-radius: 10px;
+  border-radius: 50%;
   cursor: pointer !important;
   padding: 2px;
   position: absolute;
@@ -705,6 +705,16 @@ listagemImpressoras {
   position: relative;
 }
 
+listagemImpressoras::-webkit-scrollbar {
+  width: 12px;
+  border-radius: 6px;
+  background: white;
+}
+
+listagemImpressoras::-webkit-scrollbar-thumb {
+  background: #aaa;
+}
+
 impressora {
   width: calc(50% - 14px);
   min-width: 250px;
@@ -754,10 +764,6 @@ impressora .leituraDadosLinha:nth-child(3) .leituraDadosContainer {
 }
 
 impressora .leituraDadosLinha:nth-child(4) .leituraDadosContainer {
-  max-width: 50%;
-}
-
-impressora .leituraDadosLinha:nth-child(5) .leituraDadosContainer {
   max-width: 50%;
 }
 

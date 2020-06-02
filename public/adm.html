@@ -195,7 +195,7 @@
 								<div id='ip' class='leituraDadosTexto'></div>
 							</div>
 							<div class='leituraDadosContainer'>
-								<div class='leituraDadosTitulo'>Impresso</div>
+								<div class='leituraDadosTitulo'>Impresso/Mês</div>
 								<div id='impresso' class='leituraDadosTexto'></div>
 							</div>
 						</div>
@@ -208,26 +208,8 @@
 				    			</div>
 							</div>
 							<div class='leituraDadosContainer'>
-								<div class='leituraDadosTitulo'>Excedentes</div>
+								<div class='leituraDadosTitulo'>Excedentes/Mês</div>
 				    			<div class='leituraDadosTexto' id='excedentes'></div>
-							</div>
-						</div>
-						<div class='leituraDadosLinha tinta'>
-							<div class='leituraDadosContainer'>
-								<div class='leituraDadosTitulo'>Capacidade</div>
-								<select id='capacidade'>
-									<option value='ilimitado'>Ilimitado</option>
-									<option value='2000'>2000 págs</option>
-									<option value='5000'>5000 págs</option>
-									<option value='10000'>10000 págs</option>
-									<option value='15000'>15000 págs</option>
-								</select>
-				    		</div>
-							<div class='leituraDadosContainer'>
-								<div class='leituraDadosTitulo'>
-									<img src='img/cmyk.png' id="abastecimento" class='leituraDadosTextoGrande'/>
-								</div>
-				    			<div id='nivel' class='leituraDadosTexto'>100%</div>
 							</div>
 						</div>
 				    	<div class='leituraDadosLinha'>
@@ -238,6 +220,27 @@
 							<div class='leituraDadosContainer'>
 								<div class='leituraDadosTitulo'>Contador final</div>
 				    			<div id='final' class='leituraDadosTexto'></div>
+							</div>
+						</div>
+						<div class='leituraDadosLinha tinta'>
+							<div class='leituraDadosContainer'>
+								<div class='leituraDadosTitulo'>Capacidade</div>
+								<select id='capacidade'>
+									<option value='ilimitado'>Ilimitado</option>
+									<option value='2000'>2000 págs</option>
+									<option value='5000'>5000 págs</option>
+									<option value='10000'>10000 págs</option>
+								</select>
+				    		</div>
+							<div class='leituraDadosContainer'>
+								<div class='leituraDadosTitulo'>
+									<img src='img/cmyk.png' id="abastecimento" class='leituraDadosTextoGrande'/>
+								</div>
+				    			<div id='nivel' class='leituraDadosTexto'>100%</div>
+							</div>
+							<div class='leituraDadosContainer'>
+								<div class='leituraDadosTitulo'>Impresso/Total</div>
+				    			<div class='leituraDadosTexto' id='total'></div>
 							</div>
 						</div>
 					</section>
@@ -650,8 +653,8 @@
 				<div class='menu-group'>
 					<div class='menu-section'>
 							<div class='menu-titulo'>Geral</div>
-							<!--
 							<div class='menu-item' onclick=''><i class='fas fa-th-large'></i>Dashboard</div>
+							<!--
 							<div class='menu-item' onclick=''><i class='fas fa-building'></i>Empresa</div>
 							-->
 							<div class='menu-item' onclick='selecionarSuprimentos()'><i class='fas fa-boxes'></i>Suprimentos</div>

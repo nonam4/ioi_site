@@ -490,6 +490,7 @@ const criarInterfaceImpressora = (impressora, excluidas, listagem) => {
 
     layout.querySelector('#capacidade').value = impressora.tinta.capacidade
     layout.querySelector('#nivel').innerHTML = impressora.tinta.nivel + '%'
+    layout.querySelector('#total').innerHTML = impressora.tinta.impresso + ' págs'
 
     layout.querySelector('#abastecimento').onclick = (impressora => {
       return () => { encherTinta(impressora) }
@@ -497,6 +498,9 @@ const criarInterfaceImpressora = (impressora, excluidas, listagem) => {
   } else {
     layout.querySelector('#capacidade').value = 'ilimitado'
     layout.querySelector('#nivel').innerHTML = '∞'
+    layout.querySelector('#total').innerHTML = '-'
+
+    layout.querySelector('#abastecimento').style.cursor = 'default'
   }
 
   if(excluidas) {
@@ -1555,7 +1559,7 @@ const listagemAtendimentos = () => {
                         "</div><div class='pessoasListagem tec' id='" + usuario.usuario + "'></div>"
   
         container.querySelector('.pessoasContainer').appendChild(layout)
-        Sortable.create(container.querySelector('#' + usuario.usuario), {animation: 150})
+        Sortable.create(container.querySelector('#' + usuario.usuario), {animation: 250})
       }
       container.querySelector('#' + usuario.usuario).appendChild(criarInterfaceAtendimento(atendimento))
     }
@@ -1790,16 +1794,14 @@ const autoCompleteClientes = input => {
       var cliente = clientes[Object.keys(clientes)[x]]
 
       /* checa as letras compativeis no nome fantasia */
-      if (cliente.nomefantasia.toLowerCase().indexOf( val.toLowerCase() ) > -1 
-          || cliente.razaosocial.toLowerCase().indexOf( val.toLowerCase() ) > -1) {
+      if (cliente.nomefantasia.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val.toLowerCase() ) > -1 
+          || cliente.razaosocial.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val.toLowerCase() ) > -1) {
         
         /* cria uma div para cada item que tenha correspondencia */
         b = document.createElement('DIV')
-        if (cliente.nomefantasia.toLowerCase().indexOf( val.toLowerCase() ) > -1) {
-          /* faz as letras coincidentes em negrito */
+        if (cliente.nomefantasia.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val.toLowerCase() ) > -1) {
           b.innerHTML = cliente.nomefantasia
-        } else if (cliente.razaosocial.toLowerCase().indexOf( val.toLowerCase() ) > -1) {
-          /* faz as letras coincidentes em negrito */
+        } else if (cliente.razaosocial.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val.toLowerCase() ) > -1) {
           b.innerHTML = cliente.razaosocial
         }
 
@@ -1819,7 +1821,6 @@ const autoCompleteClientes = input => {
   
   const closeAllLists = elmnt => {
     /* fecha todas as listas do documento, exceto a passada como argumento */
-      
     var x = document.querySelectorAll('.autocomplete')
     x.forEach(el => {
       if (elmnt != el && elmnt != input) {
