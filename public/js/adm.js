@@ -1685,7 +1685,7 @@ const salvarOrdemAtendimentos = responsavel => {
   }
 }
 
-const gravarAtendimentos = atendimentos => {
+const gravarAtendimentos = atendimento => {
   feedbacks++
   feedback(true)
   var usuario = JSON.parse(localStorage.getItem('usuario'))
@@ -1693,7 +1693,7 @@ const gravarAtendimentos = atendimentos => {
     params: {
       usuario: usuario.usuario,
       senha: usuario.senha,
-      atendimentos: JSON.stringify(atendimentos)
+      atendimentos: JSON.stringify(atendimento)
     }
   }).then(res => {
     feedbacks--
