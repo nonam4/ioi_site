@@ -876,7 +876,12 @@ pessoasContainer {
   background: #aaa;
 }
 
-#inativos, .tec {
+.tec {
+  max-height: fit-content;
+  height: fit-content;
+}
+
+#inativos  {
   max-height: 177px;
 }
 
