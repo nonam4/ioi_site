@@ -294,7 +294,7 @@ const criarInterfaceLeitura = (cliente, ativas) => {
   //id principal
   leitura.querySelector('leitura').id = cliente.id
   if(cliente.sistema.versao == 'Não instalado' || cliente.sistema.versao != versao){
-    leitura.querySelector('.leituraTitulo').style.backgroundColor = 'var(--atraso)';
+    leitura.querySelector('.leituraTitulo').style.backgroundColor = 'var(--erro)';
   } else if(cliente.impressoras.atraso) {
     leitura.querySelector('.leituraTitulo').style.backgroundColor = 'var(--alerta)'
   }
