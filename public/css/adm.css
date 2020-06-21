@@ -1564,10 +1564,14 @@ atendimentoExpandido #acoes i:hover {
 }
 
 .autocomplete div {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: calc(100% - 20px);
   color: var(--textos);
-  padding: 10px;
+  margin: 0px 10px;
+  padding: 10px 0px;
   cursor: pointer;
-  height: 18px;
   background-color: white;
   border-bottom: 1px solid var(--bordas);
   transition: 0.2s ease all;
