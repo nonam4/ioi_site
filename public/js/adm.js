@@ -1992,7 +1992,13 @@ const mostrarDadosCliente = (cliente, input) => {
   var dados = container.querySelector('#dados')
   var editClient = container.querySelector('#editCliente')
 
-  dados.querySelector('#endereco').innerHTML = cliente.endereco.rua + ', ' + cliente.endereco.numero + ', ' + cliente.endereco.cidade
+  var endereco = cliente.endereco
+  dados.querySelector('#endereco').href = 'http://maps.google.com/maps?q=' + endereco.rua + '+' + endereco.numero + '+' + endereco.cidade
+  if(endereco.complemento == '') {
+    dados.querySelector('#endereco').innerHTML = endereco.rua + ', ' + endereco.numero + ', ' + endereco.cidade + ', ' + endereco.estado
+  } else {
+    dados.querySelector('#endereco').innerHTML = endereco.rua + ', ' + endereco.numero + ' - ' + endereco.complemento + ' - ' + endereco.cidade + ', ' + endereco.estado
+  }
 
   if(cliente.contato.telefone != '' && cliente.contato.celular != '') {
     dados.querySelector('#telefone').innerHTML = cliente.contato.telefone + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + cliente.contato.celular

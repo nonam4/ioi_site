@@ -1385,6 +1385,11 @@ atendimentoExpandido section:nth-of-type(4) {
   -webkit-transition: 0.2s ease all;
 }
 
+#dados a {
+  text-decoration: none;
+  color: var(--titulos);
+}
+
 #dados div {
   padding: 1px 0px 2px 0px;
 }
