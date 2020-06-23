@@ -181,6 +181,26 @@ const gerarDatasDeListagem = () => {
 /*
 * separa as leituras de acordo com os filtros e cria a interface por fim
 */
+const compare = (vlocal, vserver) => {
+  var result = false
+  if(typeof vlocal !== 'object'){ vlocal = vlocal.toString().split('.') }
+  if(typeof vserver !== 'object'){ vserver = vserver.toString().split('.') }
+
+  for(var i = 0; i < (Math.max(vlocal.length, vserver.length)); i++){
+      if(vlocal[i] == undefined){ vlocal[i]= 0 }
+      if(vserver[i] == undefined){ vserver[i] = 0 }
+
+      if(Number(vlocal[i]) < Number(vserver[i])){
+          result = true
+          break
+      }
+      if(vlocal[i] != vserver[i]){
+          break
+      }
+  }
+  return result
+}
+
 const listagemLeituras = () => {
 
   var filtros = document.getElementById('filtrosDeLeituras')
@@ -195,7 +215,7 @@ const listagemLeituras = () => {
 
       if(filtroSelecionado == 'todas') {
         interfaces.appendChild(criarInterfaceLeitura(cliente, true))
-      } else if(filtroSelecionado == 'alertas' && (cliente.sistema.versao != versao || cliente.impressoras.atraso)){
+      } else if(filtroSelecionado == 'alertas' && (compare(cliente.sistema.versao, versao) || cliente.impressoras.atraso)){
         interfaces.appendChild(criarInterfaceLeitura(cliente, true))
       } else if(filtroSelecionado == 'excedentes' && cliente.excedentes > 0){
         interfaces.appendChild(criarInterfaceLeitura(cliente, true))
@@ -293,7 +313,7 @@ const criarInterfaceLeitura = (cliente, ativas) => {
 
   //id principal
   leitura.querySelector('leitura').id = cliente.id
-  if(cliente.sistema.versao == 'Não instalado' || cliente.sistema.versao != versao){
+  if(cliente.sistema.versao == 'Não instalado' || compare(cliente.sistema.versao, versao)){
     leitura.querySelector('.leituraTitulo').style.backgroundColor = 'var(--erro)';
   } else if(cliente.impressoras.atraso) {
     leitura.querySelector('.leituraTitulo').style.backgroundColor = 'var(--alerta)'
