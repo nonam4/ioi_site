@@ -390,9 +390,10 @@ const expandirLeitura = cliente => {
   //define o total impresso
   expandida.querySelector('#impresso').innerHTML = cliente.impresso + ' págs'
   //define o valor por excedentes
-  expandida.querySelector('#excedenteValor').value = cliente.franquia.preco
-  //define o valor dos excedentes
   $('#excedenteValor').mask('0,00', {reverse: true})
+  if(cliente.franquia.preco > 0) {
+    expandida.querySelector('#excedenteValor').value = cliente.franquia.preco
+  }
   var valor
   if(cliente.franquia.tipo == 'ilimitado') {
     valor = (cliente.franquia.preco * cliente.impresso).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
