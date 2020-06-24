@@ -1813,16 +1813,18 @@ const autoCompleteClientes = input => {
     
     for(var x = 0; x < Object.keys(clientes).length; x++) {
       var cliente = clientes[Object.keys(clientes)[x]]
+      
+      val = val.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '')
 
       /* checa as letras compativeis no nome fantasia */
-      if (cliente.nomefantasia.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val.toLowerCase() ) > -1 
-          || cliente.razaosocial.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val.toLowerCase() ) > -1) {
+      if (cliente.nomefantasia.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val ) > -1 
+          || cliente.razaosocial.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val ) > -1) {
         
         /* cria uma div para cada item que tenha correspondencia */
         b = document.createElement('DIV')
-        if (cliente.nomefantasia.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val.toLowerCase() ) > -1) {
+        if (cliente.nomefantasia.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val ) > -1) {
           b.innerHTML = cliente.nomefantasia
-        } else if (cliente.razaosocial.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val.toLowerCase() ) > -1) {
+        } else if (cliente.razaosocial.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val ) > -1) {
           b.innerHTML = cliente.razaosocial
         }
 
