@@ -251,7 +251,7 @@ const preparLeiturasParaListagem = cliente => {
   if(impressoras != undefined && impressoras != null) {
     for(var x = 0; x < Object.keys(impressoras).length; x++) {
       var impressora = impressoras[Object.keys(impressoras)[x]]
-      if(impressora.leituras != undefined) {
+      if(impressora.leituras != undefined && impressora.ativa) {
         impressora.serial = Object.keys(impressoras)[x]
         impressora.impresso = 0
         impressora.excedentes = 0
@@ -289,9 +289,8 @@ const preparLeiturasParaListagem = cliente => {
         } else if(impressora.ativa) {
           cliente.impressoras.atraso = true
         }
-        if(!impressora.ativa) {
-          cliente.impressoras.inativas = true
-        }
+      } else if(impressora.leituras != undefined && !impressora.ativa) {
+        cliente.impressoras.inativas = true
       }
     }
   }
@@ -533,7 +532,7 @@ const criarInterfaceImpressora = (impressora, excluidas, listagem) => {
   return layout
 }
 
-const encherTinta = (impressora) => {
+const encherTinta = impressora => {
   impressora.tinta.cheio = impressora.tinta.cheio + impressora.tinta.impresso
   impressora.tinta.impresso = 0
   impressora.tinta.nivel = 100
