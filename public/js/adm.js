@@ -868,12 +868,10 @@ const salvarLeituras = cliente => {
   feedbacks++
   feedback(true)
   var usuario = JSON.parse(localStorage.getItem('usuario'))
-  axios.request('https://us-central1-ioi-printers.cloudfunctions.net/gravarCliente', {
-    params: {
+  axios.post('https://us-central1-ioi-printers.cloudfunctions.net/gravarCliente', {
       usuario: usuario.usuario,
       senha: usuario.senha,
       cliente: JSON.stringify(cliente)
-    }
   }).then(res => {
     feedbacks--
     if(res.data.autenticado) {
