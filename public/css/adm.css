@@ -175,6 +175,10 @@ body {
   display: flex;
   flex-direction: column;
   opacity: 0;
+
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
 .menu-group {
@@ -351,6 +355,7 @@ body {
 
 filtro {
   width: calc(100% - 12px);
+  min-width: 278px;
   display: flex;
   margin: 8px 4px 4px 8px;
   border-bottom: solid 1px var(--bordas);
@@ -359,10 +364,30 @@ filtro {
   border-radius: 28px
 }
 
+@media only screen and (max-width: 890px) {
+  filtro {
+    flex-direction: column;
+  }
+
+  filtro section {
+    padding: 0px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border: none !important;
+    border-bottom: solid 1px var(--bordas) !important;
+    margin-bottom: -1px;
+  }
+
+  filtro section:nth-child(4) {
+    border-bottom: solid 0px var(--bordas) !important;
+    display: flex;
+  }
+}
+
 filtro section {
   width: calc(100% - 24px);
-  padding-right: 12px;
-  padding-left: 12px;
+  margin-right: 12px;
+  margin-left: 12px;
   transition: 0.2s ease all;
   -moz-transition: 0.2s ease all;
   -webkit-transition: 0.2s ease all;
@@ -381,7 +406,7 @@ filtro section:nth-child(3) {
 }
 
 filtro section:nth-child(4) {
-  border-right: solid 1px var(--bordas);
+  border-right: solid 0px var(--bordas);
 }
 
 filtro section:nth-child(5) {
@@ -450,6 +475,7 @@ legenda {
   font-size: 11px;
   color: var(--titulos);
   display: flex;
+  margin: auto;
 }
 
 .legenda {
@@ -475,7 +501,7 @@ legenda:nth-of-type(3) .legenda {
 
 leitura {
   width: calc(25% - 12px);
-  min-width: 250px;
+  min-width: 278px;
   display: flex;
   flex-direction: column;
   margin: 4px 4px 4px 8px;
@@ -484,6 +510,24 @@ leitura {
   transition: 0.2s ease all;
   -moz-transition: 0.2s ease all;
   -webkit-transition: 0.2s ease all;
+}
+
+@media only screen and (max-width: 1426px) {
+  leitura {
+    width: calc(33.33% - 12px);
+  }
+}
+
+@media only screen and (max-width: 1136px) {
+  leitura {
+    width: calc(50% - 12px);
+  }
+}
+
+@media only screen and (max-width: 846px) {
+  leitura {
+    width: calc(100% - 12px);
+  }
 }
 
 leitura i {
@@ -844,7 +888,6 @@ impressora .leituraDados {
 
 .pessoasContainer {
   width: 100%;
-  padding: 5px 0px;
   margin-left: 4px;
 }
 
@@ -857,6 +900,30 @@ pessoasContainer {
   color: var(--principal);
   font-size: 22px;
   padding: 8px;
+  display: flex;
+}
+
+.pessoasTitulo span {
+  width: 100%;
+}
+
+.pessoasTitulo i {
+  font-size: 18px;
+  color: var(--textos);
+  padding: 5px;
+  border-radius: 50%;
+  width: 20px;
+  line-height: 20px;
+  height: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+}
+
+.pessoasTitulo i:hover {
+  background-color: var(--hover);
 }
 
 .pessoasListagem {
@@ -1666,6 +1733,20 @@ suprimento section:nth-of-type(3) {
   border-right: solid 1px var(--bordas);
 }
 
+suprimento section:nth-of-type(4) {
+  min-width: 100px;
+  margin-right: 8px;
+  padding-right: 8px;
+  border-right: solid 1px var(--bordas);
+}
+
+suprimento section:nth-of-type(5) {
+  min-width: 100px;
+  margin-right: 8px;
+  padding-right: 8px;
+  border-right: solid 1px var(--bordas);
+}
+
 suprimento .simpleInput {
   width: 100%;
   border-bottom: none;
@@ -1701,33 +1782,19 @@ suprimento i:hover {
   -webkit-transition: 0.2s ease all;
 }
 
-.sups {
-  height: fit-content;
-  margin: 4px 4px 4px 13px;
-  display: flex;
-  font-size: 18px;
-  color: var(--textos);
-  padding: 5px;
-  text-align: center;
-}
-
-.sups i {
-  padding: 5px;
-  border-radius: 50%;
-  width: 20px;
-  line-height: 20px;
-  height: 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.2s ease all;
-  -moz-transition: 0.2s ease all;
-  -webkit-transition: 0.2s ease all;
-}
-
-.sups i:hover {
-  background-color: var(--hover);
-}
-
 .acabando {
   color: var(--erro)
 }
+
+/*
+@media only screen and (max-width: 556px) {
+  #menu {
+    position: absolute;
+    left: -250px;
+  }
+
+  #listagem {
+    width: 100%;
+  }
+}
+*/

@@ -65,9 +65,9 @@
 						</div>
 					</section>
 					<section>
-						<legenda><div class="legenda"></div> Coletor desatualizado</legenda>
-						<legenda><div class="legenda"></div> Leituras em atraso</legenda>
-						<legenda><div class="legenda"></div> Tudo certo</legenda>
+						<legenda><div class="legenda"></div> Desatualizado</legenda>
+						<legenda><div class="legenda"></div> Atraso</legenda>
+						<legenda><div class="legenda"></div> Ok</legenda>
 					</section>
 				</filtro>
 			</template>
@@ -624,7 +624,11 @@
 			<template id='tSurpimentosContainer'>
 				<div class='pessoasContainer'>
 					<pessoasContainer>
-						<div class='pessoasTitulo'>Suprimentos</div>
+						<div class='pessoasTitulo'>
+							<span>Suprimentos</span>
+							<i class='fas fa-plus' onclick='adicionarSuprimento()' title='Adicionar Novo Suprimento'></i>
+							<i class='fas fa-shopping-basket' onclick='gerarPedidos()' title='Gerar pedido'></i>
+						</div>
 						<div class='pessoasListagem suprimentos' id='suprimentos'>
 						</div>
 					</pessoasContainer>
@@ -634,16 +638,12 @@
 			<template id='tSurpimento'>
 				<suprimento>
 					<section id='modelo'></section>
-					<section id='minimo'></section>
 					<section id='quantidade'></section>
+					<section id='minimo'></section>
+					<section id='ideal'></section>
+					<section id='valor'></section>
 					<i id='salvar' class='fas fa-check'></i>
 				</suprimento>
-			</template>
-
-			<template id='tSuprimentoAdicionar'>
-				<div class='sups add'>
-					<i class='fas fa-plus' onclick='adicionarSuprimento(this)' title='Adicionar Novo Suprimento'></i>
-				</div>
 			</template>
 
 			<div id='menu'>

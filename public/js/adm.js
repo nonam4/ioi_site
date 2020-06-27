@@ -275,7 +275,7 @@ const preparLeiturasParaListagem = cliente => {
             cliente.excedentes = cliente.excedentes + impressora.excedentes
           }
 
-          if(impressora.tinta.capacidade != 'ilimitado' && impressora.tinta.impresso >= impressora.tinta.capacidade) {
+          if(impressora.tinta.capacidade != 'ilimitado' && impressora.tinta.nivel <= 0) {
             cliente.abastecimento = true
           }
 
@@ -391,7 +391,7 @@ const expandirLeitura = cliente => {
   //define o valor por excedentes
   $('#excedenteValor').mask('0,00', {reverse: true})
   if(cliente.franquia.preco > 0) {
-    expandida.querySelector('#excedenteValor').value = cliente.franquia.preco
+    expandida.querySelector('#excedenteValor').value = cliente.franquia.preco.toFixed(2)
   }
   var valor
   if(cliente.franquia.tipo == 'ilimitado') {
@@ -2176,12 +2176,21 @@ const selecionarSuprimentos = () => {
 const listagemSuprimentos = () => {
   
   $('suprimento .qtd').mask('000')
+  $('#valor input').mask('000,00', {reverse: true})
   var container = document.getElementById('tSurpimentosContainer').content.cloneNode(true)
   var holder = new DocumentFragment()
 
   for(var x = 0; x < Object.keys(suprimentos).length; x++) {
       var suprimento = suprimentos[Object.keys(suprimentos)[x]]
       var interface = document.getElementById('tSurpimento').content.cloneNode(true)
+
+      if(suprimento.valor == undefined || suprimento.valor == null) {
+        suprimento.valor = 0
+      }
+
+      if(suprimento.ideal == undefined || suprimento.ideal == null) {
+        suprimento.ideal = 0
+      }
 
       interface.querySelector('#salvar').onclick = (suprimento => {
           return () => {salvarSuprimento(suprimento)}
@@ -2190,29 +2199,33 @@ const listagemSuprimentos = () => {
       interface.querySelector('#modelo').innerHTML = '<span>Modelo</span>' + toTitleCase(suprimento.modelo)
       interface.querySelector('#minimo').innerHTML = "<span>Quantidade Mínima</span><input onkeyup='conferirSuprimentos(this)' class='simpleInput qtd' type='text' value='" + suprimento.minimo + "'></div>"
       interface.querySelector('#quantidade').innerHTML = "<span>Quantidade Atual</span><input onkeyup='conferirSuprimentos(this)' class='simpleInput qtd' type='text' value='" + suprimento.quantidade + "'></div>"
-
+      interface.querySelector('#ideal').innerHTML = "<span>Quantidade Ideal</span><input onkeyup='conferirSuprimentos(this)' class='simpleInput qtd' type='text' value='" + suprimento.ideal + "'></div>"
+      interface.querySelector('#valor').innerHTML = "<span>Valor de venda</span><input onkeyup='conferirSuprimentos(this)' class='simpleInput' type='text' value='" + suprimento.valor.toFixed(2) + "'></div>"
+      
       if(suprimento.minimo >= suprimento.quantidade) {
-          interface.querySelector('suprimento').classList.add('acabando')
+          interface.querySelector('suprimento').classList.add('acabando') 
           interface.querySelector('#modelo').classList.add('acabando')
           interface.querySelector('#minimo input').classList.add('acabando')
           interface.querySelector('#quantidade input').classList.add('acabando')
+          interface.querySelector('#ideal input').classList.add('acabando')
+          interface.querySelector('#valor input').classList.add('acabando')
       }
       holder.appendChild(interface)
   }
-  var add = document.getElementById('tSuprimentoAdicionar').content.cloneNode(true)
   container.querySelector('#suprimentos').appendChild(holder)
-  container.querySelector('#suprimentos').appendChild(add)
   document.getElementById('listagem').appendChild(container)
 }
 
-const adicionarSuprimento = el => {
+const adicionarSuprimento = () => {
   var suprimento = document.getElementById('tSurpimento').content.cloneNode(true)
   var container = suprimento.querySelector('suprimento')
   container.style.opacity = '0'
 
   suprimento.querySelector('#modelo').innerHTML = "<span>Modelo</span><input class='simpleInput' type='text' placeholder='Digite aqui'></div>"
-  suprimento.querySelector('#minimo').innerHTML = "<span>Quantidade Mínima</span><input class='simpleInput qtd' type='text' value='0'></div>"
   suprimento.querySelector('#quantidade').innerHTML = "<span>Quantidade Atual</span><input class='simpleInput qtd' type='text' value='0'></div>"
+  suprimento.querySelector('#minimo').innerHTML = "<span>Quantidade Mínima</span><input class='simpleInput qtd' type='text' value='0'></div>"
+  suprimento.querySelector('#ideal').innerHTML = "<span>Quantidade Ideal</span><input class='simpleInput qtd' type='text' value='0'></div>"
+  suprimento.querySelector('#valor').innerHTML = "<span>Valor de venda</span><input class='simpleInput qtd' type='text' value='0,00'></div>"
 
   suprimento.querySelector('#salvar').className = 'fas fa-save'
   suprimento.querySelector('#salvar').onclick = (container => {
@@ -2221,12 +2234,16 @@ const adicionarSuprimento = el => {
           var modelo = toTitleCase(container.querySelector('#modelo input').value)
           var minimo = parseInt(container.querySelector('#minimo input').value)
           var quantidade = parseInt(container.querySelector('#quantidade input').value)
+          var ideal = parseInt(container.querySelector('#ideal input').value)
+          var valor = parseInt(container.querySelector('#valor input').value)
 
           var suprimento = {
               id: new Date().getTime() + '',
               modelo: modelo,
               minimo: minimo,
-              quantidade: quantidade
+              quantidade: quantidade,
+              ideal: ideal,
+              valor: Number(valor.replace(/,/g, '.'))
           }
           if(modelo == '') {
               error('Modelo não pode ficar em branco!')
@@ -2239,9 +2256,10 @@ const adicionarSuprimento = el => {
       }
   })(suprimento.querySelector('#salvar').parentNode)
 
-  $(suprimento).insertBefore(el.parentNode)
+  document.getElementById('suprimentos').appendChild(suprimento)
   setTimeout(() => {
       container.style.opacity = '1'
+      container.scrollIntoView(false)
   }, 50)
 }
 
@@ -2252,12 +2270,16 @@ const salvarSuprimento = suprimento => {
       
       var quantidade = parseInt(layout.querySelector('#quantidade input').value)
       var minimo = parseInt(layout.querySelector('#minimo input').value)
+      var ideal = parseInt(layout.querySelector('#ideal input').value)
+      var valor = Number(layout.querySelector('#valor input').value.replace(/,/g, '.'))
 
-      if(suprimento.quantidade == quantidade && suprimento.minimo == minimo) {
+      if(suprimento.quantidade == quantidade && suprimento.minimo == minimo && suprimento.ideal == ideal && suprimento.valor == valor) {
           error('Nenhuma alteração para salvamento foi detectada')
       } else {
           suprimento.quantidade = quantidade
           suprimento.minimo = minimo
+          suprimento.ideal = ideal
+          suprimento.valor = valor
 
           if(suprimento.minimo < suprimento.quantidade) {
               layout.classList.remove('acabando')
@@ -2318,8 +2340,11 @@ const conferirSuprimentos = el => {
 
   var minimo = parseInt(layout.querySelector('#minimo input').value)
   var quantidade = parseInt(layout.querySelector('#quantidade input').value)
+  var ideal = parseInt(layout.querySelector('#ideal input').value)
+  var valor = parseInt(layout.querySelector('#valor input').value)
 
-  if((suprimento.quantidade != quantidade || suprimento.minimo != minimo) && 
+  if((suprimento.quantidade != quantidade || suprimento.minimo != minimo 
+      || suprimento.ideal != ideal || suprimento.valor != valor) && 
       !layout.querySelector('#salvar').classList.contains('fa-save')) {
       layout.querySelector('#salvar').style.opacity = '0'
       setTimeout(() => {
@@ -2341,4 +2366,37 @@ const conferirQuantidadeSuprimento = suprimento => {
           interface.querySelector('#quantidade input').classList.add('acabando')
       }
   }
+}
+
+const gerarPedidos = () => {
+  feedbacks++
+  feedback(true)
+
+  var data = new Date()
+  var ano = data.getFullYear()
+  var mes = data.getMonth() + 1
+  if (mes < 10) { mes = "0" + mes }
+  var dia = data.getDate()
+  if (dia < 10) { dia = "0" + dia }
+
+  var doc = new jsPDF('p', 'mm', [297, 210])
+  doc.addImage(pdfLogo, 'PNG', 25, 10, 150, 35)
+  doc.setFontSize(16)
+  //centra o texto na tela
+  var titulo = 'Pedido de suprimentos - ' + dia + '/' + mes + '/' + ano
+  var textWidth = doc.getStringUnitWidth(titulo) * doc.internal.getFontSize() / doc.internal.scaleFactor
+  var textOffset = (210 - textWidth) / 2
+  doc.text(textOffset, 53, titulo)
+  var line = 60
+  doc.setFontSize(12)
+  for(var x = 0; x < Object.keys(suprimentos).length; x++) {
+    var suprimento = suprimentos[Object.keys(suprimentos)[x]]
+    if(suprimento.ideal > suprimento.quantidade) {
+      doc.text(20, line, suprimento.modelo + ' - ' + (suprimento.ideal - suprimento.quantidade) + ' unidades')
+      line = incrementLine(doc, line, 5)
+    }
+  }
+  feedbacks--
+  feedback(false)
+  doc.save('pedido - ' + dia + '-' + mes + '-' + ano + '.pdf')
 }
