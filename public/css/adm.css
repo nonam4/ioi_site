@@ -887,12 +887,12 @@ impressora .leituraDados {
 }
 
 .pessoasContainer {
-  width: 100%;
+  width: calc(100% - 4px);
   margin-left: 4px;
 }
 
 pessoasContainer {
-  width: 100%;
+  width: calc(100% - 4px);
   display: block;
 }
 
@@ -920,6 +920,10 @@ pessoasContainer {
   transition: 0.2s ease all;
   -moz-transition: 0.2s ease all;
   -webkit-transition: 0.2s ease all;
+}
+
+.flipflop {
+  line-height: 16px !important;
 }
 
 .pessoasTitulo i:hover {
@@ -953,7 +957,12 @@ pessoasContainer {
 }
 
 #feitos {
-  max-height: 188px;
+  max-height: 0px;
+  display: none;
+  opacity: 0;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
 #fornecedores {

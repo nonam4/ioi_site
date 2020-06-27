@@ -1584,7 +1584,7 @@ const listagemAtendimentos = () => {
   }
  
   var feitos = document.createElement('pessoasContainer')
-  feitos.innerHTML = "<div class='pessoasTitulo'>Feitos</div><div class='pessoasListagem' id='feitos'></div>"
+  feitos.innerHTML = "<div class='pessoasTitulo'><span>Feitos</span><i class='fas fa-sort-down flipflop' onclick='expandirFeitos()' title='Expandir'></i></div><div class='pessoasListagem' id='feitos'></div>"
 
   for(var y = 0; y < Object.keys(atFeitos).length; y++) {
     var atendimento = atFeitos[Object.keys(atFeitos)[y]]   
@@ -1786,6 +1786,35 @@ const fecharAtendimento = () => {
     setTimeout(() => {
       atendimentoExpandido.remove()
     }, 200)
+}
+
+const expandirFeitos = () => {
+  var feitos = document.getElementById('feitos')
+  var shown = false
+
+  if(feitos.style.display == 'block') {
+    shown = true
+    feitos.style.maxHeight = '0px'
+    feitos.style.opacity = '0'
+    setTimeout(() => {
+      feitos.style.display = 'none'
+    }, 200)
+  } else {
+    shown = false
+    feitos.style.display = 'block'
+    setTimeout(() => {
+      feitos.style.opacity = '1'
+      feitos.style.maxHeight = '188px'
+    }, 10)
+  }
+
+  setTimeout(() => {
+    if(!shown) {
+      document.querySelector('.flipflop').style.transform = "rotate(180deg)"
+    } else {
+      document.querySelector('.flipflop').style.transform = "rotate(0deg)"
+    }
+  }, 10)
 }
 
 /*
