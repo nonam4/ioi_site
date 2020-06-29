@@ -816,7 +816,7 @@ const salvarLeituras = cliente => {
   mostrarLoad(document.getElementById(cliente.id))
   var load = document.getElementById('load')
   load.style.height = 'inherit'
-  load.style.width = 'calc(25% - 12px)'
+  load.style.width = '100%'
   load.querySelector('img').style.width = '130px'
   load.querySelector('img').style.opacity = '0'
   load.querySelector('.loading').style.marginTop = '-90px'

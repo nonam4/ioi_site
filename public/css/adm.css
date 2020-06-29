@@ -500,6 +500,7 @@ legenda:nth-of-type(3) .legenda {
 }
 
 leitura {
+  position: relative;
   width: calc(25% - 12px);
   min-width: 278px;
   display: flex;
