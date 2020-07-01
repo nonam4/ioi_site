@@ -106,11 +106,14 @@ const mostrarLoad = el => {
 }
 
 const esconderLoad = () => {
-  var load = document.body.querySelector('#load')
-  load.style.opacity = '0'
-
+  var load = document.getElementsByTagName("load")
+  for(let div of load) {
+      div.style.opacity = 0
+  }
   setTimeout(() => {
-    load.remove()
+    for(let div of load) {
+      div.remove()
+    }
   }, 250)
 }
 
@@ -592,14 +595,12 @@ const alterarListagemLeituraExpandida = cliente => {
   }
 
   cliente.impresso = 0
-  cliente.impressoras.atraso = false
-  cliente.impressoras.inativas = false
   var impressoras = cliente.impressoras
 
   if(impressoras != undefined && impressoras != null) {
     for(var x = 0; x < Object.keys(impressoras).length; x++) {
       var impressora = impressoras[Object.keys(impressoras)[x]]
-      if(impressora.leituras != undefined) {
+      if(impressora.leituras != undefined && impressora.ativa) {
         impressora.serial = Object.keys(impressoras)[x]
         impressora.impresso = 0
         impressora.excedentes = 0
@@ -620,20 +621,6 @@ const alterarListagemLeituraExpandida = cliente => {
           if(impressora.impresso > impressora.franquia) {
             impressora.excedentes = impressora.impresso - impressora.franquia
           }
-
-          //checa se o ultimo dia de leitura foi a mais de 5 dias atrás
-          var a = new Date()
-          //precisa adicionar + 1 no dia pois senão se o valor for 10 pegará o dia 9
-          var b = new Date(listagem + '-' + (parseInt(impressora.leituras[listagem].final.dia) + 1))
-
-          if(Math.ceil(Math.abs(a - b) / (1000 * 3600 * 24)) > 5 && impressora.ativa){
-            cliente.impressoras.atraso = true
-          }
-        } else if(impressora.ativa) {
-          cliente.impressoras.atraso = true
-        }
-        if(!impressora.ativa) {
-          cliente.impressoras.inativas = true
         }
       }
     }
@@ -655,7 +642,6 @@ const alterarListagemLeituraExpandida = cliente => {
     expandida.querySelector('#excedentes').innerHTML = cliente.excedentes + ' págs'
 
     var interfaces = new DocumentFragment()
-    var impressoras = cliente.impressoras
     if(impressoras != undefined && impressoras != null) {
       for(var x = 0; x < Object.keys(impressoras).length; x++) {
         var impressora = impressoras[Object.keys(impressoras)[x]]
@@ -2110,8 +2096,8 @@ const salvarAtendimento = atendimento => {
     for(var x = 0; x < Object.keys(atendimentos).length; x++) {
       var at = atendimentos[Object.keys(atendimentos)[x]]
       
-      if((at.responsavel == '' || at.responsavel == layout.querySelector('#responsavel').value) 
-        && at.cliente == atendimento.cliente && !at.feito && at.id != atendimento.id && !editando) {
+      //if( (at.responsavel == '' || at.responsavel == layout.querySelector('#responsavel').value)  && at.cliente == atendimento.cliente && !at.feito && at.id != atendimento.id && !editando) {
+        if(at.responsavel == layout.querySelector('#responsavel').value && at.cliente == atendimento.cliente && !at.feito && !editando) {
 
         error('Já existe um atendimento em aberto para esse cliente!')
         erro = true
@@ -2140,16 +2126,16 @@ const salvarAtendimento = atendimento => {
       var suprimento = suprimentoPorModelo(motivo.value)
 
       if(suprimento != undefined) {
-        atualizarSuprimentos = true
         //caso o motivo seja um toner ou suprimento
         var quantidade = parseInt(motivo.parentNode.parentNode.querySelector('.motivo-quantidade').value)
-        if(quantidade > suprimento.quantidade) {
-          error('A quantidade de toner não pode ser maior que a quantidade em estoque!')
+        if(quantidade > suprimento.quantidade && !editando) {
+          error('A quantidade não pode ser maior que o estoque!')
           erro = true
           break
         } else {
           motivoLocal.push(suprimento.modelo + ' - Quantidade: ' + quantidade)
           if(!editando) { 
+            atualizarSuprimentos = true
             suprimento.quantidade = suprimento.quantidade - quantidade 
             conferirQuantidadeSuprimento(suprimento)
           }
@@ -2262,7 +2248,7 @@ const adicionarSuprimento = () => {
           var minimo = parseInt(container.querySelector('#minimo input').value)
           var quantidade = parseInt(container.querySelector('#quantidade input').value)
           var ideal = parseInt(container.querySelector('#ideal input').value)
-          var valor = parseInt(container.querySelector('#valor input').value)
+          var valor = container.querySelector('#valor input').value
 
           var suprimento = {
               id: new Date().getTime() + '',
@@ -2383,8 +2369,8 @@ const conferirSuprimentos = el => {
 
 const conferirQuantidadeSuprimento = suprimento => {
   if(suprimento.quantidade <= suprimento.minimo) {
-      error('É necessário pedir mais unidades de ' + suprimento.modelo + '<br> '  + suprimento.quantidade + ' unidades em estoque - Quantidade mínima: ' + suprimento.minimo + ' unidades.')
-      
+      error('Um ou mais suprimentos estão abaixo do mínimo!')
+
       if(tela == 'suprimentos') {
           var interface = document.getElementById(suprimento.id)
           interface.querySelector('suprimento').classList.add('acabando')
