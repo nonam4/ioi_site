@@ -212,17 +212,22 @@ const listagemLeituras = () => {
 
   for(var x = 0; x < Object.keys(clientes).length; x++) {
     var cliente = clientes[Object.keys(clientes)[x]]
+    var impressoras = 0
+    
+    if(cliente.impressoras != undefined) {
+      impressoras = Object.keys(cliente.impressoras).length > 0
+    }
 
-    if(cliente.ativo && cliente.impressoras != undefined && Object.keys(cliente.impressoras).length > 0) {
+    if(cliente.ativo && cliente.impressoras != undefined && impressoras > 0) {
       cliente = preparLeiturasParaListagem(cliente)
 
-      if(filtroSelecionado == 'todas') {
+      if(filtroSelecionado == 'todas' && cliente.impressoras.inativas != impressoras) {
         interfaces.appendChild(criarInterfaceLeitura(cliente, true))
       } else if(filtroSelecionado == 'alertas' && (compare(cliente.sistema.versao, versao) || cliente.impressoras.atraso)){
         interfaces.appendChild(criarInterfaceLeitura(cliente, true))
       } else if(filtroSelecionado == 'excedentes' && cliente.excedentes > 0){
         interfaces.appendChild(criarInterfaceLeitura(cliente, true))
-      } else if(filtroSelecionado == 'excluidas'  && cliente.impressoras.inativas) {
+      } else if(filtroSelecionado == 'excluidas'  && cliente.impressoras.inativas > 0) {
         interfaces.appendChild(criarInterfaceLeitura(cliente, false))
       }
     }
@@ -247,7 +252,7 @@ const preparLeiturasParaListagem = cliente => {
   cliente.impresso = 0
   cliente.excedentes = 0
   cliente.impressoras.atraso = false
-  cliente.impressoras.inativas = false
+  cliente.impressoras.inativas = 0
   cliente.abastecimento = false
   var impressoras = cliente.impressoras
 
@@ -295,7 +300,7 @@ const preparLeiturasParaListagem = cliente => {
             cliente.impressoras.atraso = true
           }
         } else {
-          cliente.impressoras.inativas = true
+          cliente.impressoras.inativas++
         }
       }
     }
