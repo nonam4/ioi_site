@@ -877,15 +877,13 @@ const salvarLeituras = cliente => {
             novaListagem = criarInterfaceLeitura(cliente, true)
           }
           setTimeout(() => {
-            if(parseInt(novaListagem.querySelector('#impressoras').innerHTML) > 0) {
+            if(cliente.excedentes <= 0 && filtroSelecionado == 'excedentes') {
+              removerLeitura(cliente)
+            } else if(parseInt(novaListagem.querySelector('#impressoras').innerHTML) > 0) {
               esconderLoad()
               document.getElementById('listagem').replaceChild(novaListagem, document.getElementById(cliente.id))
             } else {
-              var el = document.getElementById(cliente.id)
-              el.style.opacity = '0'
-              setTimeout(() => {
-                el.remove()
-              }, 250)
+              removerLeitura(cliente)
             }
           }, 100)
         }
@@ -899,6 +897,14 @@ const salvarLeituras = cliente => {
     error('Erro ao gravar os dados. Recarregue a página e tente novamente!')
   })
   fecharLeitura()
+}
+
+const removerLeitura = cliente => {
+  var el = document.getElementById(cliente.id)
+  el.style.opacity = '0'
+  setTimeout(() => {
+    el.remove()
+  }, 250)
 }
 
 const gerarRelatorio = cliente => {
@@ -940,9 +946,9 @@ const dadosDoRelatorio = (cliente, el) => {
   doc.text(textOffset, line, msg)
   line = incrementLine(doc, line, 9)
 
+  var impressoras = cliente.impressoras
   if(cliente.franquia.tipo == 'maquina') {
 
-    var impressoras = cliente.impressoras
     for(var x = 0; x < Object.keys(impressoras).length; x++) {
       var impressora = impressoras[Object.keys(impressoras)[x]]
 
@@ -1058,14 +1064,14 @@ const gerarRelatorios = () => {
         doc.text(textOffset, line, cliente.nomefantasia)
         line = incrementLine(doc, line, 9)
         doc.setFontSize(12)
-
+        var impressoras = cliente.impressoras
+        
         if(cliente.franquia.tipo == 'maquina'){
 
           var valorTotal = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
           doc.text(20, line, 'Valor por excedente: ' + valor + ' - Excedentes: ' + cliente.excedentes + ' páginas - Valor excedentes: ' + valorTotal)
           line = incrementLine(doc, line, 9)
 
-          var impressoras = cliente.impressoras
           for(var x = 0; x < Object.keys(impressoras).length; x++) {
             var impressora = impressoras[Object.keys(impressoras)[x]]
             if(impressora.ativa) {
@@ -1107,7 +1113,6 @@ const gerarRelatorios = () => {
             line = incrementLine(doc, line, 10)
           }
 
-          var impressoras = cliente.impressoras
           for(var x = 0; x < Object.keys(impressoras).length; x++) {
             var impressora = impressoras[Object.keys(impressoras)[x]]
             if(impressora.ativa) {
@@ -1438,6 +1443,7 @@ const gravarCliente = cliente => {
     cliente: JSON.stringify(cliente)
   }).then(res => {
     feedbacks--
+    preparLeiturasParaListagem(cliente)
     if(res.data.autenticado) {
       if(res.data.erro) {
         error(res.data.msg)
