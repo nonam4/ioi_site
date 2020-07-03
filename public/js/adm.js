@@ -933,7 +933,7 @@ const dadosDoRelatorio = (cliente, el) => {
   var dataDeListagem = meses[parseInt(dataSplit[1])] + '/' + dataSplit[0]
 
   var doc = new jsPDF('p', 'mm', [297, 210])
-  doc.addImage(pdfLogo, 'PNG', 25, 10, 150, 35)
+  doc.addImage(pdfLogo, 'PNG', 0, 0, 210, 297)
   doc.setFontSize(16)
 
   //centra o texto na tela
@@ -1445,12 +1445,33 @@ const gravarCliente = cliente => {
     cliente: JSON.stringify(cliente)
   }).then(res => {
     feedbacks--
-    preparLeiturasParaListagem(cliente)
     if(res.data.autenticado) {
       if(res.data.erro) {
         error(res.data.msg)
       } else {
         feedback(false)
+        if(tela == 'leituras') {
+          preparLeiturasParaListagem(cliente)
+    
+          var filtros = document.getElementById('filtrosDeLeituras')
+          var filtroSelecionado = filtros.options[filtros.selectedIndex].value
+          var novaListagem
+          if(filtroSelecionado == 'excluidas') {
+            novaListagem = criarInterfaceLeitura(cliente, false)
+          } else {
+            novaListagem = criarInterfaceLeitura(cliente, true)
+          }
+          setTimeout(() => {
+            if(cliente.excedentes <= 0 && filtroSelecionado == 'excedentes') {
+              removerLeitura(cliente)
+            } else if(parseInt(novaListagem.querySelector('#impressoras').innerHTML) > 0) {
+              esconderLoad()
+              document.getElementById('listagem').replaceChild(novaListagem, document.getElementById(cliente.id))
+            } else {
+              removerLeitura(cliente)
+            }
+          }, 100)
+        }
       }
     } else {
       error('Tivemos algum problema com a autenticação. Recarregue a página e tente novamente!')
