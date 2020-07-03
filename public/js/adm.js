@@ -1455,27 +1455,8 @@ const gravarCliente = cliente => {
         error(res.data.msg)
       } else {
         feedback(false)
-        if(tela == 'leituras') {
+        if(tela == 'leituras' &&  cliente.impressoras != undefined) {
           preparLeiturasParaListagem(cliente)
-    
-          var filtros = document.getElementById('filtrosDeLeituras')
-          var filtroSelecionado = filtros.options[filtros.selectedIndex].value
-          var novaListagem
-          if(filtroSelecionado == 'excluidas') {
-            novaListagem = criarInterfaceLeitura(cliente, false)
-          } else {
-            novaListagem = criarInterfaceLeitura(cliente, true)
-          }
-          setTimeout(() => {
-            if(cliente.excedentes <= 0 && filtroSelecionado == 'excedentes') {
-              removerLeitura(cliente)
-            } else if(parseInt(novaListagem.querySelector('#impressoras').innerHTML) > 0) {
-              esconderLoad()
-              document.getElementById('listagem').replaceChild(novaListagem, document.getElementById(cliente.id))
-            } else {
-              removerLeitura(cliente)
-            }
-          }, 100)
         }
       }
     } else {
