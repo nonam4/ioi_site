@@ -254,46 +254,49 @@ const preparLeiturasParaListagem = cliente => {
   if(impressoras != undefined && impressoras != null) {
     for(var x = 0; x < Object.keys(impressoras).length; x++) {
       var impressora = impressoras[Object.keys(impressoras)[x]]
-      if(impressora.leituras != undefined && impressora.ativa) {
+      if(impressora.leituras != undefined) {
         impressora.serial = Object.keys(impressoras)[x]
         impressora.impresso = 0
         impressora.excedentes = 0
-        /*
-        * define a franquia total do cliente se a franquia for separada por maquinas
-        */
-        if(cliente.franquia.tipo !== 'ilimitado' && cliente.franquia.tipo !== 'pagina') {
-          cliente.franquia.valor = parseInt(cliente.franquia.valor) + parseInt(impressora.franquia)
-        }
-        /*
-        * define o total impresso por todas as maquinas
-        */
-        if(impressora.leituras[listagem] !== undefined) {
-          var inicio = impressora.leituras[listagem].inicial.valor
-          var fim = impressora.leituras[listagem].final.valor
-          cliente.impresso = cliente.impresso + (fim - inicio)
-          impressora.impresso = fim - inicio
-          impressora.excedentes = 0
-          if(impressora.impresso > impressora.franquia && cliente.franquia.tipo == 'maquina') {
-            impressora.excedentes = impressora.impresso - impressora.franquia
-            cliente.excedentes = cliente.excedentes + impressora.excedentes
+
+        if(impressora.ativa) {
+          /*
+          * define a franquia total do cliente se a franquia for separada por maquinas
+          */
+          if(cliente.franquia.tipo !== 'ilimitado' && cliente.franquia.tipo !== 'pagina' && impressora.ativa) {
+            cliente.franquia.valor = parseInt(cliente.franquia.valor) + parseInt(impressora.franquia)
           }
 
           if(impressora.tinta.capacidade != 'ilimitado' && impressora.tinta.nivel <= 0) {
             cliente.abastecimento = true
           }
+          /*
+          * define o total impresso por todas as maquinas
+          */
+          if(impressora.leituras[listagem] !== undefined) {
+            var inicio = impressora.leituras[listagem].inicial.valor
+            var fim = impressora.leituras[listagem].final.valor
+            impressora.impresso = fim - inicio
 
-          //checa se o ultimo dia de leitura foi a mais de 5 dias atrás
-          var a = new Date()
-          //precisa adicionar + 1 no dia pois senão se o valor for 10 pegará o dia 9
-          var b = new Date(listagem + '-' + (parseInt(impressora.leituras[listagem].final.dia) + 1))
-          if(Math.ceil(Math.abs(a - b) / (1000 * 3600 * 24)) > 5 && impressora.ativa){
+            cliente.impresso = cliente.impresso + impressora.impresso
+            if(impressora.impresso > impressora.franquia && cliente.franquia.tipo == 'maquina') {
+              impressora.excedentes = impressora.impresso - impressora.franquia
+              cliente.excedentes = cliente.excedentes + impressora.excedentes
+            }
+
+            //checa se o ultimo dia de leitura foi a mais de 5 dias atrás
+            var a = new Date()
+            //precisa adicionar + 1 no dia pois senão se o valor for 10 pegará o dia 9
+            var b = new Date(listagem + '-' + (parseInt(impressora.leituras[listagem].final.dia) + 1))
+            if(Math.ceil(Math.abs(a - b) / (1000 * 3600 * 24)) > 5 && impressora.ativa){
+              cliente.impressoras.atraso = true
+            }
+          } else {
             cliente.impressoras.atraso = true
           }
-        } else if(impressora.ativa) {
-          cliente.impressoras.atraso = true
+        } else {
+          cliente.impressoras.inativas = true
         }
-      } else if(impressora.leituras != undefined && !impressora.ativa) {
-        cliente.impressoras.inativas = true
       }
     }
   }
@@ -559,7 +562,7 @@ const converterNumeroPagina = elemento => {
   }
 }
 
-var converterPaginaNumero = elemento => {
+const converterPaginaNumero = elemento => {
   elemento.value = elemento.value.replace(/ págs/g , '')
 }
 
@@ -1065,16 +1068,15 @@ const gerarRelatorios = () => {
         line = incrementLine(doc, line, 9)
         doc.setFontSize(12)
         var impressoras = cliente.impressoras
-        
+            
         if(cliente.franquia.tipo == 'maquina'){
-
           var valorTotal = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
           doc.text(20, line, 'Valor por excedente: ' + valor + ' - Excedentes: ' + cliente.excedentes + ' páginas - Valor excedentes: ' + valorTotal)
           line = incrementLine(doc, line, 9)
 
-          for(var x = 0; x < Object.keys(impressoras).length; x++) {
-            var impressora = impressoras[Object.keys(impressoras)[x]]
-            if(impressora.ativa) {
+          for(var y = 0; y < Object.keys(impressoras).length; y++) {
+            var impressora = impressoras[Object.keys(impressoras)[y]]
+            if(impressora.modelo != undefined && impressora.ativa) {
               doc.text(20, line, impressora.modelo + ' - ' + impressora.serial)
               line = incrementLine(doc, line, 5)
               doc.text(20, line, 'Setor: ' + impressora.setor + ' - IP: ' + impressora.ip)
@@ -1112,10 +1114,10 @@ const gerarRelatorios = () => {
             doc.text(20, line, 'Valor por página: ' + valor + ' - Valor total: ' + valorTotal)
             line = incrementLine(doc, line, 10)
           }
-
-          for(var x = 0; x < Object.keys(impressoras).length; x++) {
-            var impressora = impressoras[Object.keys(impressoras)[x]]
-            if(impressora.ativa) {
+          
+          for(var z = 0; z < Object.keys(impressoras).length; z++) {
+            var impressora = impressoras[Object.keys(impressoras)[z]]
+            if(impressora.modelo != undefined && impressora.ativa) {
               doc.text(20, line, impressora.modelo + ' - ' + impressora.serial)
               line = incrementLine(doc, line, 5)
               doc.text(20, line, 'Setor: ' + impressora.setor + ' - IP: ' + impressora.ip)
@@ -1145,9 +1147,7 @@ const gerarRelatorios = () => {
     }
   }
 
-  feedbacks--
   if(salvar) {
-    feedback(false)
     if(relatorioSelect == 'todos') {
       zip.generateAsync({type:'blob'}).then(blob =>  {
         saveAs(blob, meses[parseInt(dataSplit[1])] + '_' + dataSplit[0] + '.zip')
@@ -1155,6 +1155,8 @@ const gerarRelatorios = () => {
     } else if(relatorioSelect == 'interno') {
       doc.save('interno - ' + meses[parseInt(dataSplit[1])] + '_' + dataSplit[0] + '.pdf')
     }
+    feedbacks--
+    feedback(false)
   } else {
     error('Clientes sem excedentes para gerar o relatório!')
   }

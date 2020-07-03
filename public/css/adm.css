@@ -353,7 +353,7 @@ body {
   -webkit-transition: 0.2s ease all;
 }
 
-filtro {
+filtro, filtros {
   width: calc(100% - 12px);
   min-width: 278px;
   display: flex;
@@ -384,7 +384,7 @@ filtro {
   }
 }
 
-filtro section {
+filtro section, filtros section {
   width: calc(100% - 24px);
   margin-right: 12px;
   margin-left: 12px;
@@ -393,27 +393,27 @@ filtro section {
   -webkit-transition: 0.2s ease all;
 }
 
-filtro section:nth-child(1) {
+filtro section:nth-child(1), filtros section:nth-child(1) {
   border-right: solid 1px var(--bordas);
 }
 
-filtro section:nth-child(2) {
+filtro section:nth-child(2), filtros section:nth-child(2) {
   border-right: solid 1px var(--bordas);
 }
 
-filtro section:nth-child(3) {
+filtro section:nth-child(3), filtros section:nth-child(3) {
   border-right: solid 1px var(--bordas);
 }
 
-filtro section:nth-child(4) {
+filtro section:nth-child(4), filtros section:nth-child(4) {
   border-right: solid 0px var(--bordas);
 }
 
-filtro section:nth-child(5) {
+filtro section:nth-child(5), filtros section:nth-child(5) {
   border-right: solid 1px var(--bordas);
 }
 
-filtro section:nth-child(6) {
+filtro section:nth-child(6), filtros section:nth-child(6) {
   border-right: solid 0px var(--bordas);
 }
 
