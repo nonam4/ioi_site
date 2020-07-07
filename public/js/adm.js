@@ -48,7 +48,7 @@ const receberDados = usuario => {
         permissao: res.data.auth.permissao
       }
       localStorage.setItem('usuario', JSON.stringify(usuario))
-      
+
       //dashboard = res.data.dashboard
       usuarios = res.data.usuarios
       //empresa = res.data.empresa
@@ -213,7 +213,7 @@ const listagemLeituras = () => {
   for(var x = 0; x < Object.keys(clientes).length; x++) {
     var cliente = clientes[Object.keys(clientes)[x]]
     var impressoras = 0
-    
+
     if(cliente.impressoras != undefined) {
       impressoras = Object.keys(cliente.impressoras).length
     }
@@ -221,7 +221,7 @@ const listagemLeituras = () => {
     if(cliente.ativo && cliente.impressoras != undefined && impressoras > 0) {
       cliente = preparLeiturasParaListagem(cliente)
 
-      if(filtroSelecionado == 'todas' && cliente.impressoras.inativas != impressoras) {
+      if(filtroSelecionado == 'todas' && cliente.impressoras.inativas < impressoras) {
         interfaces.appendChild(criarInterfaceLeitura(cliente, true))
       } else if(filtroSelecionado == 'alertas' && (compare(cliente.sistema.versao, versao) || cliente.impressoras.atraso)){
         interfaces.appendChild(criarInterfaceLeitura(cliente, true))
@@ -240,7 +240,7 @@ const preparLeiturasParaListagem = cliente => {
   var datas = document.getElementById('datasDeLeituras')
   var listagem = datas.options[datas.selectedIndex].value
 
-  if(cliente.franquia.valor == undefined || cliente.franquia.valor == null 
+  if(cliente.franquia.valor == undefined || cliente.franquia.valor == null
     || cliente.franquia.tipo == 'maquina' || cliente.franquia.tipo == 'ilimitado') {
     cliente.franquia.valor = 0
   }
@@ -316,7 +316,7 @@ const preparLeiturasParaListagem = cliente => {
 
 const criarInterfaceLeitura = (cliente, ativas) => {
   var leitura = document.getElementById('tLeitura').content.cloneNode(true)
-  
+
   leitura.querySelector('.leituraTitulo').querySelector('i').onclick = (cliente => {
     return () => {expandirLeitura(cliente)}
   })(cliente)
@@ -334,7 +334,7 @@ const criarInterfaceLeitura = (cliente, ativas) => {
   leitura.querySelector('#versao').innerHTML = cliente.sistema.versao
   //define o numero de impressoras (precisa subtrair 2 do length pois tem duas variáveis definidas junto)
   leitura.querySelector('#impressoras').innerHTML = pegarQuantidadeImpressoras(ativas, cliente.impressoras)
-  
+
   if(cliente.abastecimento) {
     leitura.querySelector('.tintas').style.width = '100%'
     leitura.querySelector('.tintas').style.maxWidth = '33.33%'
@@ -349,7 +349,7 @@ const criarInterfaceLeitura = (cliente, ativas) => {
   } else {
     leitura.querySelector('#excedentes').innerHTML = 'Excluídas'
   }
-  
+
   //define a franquia
   if(cliente.franquia.tipo == 'ilimitado') {
     leitura.querySelector('#franquia').innerHTML = 'S/F'
@@ -698,7 +698,7 @@ const alterarTipoFranquia = elemento => {
       section.style.paddingRight = '12px'
       section.style.paddingLeft = '12px'
       section.style.opacity = '1'
-      
+
       excedentes.style.width = '100%'
       excedentes.style.paddingRight = '12px'
       excedentes.style.paddingLeft = '12px'
@@ -735,7 +735,7 @@ const alterarTipoFranquia = elemento => {
 
     excedentes.style.display = 'block'
     setTimeout(() => {
-      
+
       excedentes.style.width = '100%'
       excedentes.style.paddingRight = '12px'
       excedentes.style.paddingLeft = '12px'
@@ -757,7 +757,7 @@ const alterarTipoFranquia = elemento => {
 
     valores.querySelector('.filtroTitulo').innerHTML = 'Valor Página'
     container.querySelector('#impresso').innerHTML = cliente.impresso + ' págs - ' + valor
-    
+
     valores.style.borderRight = "solid 0px var(--bordas)"
     section.style.width = '0px'
     section.style.paddingRight = '0px'
@@ -875,7 +875,7 @@ const salvarLeituras = cliente => {
         feedback(false)
         if(tela == 'leituras') {
           preparLeiturasParaListagem(cliente)
-    
+
           var filtros = document.getElementById('filtrosDeLeituras')
           var filtroSelecionado = filtros.options[filtros.selectedIndex].value
           var novaListagem
@@ -1053,7 +1053,7 @@ const gerarRelatorios = () => {
   var relatorioSelect = document.getElementById('relatorioFiltro').value
   var doc = new jsPDF('p', 'mm', [297, 210])
   var line = 30
-  
+
   for(var x = 0; x < Object.keys(clientes).length; x++) {
     var cliente = clientes[Object.keys(clientes)[x]]
     if(cliente.impressoras != undefined && Object.keys(cliente.impressoras).length > 0){
@@ -1073,7 +1073,7 @@ const gerarRelatorios = () => {
         line = incrementLine(doc, line, 9)
         doc.setFontSize(12)
         var impressoras = cliente.impressoras
-            
+
         if(cliente.franquia.tipo == 'maquina'){
           var valorTotal = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
           doc.text(20, line, 'Valor por excedente: ' + valor + ' - Excedentes: ' + cliente.excedentes + ' páginas - Valor excedentes: ' + valorTotal)
@@ -1119,7 +1119,7 @@ const gerarRelatorios = () => {
             doc.text(20, line, 'Valor por página: ' + valor + ' - Valor total: ' + valorTotal)
             line = incrementLine(doc, line, 10)
           }
-          
+
           for(var z = 0; z < Object.keys(impressoras).length; z++) {
             var impressora = impressoras[Object.keys(impressoras)[z]]
             if(impressora.modelo != undefined && impressora.ativa) {
@@ -1275,7 +1275,7 @@ const excluirCliente = cliente => {
 
   if(cliente.ativo) {
     if(confirm('Deseja desativar o cliente? Isso NÂO vai excluir os dados!')) {
-      
+
       var usuario = JSON.parse(localStorage.getItem('usuario'))
       if(usuario.permissao.excluir) {
         cliente.ativo = false
@@ -1522,32 +1522,32 @@ const listagemAtendimentos = () => {
     var usuario = usuarios[Object.keys(usuarios)[x]]
     usuario.atendimentos = {}
   }
- 
+
   for(var x = 0; x < Object.keys(atendimentos).length; x++) {
     var atendimento = atendimentos[Object.keys(atendimentos)[x]]
-    
+
     if(clientes[atendimento.cliente] != undefined) {
       atendimento.dados = clientes[atendimento.cliente]
 
       if(atendimento.feito) {
         atFeitos[atendimento.id] = atendimento
-  
+
       } else if(atendimento.responsavel == '') {
         atAberto[atendimento.id] = atendimento
-  
+
       } else {
         for(var y = 0; y < Object.keys(usuarios).length; y++) {
           var usuario = usuarios[Object.keys(usuarios)[y]]
-      
+
           if(atendimento.responsavel == usuario.nome) {
             atendimento.tecnico = usuario
             usuario.atendimentos[atendimento.id] = atendimento
           }
         }
       }
-    } 
+    }
   }
-  
+
   var container = document.getElementById('tAtendimentosContainer').content.cloneNode(true)
 
   for(var y = 0; y < Object.keys(atAberto).length; y++) {
@@ -1555,7 +1555,7 @@ const listagemAtendimentos = () => {
 
     container.querySelector('#abertos').appendChild(criarInterfaceAtendimento(atendimento))
   }
- 
+
   for(var x = 0; x < Object.keys(usuarios).length; x++) {
     var usuario = usuarios[Object.keys(usuarios)[x]]
     var ordered = {}
@@ -1572,21 +1572,21 @@ const listagemAtendimentos = () => {
 
       if(container.querySelector('#' + usuario.usuario) == null) {
         var layout = document.createElement('pessoasContainer')
-        layout.innerHTML = "<div class='pessoasTitulo ordem'>" + usuario.nome + 
+        layout.innerHTML = "<div class='pessoasTitulo ordem'>" + usuario.nome +
                         "</div><div class='pessoasListagem tec' id='" + usuario.usuario + "'></div>"
-  
+
         container.querySelector('.pessoasContainer').appendChild(layout)
         Sortable.create(container.querySelector('#' + usuario.usuario), {animation: 250})
       }
       container.querySelector('#' + usuario.usuario).appendChild(criarInterfaceAtendimento(atendimento))
     }
   }
- 
+
   var feitos = document.createElement('pessoasContainer')
   feitos.innerHTML = "<div class='pessoasTitulo'><span>Feitos</span><i class='fas fa-sort-down flipflop' onclick='expandirFeitos()' title='Expandir'></i></div><div class='pessoasListagem' id='feitos'></div>"
 
   for(var y = 0; y < Object.keys(atFeitos).length; y++) {
-    var atendimento = atFeitos[Object.keys(atFeitos)[y]]   
+    var atendimento = atFeitos[Object.keys(atFeitos)[y]]
 
     feitos.querySelector('#feitos').appendChild(criarInterfaceAtendimento(atendimento))
   }
@@ -1598,7 +1598,7 @@ const listagemAtendimentos = () => {
 const criarInterfaceAtendimento = atendimento => {
   var interface = document.getElementById('tAtendimento').content.cloneNode(true)
   interface.querySelector('atendimento').id = atendimento.id
-  
+
   if(atendimento.feito){
     interface.querySelector('#concluido').className = 'fas fa-file-times red'
   }
@@ -1648,7 +1648,7 @@ const criarInterfaceAtendimento = atendimento => {
 
   interface.querySelector('#cliente').innerHTML = '<span>Cliente</span>' + atendimento.dados.nomefantasia
   interface.querySelector('#cidade').innerHTML = '<span>Cidade</span>' + atendimento.dados.endereco.cidade
-  
+
   var motivo = ''
   atendimento.motivo.forEach((el, index) => {
     if(index < atendimento.motivo.length - 1) {
@@ -1691,7 +1691,7 @@ const salvarOrdemAtendimentos = responsavel => {
 
     for(var x = 0; x < container.length; x++) {
       var el = container[x]
-  
+
       var atendimento = responsavel.atendimentos[el.id]
       atendimento.ordem = x + 1
 
@@ -1824,10 +1824,10 @@ const autoCompleteClientes = input => {
 	var currentFocus
 	/* adiciona um listener quando for digitado alguma coisa */
 	input.addEventListener('input', function(e) {
-  
+
     var a, b, i, val = this.value
     closeAllLists()
-    
+
 	  if (!val) { return false }
     currentFocus = -1
 
@@ -1835,16 +1835,16 @@ const autoCompleteClientes = input => {
 	  a.setAttribute('id', this.id + 'autocomplete-list')
 	  a.setAttribute('class', 'autocomplete')
     this.parentNode.appendChild(a)
-    
+
     for(var x = 0; x < Object.keys(clientes).length; x++) {
       var cliente = clientes[Object.keys(clientes)[x]]
-      
+
       val = val.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '')
 
       /* checa as letras compativeis no nome fantasia */
-      if (cliente.nomefantasia.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val ) > -1 
+      if (cliente.nomefantasia.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val ) > -1
           || cliente.razaosocial.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val ) > -1) {
-        
+
         /* cria uma div para cada item que tenha correspondencia */
         b = document.createElement('DIV')
         if (cliente.nomefantasia.toLowerCase().normalize('NFD').replace(/[^a-zA-Zs]/g, '').indexOf( val ) > -1) {
@@ -1866,7 +1866,7 @@ const autoCompleteClientes = input => {
       }
 	  }
   })
-  
+
   const closeAllLists = elmnt => {
     /* fecha todas as listas do documento, exceto a passada como argumento */
     var x = document.querySelectorAll('.autocomplete')
@@ -1876,7 +1876,7 @@ const autoCompleteClientes = input => {
       }
     })
   }
-    
+
 	/* executa a função quando alguem clicar fora da lista */
 	document.addEventListener('click', e => {
 	  closeAllLists(e.target)
@@ -1888,10 +1888,10 @@ const autoCompleteMotivos = input => {
 	var currentFocus
 	/* adiciona um listener quando for digitado alguma coisa */
 	input.addEventListener('input', function(e) {
-  
+
     var a, b, i, val = this.value
     closeAllLists()
-    
+
 	  if (!val) { return false }
     currentFocus = -1
 
@@ -1899,7 +1899,7 @@ const autoCompleteMotivos = input => {
 	  a.setAttribute('id', this.id + 'autocomplete-list')
 	  a.setAttribute('class', 'autocomplete')
     this.parentNode.appendChild(a)
-    
+
     for(var x = 0; x < Object.keys(suprimentos).length; x++) {
       var suprimento = suprimentos[Object.keys(suprimentos)[x]]
 
@@ -1921,10 +1921,10 @@ const autoCompleteMotivos = input => {
       }
 	  }
   })
-  
+
   const closeAllLists = elmnt => {
     /* fecha todas as listas do documento, exceto a passada como argumento */
-      
+
     var x = document.querySelectorAll('.autocomplete')
     x.forEach(el => {
       if (elmnt != el && elmnt != input) {
@@ -1966,7 +1966,7 @@ const preencherAtendimento = (atendimento, layout) => {
     var el = document.getElementById('tAtendimentoMotivo').content.cloneNode(true)
 
     if(motivo.indexOf('Quantidade:') > 0) {
-      
+
       var modelo = motivo.split(' - Quantidade: ')[0]
       var quantidade = parseInt(motivo.split(' - Quantidade: ')[1])
       var suprimento = suprimentoPorModelo(modelo)
@@ -2012,7 +2012,7 @@ const mostrarQuantidades = (el, suprimento, alterarQuantidade) => {
   quantidade.style.marginLeft = '8px'
   quantidade.style.marginRight = '8px'
   quantidade.style.opacity = '1'
-  
+
   var input = quantidade.querySelector('.motivo-quantidade')
   if(parseInt(input.value) > parseInt(suprimento.quantidade) && alterarQuantidade) {
     input.value = suprimento.quantidade
@@ -2060,15 +2060,15 @@ const mostrarDadosCliente = (cliente, input) => {
   editClient.style.maxWidth = '20px'
   editClient.style.maxHeight = '20px'
   editClient.style.opacity = '1'
-  editClient.onclick = () => { 
+  editClient.onclick = () => {
     fecharAtendimento()
     setTimeout(() => {
       expandirCliente(cliente)
-    }, 50) 
+    }, 50)
   }
 
   dados.querySelector('#chave').innerHTML = 'Chave: ' + cliente.id + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Local inst.: ' + atob(cliente.sistema.local) + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Versão: ' + cliente.sistema.versao
-    
+
   dados.style.height = 'fit-content'
   dados.style.opacity = '1'
 }
@@ -2106,11 +2106,11 @@ const salvarAtendimento = atendimento => {
   } else {
     atendimento.cliente = cliente.id
   }
-  
+
   if(!erro) {
     for(var x = 0; x < Object.keys(atendimentos).length; x++) {
       var at = atendimentos[Object.keys(atendimentos)[x]]
-      
+
       //if( (at.responsavel == '' || at.responsavel == layout.querySelector('#responsavel').value)  && at.cliente == atendimento.cliente && !at.feito && at.id != atendimento.id && !editando) {
         if(at.responsavel == layout.querySelector('#responsavel').value && at.cliente == atendimento.cliente && !at.feito && !editando) {
 
@@ -2120,11 +2120,11 @@ const salvarAtendimento = atendimento => {
       }
     }
   }
-  
+
   if(!erro) {
     for(var x = 0; x < motivos.length; x++) {
       var motivo = motivos[x]
-  
+
       if(motivo.value == '' && motivos.length < 2) {
         error('Motivo muito curto ou vazio!')
         erro = true
@@ -2135,7 +2135,7 @@ const salvarAtendimento = atendimento => {
 
   if(!erro) {
     var motivoLocal = []
-    
+
     for(var x = 0; x < motivos.length; x++) {
       var motivo = motivos[x]
       var suprimento = suprimentoPorModelo(motivo.value)
@@ -2149,9 +2149,9 @@ const salvarAtendimento = atendimento => {
           break
         } else {
           motivoLocal.push(suprimento.modelo + ' - Quantidade: ' + quantidade)
-          if(!editando) { 
+          if(!editando) {
             atualizarSuprimentos = true
-            suprimento.quantidade = suprimento.quantidade - quantidade 
+            suprimento.quantidade = suprimento.quantidade - quantidade
             conferirQuantidadeSuprimento(suprimento)
           }
         }
@@ -2179,7 +2179,7 @@ const salvarAtendimento = atendimento => {
     if(!erro) {
       fecharAtendimento()
       atendimentos[atendimento.id] = atendimento
-    
+
       delete atendimento.dados
       delete atendimento.tecnico
       if(atualizarSuprimentos) { gravarSuprimentos() }
@@ -2202,7 +2202,7 @@ const selecionarSuprimentos = () => {
 }
 
 const listagemSuprimentos = () => {
-  
+
   $('suprimento .qtd').mask('000')
   $('#valor input').mask('000,00', {reverse: true})
   var container = document.getElementById('tSurpimentosContainer').content.cloneNode(true)
@@ -2229,9 +2229,9 @@ const listagemSuprimentos = () => {
       interface.querySelector('#quantidade').innerHTML = "<span>Quantidade Atual</span><input onkeyup='conferirSuprimentos(this)' class='simpleInput qtd' type='text' value='" + suprimento.quantidade + "'></div>"
       interface.querySelector('#ideal').innerHTML = "<span>Quantidade Ideal</span><input onkeyup='conferirSuprimentos(this)' class='simpleInput qtd' type='text' value='" + suprimento.ideal + "'></div>"
       interface.querySelector('#valor').innerHTML = "<span>Valor de venda</span><input onkeyup='conferirSuprimentos(this)' class='simpleInput' type='text' value='" + suprimento.valor.toFixed(2) + "'></div>"
-      
+
       if(suprimento.minimo >= suprimento.quantidade) {
-          interface.querySelector('suprimento').classList.add('acabando') 
+          interface.querySelector('suprimento').classList.add('acabando')
           interface.querySelector('#modelo').classList.add('acabando')
           interface.querySelector('#minimo input').classList.add('acabando')
           interface.querySelector('#quantidade input').classList.add('acabando')
@@ -2295,7 +2295,7 @@ const salvarSuprimento = suprimento => {
   //se o suprimento já estiver na lista de suprimentos
   var layout = document.getElementById(suprimento.id)
   if(suprimentos[suprimento.id] != undefined) {
-      
+
       var quantidade = parseInt(layout.querySelector('#quantidade input').value)
       var minimo = parseInt(layout.querySelector('#minimo input').value)
       var ideal = parseInt(layout.querySelector('#ideal input').value)
@@ -2371,8 +2371,8 @@ const conferirSuprimentos = el => {
   var ideal = parseInt(layout.querySelector('#ideal input').value)
   var valor = parseInt(layout.querySelector('#valor input').value)
 
-  if((suprimento.quantidade != quantidade || suprimento.minimo != minimo 
-      || suprimento.ideal != ideal || suprimento.valor != valor) && 
+  if((suprimento.quantidade != quantidade || suprimento.minimo != minimo
+      || suprimento.ideal != ideal || suprimento.valor != valor) &&
       !layout.querySelector('#salvar').classList.contains('fa-save')) {
       layout.querySelector('#salvar').style.opacity = '0'
       setTimeout(() => {
