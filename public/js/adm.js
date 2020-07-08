@@ -215,6 +215,8 @@ const listagemLeituras = () => {
     var impressoras = 0
 
     if(cliente.impressoras != undefined) {
+      delete cliente.impressoras.atraso
+      delete cliente.impressoras.inativas
       impressoras = Object.keys(cliente.impressoras).length
     }
 
