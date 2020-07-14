@@ -834,15 +834,13 @@ const salvarLeituras = cliente => {
 
   cliente.franquia.preco = Number(leitura.querySelector('#excedenteValor').value.replace(/,/g, '.'))
 
-  var leituras = document.querySelectorAll('impressora')
   var impressoras = cliente.impressoras
   for(var x = 0; x < Object.keys(impressoras).length; x++) {
     var impressora = impressoras[Object.keys(impressoras)[x]]
     
-    var el = leituras[impressora.serial]
-    if(el !== undefined) {
+    var el = leitura.querySelector('#impressoras').querySelector('#' + impressora.serial)
+    if(el !== null && el !== undefined) {
       impressora.setor = el.querySelector('#setor').value
-
       if(el.querySelector('#capacidade').value == 'ilimitado') {
         impressora.tinta.capacidade = 'ilimitado'
       } else {
