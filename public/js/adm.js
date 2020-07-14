@@ -837,29 +837,31 @@ const salvarLeituras = cliente => {
   var impressoras = cliente.impressoras
   for(var x = 0; x < Object.keys(impressoras).length; x++) {
     var impressora = impressoras[Object.keys(impressoras)[x]]
+    
+    if(impressora.ativa) {
+      //var el = leitura.querySelector('#impressoras').querySelector('#' + impressora.serial)
+      var el = document.getElementById(impressora.serial)
+      if(el !== null && el !== undefined) {
+        impressora.setor = el.querySelector('#setor').value
+        if(el.querySelector('#capacidade').value == 'ilimitado') {
+          impressora.tinta.capacidade = 'ilimitado'
+        } else {
+          impressora.tinta.capacidade = Number(el.querySelector('#capacidade').value)
+        }
+
+        if(cliente.franquia.tipo == 'maquina') {
+          impressora.franquia = parseInt(el.querySelector('#franquia').value.replace(/ págs/g , ''))
+        } else {
+          impressora.franquia = 0
+        }
+      }
+    }
+
     //deleta os dados locais que não precisam serem salvos no DB
     delete impressora.excedentes
     delete impressora.impresso
     delete impressora.serial
   }
-
-  document.querySelectorAll('impressora').forEach(el => {
-    var impressora = impressoras[el.id]
-
-    impressora.setor = el.querySelector('#setor').value
-
-    if(el.querySelector('#capacidade').value == 'ilimitado') {
-      impressora.tinta.capacidade = el.querySelector('#capacidade').value
-    } else {
-      impressora.tinta.capacidade = Number(el.querySelector('#capacidade').value)
-    }
-
-    if(cliente.franquia.tipo == 'maquina') {
-      impressora.franquia = parseInt(el.querySelector('#franquia').value.replace(/ págs/g , ''))
-    } else {
-      impressora.franquia = 0
-    }
-  })
 
   feedbacks++
   feedback(true)
