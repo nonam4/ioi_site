@@ -839,7 +839,6 @@ const salvarLeituras = cliente => {
     var impressora = impressoras[Object.keys(impressoras)[x]]
     
     if(impressora.ativa) {
-      //var el = leitura.querySelector('#impressoras').querySelector('#' + impressora.serial)
       var el = document.getElementById(impressora.serial)
       if(el !== null && el !== undefined) {
         impressora.setor = el.querySelector('#setor').value
