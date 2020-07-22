@@ -2411,7 +2411,7 @@ const gerarPedidos = () => {
   if (dia < 10) { dia = "0" + dia }
 
   var doc = new jsPDF('p', 'mm', [297, 210])
-  doc.addImage(pdfLogo, 'PNG', 25, 10, 150, 35)
+  doc.addImage(pdfLogo, 'PNG', 0, 0, 210, 297)
   doc.setFontSize(16)
   //centra o texto na tela
   var titulo = 'Pedido de suprimentos - ' + dia + '/' + mes + '/' + ano
