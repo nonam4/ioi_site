@@ -941,21 +941,22 @@ const dadosDoRelatorio = (cliente, el) => {
   var dataDeListagem = meses[parseInt(dataSplit[1])] + '/' + dataSplit[0]
 
   var doc = new jsPDF('p', 'mm', [297, 210])
-  doc.addImage(pdfLogo, 'PNG', 0, 0, 210, 297)
+  var pdfImageAdded = true
+  doc.addImage(pdfBackground, 'PNG', 0, 0, 210, 297)
   doc.setFontSize(16)
 
   //centra o texto na tela
   var textWidth = doc.getStringUnitWidth(cliente.nomefantasia) * doc.internal.getFontSize() / doc.internal.scaleFactor
   var textOffset = (210 - textWidth) / 2
-  doc.text(textOffset, 53, cliente.nomefantasia)
-  var line = 60
+  doc.text(textOffset, 90, cliente.nomefantasia)
+  var line = 97
 
   doc.setFontSize(14)
   var msg = 'Relatorio de páginas impressas - Mês de referência: ' + dataDeListagem
   textWidth = doc.getStringUnitWidth(msg) * doc.internal.getFontSize() / doc.internal.scaleFactor
   textOffset = (210 - textWidth) / 2
   doc.text(textOffset, line, msg)
-  line = incrementLine(doc, line, 9)
+  line = incrementLine(doc, line, 9, pdfImageAdded)
 
   var impressoras = cliente.impressoras
   if(cliente.franquia.tipo == 'maquina') {
@@ -966,25 +967,25 @@ const dadosDoRelatorio = (cliente, el) => {
       if(impressora.ativa) {
         doc.setFontSize(12)
         doc.text(20, line, impressora.modelo + ' - ' + impressora.serial)
-        line = incrementLine(doc, line, 5)
+        line = incrementLine(doc, line, 5, pdfImageAdded)
         doc.text(20, line, 'Setor: ' + impressora.setor + ' - IP: ' + impressora.ip)
-        line = incrementLine(doc, line, 5)
+        line = incrementLine(doc, line, 5, pdfImageAdded)
         doc.text(20, line, 'Impressões contabilizadas: ' + impressora.impresso + ' páginas')
-        line = incrementLine(doc, line, 5)
+        line = incrementLine(doc, line, 5, pdfImageAdded)
 
         if(impressora.leituras[dataInvertida] != undefined) {
           var inicial = impressora.leituras[dataInvertida].inicial.dia + '/' + dataDeListagem + ' - ' + impressora.leituras[dataInvertida].inicial.valor + ' páginas'
           var final = impressora.leituras[dataInvertida].final.dia + '/' + dataDeListagem + ' - ' + impressora.leituras[dataInvertida].final.valor + ' páginas'
           doc.text(20, line, 'Contador inicial: ' + inicial)
-          line = incrementLine(doc, line, 5)
+          line = incrementLine(doc, line, 5, pdfImageAdded)
           doc.text(20, line, 'Contador final: ' + final)
         } else {
           doc.text(20, line, 'Contador inicial: Sem Registro - Contador final: Sem Registro')
         }
-        line = incrementLine(doc, line, 5)
+        line = incrementLine(doc, line, 5, pdfImageAdded)
 
         doc.text(20, line, 'Franquia contratada: ' + impressora.franquia + ' páginas' + ' - Excedentes: ' + impressora.excedentes + ' páginas')
-        line = incrementLine(doc, line, 8)
+        line = incrementLine(doc, line, 8, pdfImageAdded)
       }
     }
   } else {
@@ -992,13 +993,13 @@ const dadosDoRelatorio = (cliente, el) => {
     if(cliente.franquia.tipo == 'pagina'){
 
       doc.text(20, line, 'Franquia contratada: ' + cliente.franquia + ' páginas - Impressões contabilizadas: ' + cliente.impresso + ' páginas')
-      line = incrementLine(doc, line, 5)
+      line = incrementLine(doc, line, 5, pdfImageAdded)
       doc.text(20, line, 'Páginas excedentes: ' + cliente.excedentes + ' páginas')
-      line = incrementLine(doc, line, 10)
+      line = incrementLine(doc, line, 10, pdfImageAdded)
 
     } else {
       doc.text(20, line, 'Franquia contratada: Ilimitada - Impressões contabilizadas: ' + cliente.impresso + ' páginas')
-      line = incrementLine(doc, line, 10)
+      line = incrementLine(doc, line, 10, pdfImageAdded)
     }
 
     for(var x = 0; x < Object.keys(impressoras).length; x++) {
@@ -1007,35 +1008,40 @@ const dadosDoRelatorio = (cliente, el) => {
       if(impressora.ativa) {
         doc.setFontSize(12)
         doc.text(20, line, impressora.modelo + ' - ' + impressora.serial)
-        line = incrementLine(doc, line, 5)
+        line = incrementLine(doc, line, 5, pdfImageAdded)
         doc.text(20, line, 'Setor: ' + impressora.setor + ' - IP: ' + impressora.ip)
-        line = incrementLine(doc, line, 5)
+        line = incrementLine(doc, line, 5, pdfImageAdded)
 
         if(impressora.leituras[dataInvertida] != undefined) {
           var inicial = impressora.leituras[dataInvertida].inicial.dia + '/' + dataDeListagem + ' - ' + impressora.leituras[dataInvertida].inicial.valor + ' páginas'
           var final = impressora.leituras[dataInvertida].final.dia + '/' + dataDeListagem + ' - ' + impressora.leituras[dataInvertida].final.valor + ' páginas'
           doc.text(20, line, 'Contador inicial: ' + inicial)
-          line = incrementLine(doc, line, 5)
+          line = incrementLine(doc, line, 5, pdfImageAdded)
           doc.text(20, line, 'Contador final: ' + final)
         } else {
           doc.text(20, line, 'Contador inicial: Sem Registro - Contador final: Sem Registro')
         }
-        line = incrementLine(doc, line, 5)
+        line = incrementLine(doc, line, 5, pdfImageAdded)
         doc.text(20, line, 'Total impresso: ' + impressora.impresso + ' páginas')
-        line = incrementLine(doc, line, 8)
+        line = incrementLine(doc, line, 8, pdfImageAdded)
       }
     }
   }
   return doc
 }
 
-const incrementLine = (doc, line, valor) => {
+const incrementLine = (doc, line, valor, pdfImageAdded) => {
     if (line < 270) {
         line = line + valor
         return line
     } else {
         doc.addPage()
-        line = 20
+        if(pdfImageAdded) {
+          doc.addImage(pdfBackground, 'PNG', 0, 0, 210, 297)
+          line = 90
+        } else {
+          line = 20
+        }
         return line
     }
 }
@@ -1055,6 +1061,7 @@ const gerarRelatorios = () => {
 
   var relatorioSelect = document.getElementById('relatorioFiltro').value
   var doc = new jsPDF('p', 'mm', [297, 210])
+  var pdfImageAdded = false
   var line = 30
 
   for(var x = 0; x < Object.keys(clientes).length; x++) {
@@ -1073,76 +1080,76 @@ const gerarRelatorios = () => {
         textWidth = doc.getStringUnitWidth(cliente.nomefantasia) * doc.internal.getFontSize() / doc.internal.scaleFactor
         textOffset = (210 - textWidth) / 2
         doc.text(textOffset, line, cliente.nomefantasia)
-        line = incrementLine(doc, line, 9)
+        line = incrementLine(doc, line, 9, pdfImageAdded)
         doc.setFontSize(12)
         var impressoras = cliente.impressoras
 
         if(cliente.franquia.tipo == 'maquina'){
           var valorTotal = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
           doc.text(20, line, 'Valor por excedente: ' + valor + ' - Excedentes: ' + cliente.excedentes + ' páginas - Valor excedentes: ' + valorTotal)
-          line = incrementLine(doc, line, 9)
+          line = incrementLine(doc, line, 9, pdfImageAdded)
 
           for(var y = 0; y < Object.keys(impressoras).length; y++) {
             var impressora = impressoras[Object.keys(impressoras)[y]]
             if(impressora.modelo != undefined && impressora.ativa) {
               doc.text(20, line, impressora.modelo + ' - ' + impressora.serial)
-              line = incrementLine(doc, line, 5)
+              line = incrementLine(doc, line, 5, pdfImageAdded)
               doc.text(20, line, 'Setor: ' + impressora.setor + ' - IP: ' + impressora.ip)
-              line = incrementLine(doc, line, 5)
+              line = incrementLine(doc, line, 5, pdfImageAdded)
               doc.text(20, line, 'Impressões contabilizadas: ' + impressora.impresso + ' páginas')
-              line = incrementLine(doc, line, 5)
+              line = incrementLine(doc, line, 5, pdfImageAdded)
 
               if(impressora.leituras[dataInvertida] != undefined) {
                 var inicial = impressora.leituras[dataInvertida].inicial.dia + '/' + dataDeListagem + ' - ' + impressora.leituras[dataInvertida].inicial.valor + ' páginas'
                 var final = impressora.leituras[dataInvertida].final.dia + '/' + dataDeListagem + ' - ' + impressora.leituras[dataInvertida].final.valor + ' páginas'
                 doc.text(20, line, 'Contador inicial: ' + inicial)
-                line = incrementLine(doc, line, 5)
+                line = incrementLine(doc, line, 5, pdfImageAdded)
                 doc.text(20, line, 'Contador final: ' + final)
               } else {
                 doc.text(20, line, 'Contador inicial: Sem Registro - Contador final: Sem Registro')
               }
-              line = incrementLine(doc, line, 5)
+              line = incrementLine(doc, line, 5, pdfImageAdded)
 
               doc.text(20, line, 'Franquia contratada: ' + impressora.franquia + ' páginas' + ' - Excedentes: ' + impressora.excedentes + ' páginas')
-              line = incrementLine(doc, line, 8)
+              line = incrementLine(doc, line, 8, pdfImageAdded)
             }
           }
         } else {
           if(cliente.franquia.tipo == 'pagina'){
             doc.text(20, line, 'Franquia contratada: ' + cliente.franquia.valor + ' páginas - Impressões contabilizadas: ' + cliente.impresso + ' páginas')
-            line = incrementLine(doc, line, 5)
+            line = incrementLine(doc, line, 5, pdfImageAdded)
             var valorTotal = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
             doc.text(20, line, 'Valor por excedente: ' + valor + ' - Excedentes: ' + cliente.excedentes + ' páginas - Valor excedentes: ' + valorTotal)
-            line = incrementLine(doc, line, 10)
+            line = incrementLine(doc, line, 10, pdfImageAdded)
 
           } else {
             doc.text(20, line, 'Franquia contratada: Ilimitada - Impressões contabilizadas: ' + cliente.impresso + ' páginas')
-            line = incrementLine(doc, line, 5)
+            line = incrementLine(doc, line, 5, pdfImageAdded)
             var valorTotal = (cliente.franquia.preco * cliente.impresso).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
             doc.text(20, line, 'Valor por página: ' + valor + ' - Valor total: ' + valorTotal)
-            line = incrementLine(doc, line, 10)
+            line = incrementLine(doc, line, 10, pdfImageAdded)
           }
 
           for(var z = 0; z < Object.keys(impressoras).length; z++) {
             var impressora = impressoras[Object.keys(impressoras)[z]]
             if(impressora.modelo != undefined && impressora.ativa) {
               doc.text(20, line, impressora.modelo + ' - ' + impressora.serial)
-              line = incrementLine(doc, line, 5)
+              line = incrementLine(doc, line, 5, pdfImageAdded)
               doc.text(20, line, 'Setor: ' + impressora.setor + ' - IP: ' + impressora.ip)
-              line = incrementLine(doc, line, 5)
+              line = incrementLine(doc, line, 5, pdfImageAdded)
 
               if(impressora.leituras[dataInvertida] != undefined) {
                 var inicial = impressora.leituras[dataInvertida].inicial.dia + '/' + dataDeListagem + ' - ' + impressora.leituras[dataInvertida].inicial.valor + ' páginas'
                 var final = impressora.leituras[dataInvertida].final.dia + '/' + dataDeListagem + ' - ' + impressora.leituras[dataInvertida].final.valor + ' páginas'
                 doc.text(20, line, 'Contador inicial: ' + inicial)
-                line = incrementLine(doc, line, 5)
+                line = incrementLine(doc, line, 5, pdfImageAdded)
                 doc.text(20, line, 'Contador final: ' + final)
               } else {
                 doc.text(20, line, 'Contador inicial: Sem Registro - Contador final: Sem Registro')
               }
-              line = incrementLine(doc, line, 5)
+              line = incrementLine(doc, line, 5, pdfImageAdded)
               doc.text(20, line, 'Total impresso: ' + impressora.impresso + ' páginas')
-              line = incrementLine(doc, line, 8)
+              line = incrementLine(doc, line, 8, pdfImageAdded)
             }
           }
         }
@@ -1150,7 +1157,7 @@ const gerarRelatorios = () => {
         textWidth = doc.getStringUnitWidth(separador) * doc.internal.getFontSize() / doc.internal.scaleFactor
         textOffset = (210 - textWidth) / 2
         doc.text(textOffset, line, separador)
-        line = incrementLine(doc, line, 8)
+        line = incrementLine(doc, line, 8, pdfImageAdded)
       }
     }
   }
@@ -2411,20 +2418,21 @@ const gerarPedidos = () => {
   if (dia < 10) { dia = "0" + dia }
 
   var doc = new jsPDF('p', 'mm', [297, 210])
-  doc.addImage(pdfLogo, 'PNG', 0, 0, 210, 297)
+  var pdfImageAdded = true
+  doc.addImage(pdfBackground, 'PNG', 0, 0, 210, 297)
   doc.setFontSize(16)
   //centra o texto na tela
   var titulo = 'Pedido de suprimentos - ' + dia + '/' + mes + '/' + ano
   var textWidth = doc.getStringUnitWidth(titulo) * doc.internal.getFontSize() / doc.internal.scaleFactor
   var textOffset = (210 - textWidth) / 2
-  doc.text(textOffset, 53, titulo)
-  var line = 60
+  doc.text(textOffset, 90, titulo)
+  var line = 97
   doc.setFontSize(12)
   for(var x = 0; x < Object.keys(suprimentos).length; x++) {
     var suprimento = suprimentos[Object.keys(suprimentos)[x]]
     if(suprimento.ideal > suprimento.quantidade) {
       doc.text(20, line, suprimento.modelo + ' - ' + (suprimento.ideal - suprimento.quantidade) + ' unidades')
-      line = incrementLine(doc, line, 5)
+      line = incrementLine(doc, line, 5, pdfImageAdded)
     }
   }
   feedbacks--

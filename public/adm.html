@@ -6,8 +6,8 @@
 		<script type="text/javascript" src='js/axios.min.js'></script>
 		<script type="text/javascript" src="js/masks.js"></script>
 		<script type="text/javascript" src="js/pdf.js"></script>
-		<script type="text/javascript"src="js/zip.js"></script>
-		<script type="text/javascript" src="js/logo.js"></script>
+		<script type="text/javascript" src="js/zip.js"></script>
+		<script type="text/javascript" src="js/pdf.background.js"></script>
 		<script type="text/javascript" src="js/sortable.js"></script>
 		<script type="text/javascript" src="js/filesaver.min.js"></script>
 		<script type="text/javascript" src='js/adm.js'></script>
@@ -629,7 +629,7 @@
 						<div class='pessoasTitulo'>
 							<span>Suprimentos</span>
 							<i class='fas fa-plus' onclick='adicionarSuprimento()' title='Adicionar Novo Suprimento'></i>
-							<i class='fas fa-shopping-basket' onclick='gerarPedidos()' title='Gerar pedido'></i>
+							<i class='fas fa-clipboard-list' onclick='gerarPedidos()' title='Gerar pedido'></i>
 						</div>
 						<div class='pessoasListagem suprimentos' id='suprimentos'>
 						</div>
@@ -655,8 +655,8 @@
 				<div class='menu-group'>
 					<div class='menu-section'>
 							<div class='menu-titulo'>Geral</div>
-							<div class='menu-item' onclick=''><i class='fas fa-th-large'></i>Dashboard</div>
 							<!--
+							<div class='menu-item' onclick=''><i class='fas fa-th-large'></i>Dashboard</div>
 							<div class='menu-item' onclick=''><i class='fas fa-building'></i>Empresa</div>
 							-->
 							<div class='menu-item' onclick='selecionarSuprimentos()'><i class='fas fa-boxes'></i>Suprimentos</div>
