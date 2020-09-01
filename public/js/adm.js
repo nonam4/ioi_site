@@ -940,9 +940,9 @@ const dadosDoRelatorio = (cliente, el) => {
   var dataSplit = dataInvertida.split('-')
   var dataDeListagem = meses[parseInt(dataSplit[1])] + '/' + dataSplit[0]
 
-  var doc = new jsPDF('p', 'mm', [297, 210])
+  var doc = new jsPDF('p', 'mm', [297, 210], true)
   var pdfImageAdded = true
-  doc.addImage(pdfBackground, 'PNG', 0, 0, 210, 297)
+  doc.addImage(pdfBackground, 'PNG', 0, 0, 210, 297, undefined, 'FAST')
   doc.setFontSize(16)
 
   //centra o texto na tela
@@ -953,6 +953,14 @@ const dadosDoRelatorio = (cliente, el) => {
 
   doc.setFontSize(14)
   var msg = 'Relatorio de páginas impressas - Mês de referência: ' + dataDeListagem
+  textWidth = doc.getStringUnitWidth(msg) * doc.internal.getFontSize() / doc.internal.scaleFactor
+  textOffset = (210 - textWidth) / 2
+  doc.text(textOffset, line, msg)
+  line = incrementLine(doc, line, 6, pdfImageAdded)
+
+  var valor = cliente.franquia.preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+  var valorTotal = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+  msg = 'Total de excedentes: ' + cliente.excedentes + ' páginass - Valor total: ' + valorTotal
   textWidth = doc.getStringUnitWidth(msg) * doc.internal.getFontSize() / doc.internal.scaleFactor
   textOffset = (210 - textWidth) / 2
   doc.text(textOffset, line, msg)
@@ -1031,7 +1039,7 @@ const dadosDoRelatorio = (cliente, el) => {
 }
 
 const incrementLine = (doc, line, valor, pdfImageAdded) => {
-    if (line < 270) {
+    if (line < 265) {
         line = line + valor
         return line
     } else {
@@ -1060,7 +1068,7 @@ const gerarRelatorios = () => {
   var zip = new JSZip()
 
   var relatorioSelect = document.getElementById('relatorioFiltro').value
-  var doc = new jsPDF('p', 'mm', [297, 210])
+  var doc = new jsPDF('p', 'mm', [297, 210], true)
   var pdfImageAdded = false
   var line = 30
 
