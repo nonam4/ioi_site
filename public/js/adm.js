@@ -220,16 +220,17 @@ const listagemLeituras = () => {
       impressoras = Object.keys(cliente.impressoras).length
     }
 
-    if(cliente.ativo && cliente.impressoras != undefined && impressoras > 0) {
+    //if(cliente.ativo && cliente.impressoras != undefined && impressoras > 0) {
+    if(cliente.ativo && !cliente.fornecedor && cliente.impressoras != false) {
       cliente = preparLeiturasParaListagem(cliente)
 
-      if(filtroSelecionado == 'todas' && cliente.impressoras.inativas < impressoras) {
+      if(filtroSelecionado == 'todas') {
         interfaces.appendChild(criarInterfaceLeitura(cliente, true))
-      } else if(filtroSelecionado == 'alertas' && (compare(cliente.sistema.versao, versao) || cliente.impressoras.atraso)){
+      } else if(filtroSelecionado == 'alertas' && (compare(cliente.sistema.versao, versao) || cliente.impressoras.atraso || cliente.impressoras == undefined || impressoras <= 0)){
         interfaces.appendChild(criarInterfaceLeitura(cliente, true))
-      } else if(filtroSelecionado == 'excedentes' && cliente.excedentes > 0){
+      } else if(filtroSelecionado == 'excedentes' && cliente.excedentes > 0 && cliente.impressoras != undefined && impressoras > 0){
         interfaces.appendChild(criarInterfaceLeitura(cliente, true))
-      } else if(filtroSelecionado == 'excluidas'  && cliente.impressoras.inativas > 0) {
+      } else if(filtroSelecionado == 'excluidas'  && cliente.impressoras.inativas > 0 && cliente.impressoras != undefined && impressoras > 0) {
         interfaces.appendChild(criarInterfaceLeitura(cliente, false))
       }
     }
@@ -253,6 +254,8 @@ const preparLeiturasParaListagem = cliente => {
 
   cliente.impresso = 0
   cliente.excedentes = 0
+
+  cliente.impressoras == undefined ? cliente.impressoras = new Object() : 0;
   cliente.impressoras.atraso = false
   cliente.impressoras.inativas = 0
   cliente.abastecimento = false
@@ -318,6 +321,7 @@ const preparLeiturasParaListagem = cliente => {
 
 const criarInterfaceLeitura = (cliente, ativas) => {
   var leitura = document.getElementById('tLeitura').content.cloneNode(true)
+  var quantidadeImpressoras = pegarQuantidadeImpressoras(ativas, cliente.impressoras)
 
   leitura.querySelector('.leituraTitulo').querySelector('i').onclick = (cliente => {
     return () => {expandirLeitura(cliente)}
@@ -325,17 +329,19 @@ const criarInterfaceLeitura = (cliente, ativas) => {
 
   //id principal
   leitura.querySelector('leitura').id = cliente.id
-  if(cliente.sistema.versao == 'Não instalado' || compare(cliente.sistema.versao, versao)){
+  if(cliente.sistema.versao.toLowerCase() == 'não instalado' || compare(cliente.sistema.versao, versao)){
     leitura.querySelector('.leituraTitulo').style.backgroundColor = 'var(--erro)'
   } else if(cliente.impressoras.atraso) {
     leitura.querySelector('.leituraTitulo').style.backgroundColor = 'var(--alerta)'
+  } else if(quantidadeImpressoras <= 0) {
+    leitura.querySelector('.leituraTitulo').style.backgroundColor = 'var(--resolvido)'
   }
   //define o nome do cliente na leitura
   leitura.querySelector('#nome').innerHTML = cliente.nomefantasia
   //define a versão do coletor
   leitura.querySelector('#versao').innerHTML = cliente.sistema.versao
   //define o numero de impressoras (precisa subtrair 2 do length pois tem duas variáveis definidas junto)
-  leitura.querySelector('#impressoras').innerHTML = pegarQuantidadeImpressoras(ativas, cliente.impressoras)
+  leitura.querySelector('#impressoras').innerHTML = quantidadeImpressoras
 
   if(cliente.abastecimento) {
     leitura.querySelector('.tintas').style.width = '100%'
@@ -1079,7 +1085,10 @@ const gerarRelatorios = () => {
         salvar = true
         doc = dadosDoRelatorio(cliente, dataParaListagem)
         zip.file(cliente.nomefantasia + ' - ' + dataSplit[1] + '_' + dataSplit[0] + '.pdf', doc.output('blob'))
-
+      } else if(relatorioSelect == 'excedentes' && (cliente.excedentes > 0 || cliente.franquia.tipo == 'ilimitado')) {
+        salvar = true
+        doc = dadosDoRelatorio(cliente, dataParaListagem)
+        zip.file(cliente.nomefantasia + ' - ' + dataSplit[1] + '_' + dataSplit[0] + '.pdf', doc.output('blob'))
       } else if(relatorioSelect == 'interno' && (cliente.excedentes > 0 || cliente.franquia.tipo == 'ilimitado')) {
 
         var valor = cliente.franquia.preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
@@ -1388,6 +1397,8 @@ const salvarCliente = cliente => {
       var tipo = layout.querySelector('#tipoCliente').value
       if(tipo == 'fornecedor') {
         cliente.fornecedor = true
+      } else if(tipo == 'ti') {
+        cliente.impressoras = false
       }
       cliente.sistema = {
         local: btoa('Não Instalado'),

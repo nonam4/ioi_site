@@ -60,15 +60,17 @@
 							<select id='relatorioFiltro'>
 								<option value='interno'>Interno</option>
 								<option value='todos'>Todos</option>
+								<option value='excedentes'>Excedentes</option>
 							</select>
 							<i class="fas fa-file-download" id="gerarRelatorios" onclick="gerarRelatorios()"></i>
 						</div>
 					</section>
-					<section>
+					<!--section>
 						<legenda><div class="legenda"></div> Desatualizado</legenda>
 						<legenda><div class="legenda"></div> Atraso</legenda>
 						<legenda><div class="legenda"></div> Ok</legenda>
-					</section>
+						<legenda><div class="legenda"></div> Ok</legenda>
+					</section-->
 				</filtro>
 			</template>
 
@@ -296,8 +298,9 @@
 							<div class='group tipo'>
 								<label class='lbl'>Tipo</label>
 								<select id='tipoCliente'>
-									<option value='cliente'>Cliente</option>
+									<option value='cliente'>Locação</option>
 									<option value='fornecedor'>Fornecedor</option>
+									<option value='ti'>TI</option>
 								</select>
 							</div>
 						</section>
