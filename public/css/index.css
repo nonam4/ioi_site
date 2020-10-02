@@ -224,9 +224,9 @@
   }
   .footer-under{
     background-color:#1a1a1c;
-    padding-bottom:100px;
-    padding-top:100px;
-    min-height:450px;
+    padding-bottom:50px;
+    padding-top:50px;
+    min-height:250px;
     color:#eee;
     position:relative;
     font-weight:100;
@@ -247,6 +247,7 @@
     float:left;
     width:100%;
     padding:5px 0;
+    text-align: center;
   }
   .foot-social-btns{
     display:none;
