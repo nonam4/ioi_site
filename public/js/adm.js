@@ -109,12 +109,10 @@ const esconderLoad = () => {
   var load = document.getElementsByTagName("load")
   for(let div of load) {
       div.style.opacity = 0
+      setTimeout(() => {
+        div.remove()
+      }, 250)
   }
-  setTimeout(() => {
-    for(let div of load) {
-      div.remove()
-    }
-  }, 250)
 }
 
 const error = message => {
@@ -220,7 +218,6 @@ const listagemLeituras = () => {
       impressoras = Object.keys(cliente.impressoras).length
     }
 
-    //if(cliente.ativo && cliente.impressoras != undefined && impressoras > 0) {
     if(cliente.ativo && !cliente.fornecedor && cliente.impressoras != false) {
       cliente = preparLeiturasParaListagem(cliente)
 
@@ -273,7 +270,7 @@ const preparLeiturasParaListagem = cliente => {
           /*
           * define a franquia total do cliente se a franquia for separada por maquinas
           */
-          if(cliente.franquia.tipo !== 'ilimitado' && cliente.franquia.tipo !== 'pagina' && impressora.ativa) {
+          if(cliente.franquia.tipo !== 'ilimitado' && cliente.franquia.tipo !== 'pagina') {
             cliente.franquia.valor = parseInt(cliente.franquia.valor) + parseInt(impressora.franquia)
           }
 
@@ -283,25 +280,48 @@ const preparLeiturasParaListagem = cliente => {
           /*
           * define o total impresso por todas as maquinas
           */
-          if(impressora.leituras[listagem] !== undefined) {
-            var inicio = impressora.leituras[listagem].inicial.valor
-            var fim = impressora.leituras[listagem].final.valor
-            impressora.impresso = fim - inicio
+          //tem leitura
+          if(impressora.leituras[listagem] !== undefined || impressora.substituindo !== undefined && impressora.substituindo !== null) {
+            if(impressora.leituras[listagem] !== undefined) {
 
-            cliente.impresso = cliente.impresso + impressora.impresso
+              var inicio = impressora.leituras[listagem].inicial.valor
+              var fim = impressora.leituras[listagem].final.valor
+              impressora.impresso = fim - inicio
+
+              cliente.impresso = cliente.impresso + impressora.impresso
+
+              //não calcular excedentes nos meses anteriores
+              var data = new Date()
+              var ano = data.getFullYear()
+              var mes = data.getMonth() + 1
+              if(mes < 10) { mes = '0' + mes }
+              if(ano + '-' + mes == listagem) {
+                //checa se o ultimo dia de leitura foi a mais de 5 dias atrás
+                var a = new Date()
+                //precisa adicionar + 1 no dia pois senão se o valor for 10 pegará o dia 9
+                var b = new Date(listagem + '-' + (parseInt(impressora.leituras[listagem].final.dia) + 1))
+                if(Math.ceil(Math.abs(a - b) / (1000 * 3600 * 24)) > 5 && !impressora.trocada) {
+                  cliente.impressoras.atraso = true
+                }
+              }
+            }
+
+            if(impressora.substituindo !== undefined && impressora.substituindo !== null) {
+              var substituida = cliente.impressoras[impressora.substituindo]
+              
+              if(substituida.leituras[listagem] !== undefined && substituida.leituras[listagem] !== null) {
+                impressora.impresso = impressora.impresso + (substituida.leituras[listagem].final.valor - substituida.leituras[listagem].inicial.valor)
+              }
+            } 
+            
             if(impressora.impresso > impressora.franquia && cliente.franquia.tipo == 'maquina') {
               impressora.excedentes = impressora.impresso - impressora.franquia
-              cliente.excedentes = cliente.excedentes + impressora.excedentes
+              if(!impressora.trocada) {
+                cliente.excedentes = cliente.excedentes + impressora.excedentes
+              }
             }
 
-            //checa se o ultimo dia de leitura foi a mais de 5 dias atrás
-            var a = new Date()
-            //precisa adicionar + 1 no dia pois senão se o valor for 10 pegará o dia 9
-            var b = new Date(listagem + '-' + (parseInt(impressora.leituras[listagem].final.dia) + 1))
-            if(Math.ceil(Math.abs(a - b) / (1000 * 3600 * 24)) > 5 && impressora.ativa){
-              cliente.impressoras.atraso = true
-            }
-          } else {
+          } else if(!impressora.trocada){
             cliente.impressoras.atraso = true
           }
         } else {
@@ -313,7 +333,7 @@ const preparLeiturasParaListagem = cliente => {
 
   if(cliente.franquia.tipo == 'pagina') {
     if(cliente.franquia.valor < cliente.impresso) {
-    cliente.excedentes = cliente.impresso - cliente.franquia.valor
+      cliente.excedentes = cliente.impresso - cliente.franquia.valor
     }
   }
   return cliente
@@ -430,9 +450,9 @@ const expandirLeitura = cliente => {
     var impressora = impressoras[Object.keys(impressoras)[x]]
     if(impressora.modelo != undefined) {
       if(listagem == 'excluidas' && !impressora.ativa) {
-        interfaces.appendChild(criarInterfaceImpressora(impressora, true, data))
+        interfaces.appendChild(criarInterfaceImpressora(impressora, false, data, cliente))
       } else if(impressora.ativa && listagem != 'excluidas') {
-        interfaces.appendChild(criarInterfaceImpressora(impressora, false, data))
+        interfaces.appendChild(criarInterfaceImpressora(impressora, false, data, cliente))
       }
     }
   }
@@ -500,7 +520,7 @@ const fecharLeitura = () => {
 /*
 * cria a interface da leitura expandida
 */
-const criarInterfaceImpressora = (impressora, excluidas, listagem) => {
+const criarInterfaceImpressora = (impressora, excluidas, listagem, cliente) => {
 
   var data = listagem.split('-')[1] + '/' + listagem.split('-')[0]
 
@@ -546,6 +566,27 @@ const criarInterfaceImpressora = (impressora, excluidas, listagem) => {
     layout.querySelector('#deletar').className = 'fas fa-trash-restore'
     layout.querySelector('#deletar').title = 'Restaurar impressora'
     layout.querySelector('.leituraTitulo').style.backgroundColor = 'var(--erro)'
+  }
+
+  //cria os seriais de opção de substitutas
+  var substitutas = layout.querySelector('#trocaContainer')
+  for(var x = 0; x < Object.keys(cliente.impressoras).length; x++) {
+    var serial = Object.keys(cliente.impressoras)[x]
+
+    if(cliente.impressoras[Object.keys(cliente.impressoras)[x]].leituras != undefined 
+      && serial !== impressora.serial && cliente.impressoras[Object.keys(cliente.impressoras)[x]].ativa
+      && impressora.substituindo !== serial) {
+      var option = document.createElement('option')
+
+      option.value = serial
+      option.innerHTML = serial
+      substitutas.appendChild(option)
+    }
+  }
+
+  if(impressora.trocada) {
+    layout.querySelector('.leituraTitulo').style.backgroundColor = 'var(--erro)'
+    layout.querySelector('#trocaContainer').value = impressora.substituta
   }
 
   return layout
@@ -606,47 +647,76 @@ const alterarListagemLeituraExpandida = cliente => {
   var listagens = document.getElementById('datasDeLeiturasExpandida')
   var listagem = listagens.options[listagens.selectedIndex].value
 
-  if(cliente.franquia.valor == undefined || cliente.franquia.valor == null) {
+  if(cliente.franquia.valor == undefined || cliente.franquia.valor == null
+    || cliente.franquia.tipo == 'maquina' || cliente.franquia.tipo == 'ilimitado') {
     cliente.franquia.valor = 0
   }
 
+  if(cliente.franquia.preco == undefined || cliente.franquia.preco == null) {
+    cliente.franquia.preco = 0
+  }
+
   cliente.impresso = 0
+  cliente.excedentes = 0
+
+  cliente.impressoras == undefined ? cliente.impressoras = new Object() : 0;
+  cliente.impressoras.atraso = false
+  cliente.impressoras.inativas = 0
+  cliente.abastecimento = false
   var impressoras = cliente.impressoras
 
   if(impressoras != undefined && impressoras != null) {
     for(var x = 0; x < Object.keys(impressoras).length; x++) {
       var impressora = impressoras[Object.keys(impressoras)[x]]
-      if(impressora.leituras != undefined && impressora.ativa) {
+      if(impressora.leituras != undefined) {
         impressora.serial = Object.keys(impressoras)[x]
         impressora.impresso = 0
         impressora.excedentes = 0
-        /*
-        * define a franquia total do cliente se a franquia for separada por maquinas
-        */
-        if(cliente.franquia.tipo !== 'ilimitado' && cliente.franquia.tipo !== 'pagina') {
-          cliente.franquia.valor = parseInt(cliente.franquia.valor) + parseInt(impressora.franquia)
+        
+        if(impressora.ativa) {
+          /*
+          * define a franquia total do cliente se a franquia for separada por maquinas
+          */
+          if(cliente.franquia.tipo !== 'ilimitado' && cliente.franquia.tipo !== 'pagina') {
+            cliente.franquia.valor = parseInt(cliente.franquia.valor) + parseInt(impressora.franquia)
+          }
         }
+
         /*
         * define o total impresso por todas as maquinas
         */
-        if(impressora.leituras[listagem] !== undefined) {
-          var inicio = impressora.leituras[listagem].inicial.valor
-          var fim = impressora.leituras[listagem].final.valor
-          cliente.impresso = cliente.impresso + (fim - inicio)
-          impressora.impresso = fim - inicio
-          if(impressora.impresso > impressora.franquia) {
+        //tem leitura
+        if(impressora.leituras[listagem] !== undefined || impressora.substituindo !== undefined && impressora.substituindo !== null) {
+          if(impressora.leituras[listagem] !== undefined) {
+            var inicio = impressora.leituras[listagem].inicial.valor
+            var fim = impressora.leituras[listagem].final.valor
+            impressora.impresso = fim - inicio
+  
+            cliente.impresso = cliente.impresso + impressora.impresso
+          }
+          
+          if(impressora.substituindo !== undefined && impressora.substituindo !== null) {
+            var substituida = cliente.impressoras[impressora.substituindo]
+            
+            if(substituida.leituras[listagem] !== undefined && substituida.leituras[listagem] !== null) {
+              impressora.impresso = impressora.impresso + (substituida.leituras[listagem].final.valor - substituida.leituras[listagem].inicial.valor)
+            }
+          } 
+          
+          if(impressora.impresso > impressora.franquia && cliente.franquia.tipo == 'maquina') {
             impressora.excedentes = impressora.impresso - impressora.franquia
+            if(!impressora.trocada) {
+              cliente.excedentes = cliente.excedentes + impressora.excedentes
+            }
           }
         }
       }
     }
   }
 
-  if(cliente.franquia.tipo !== 'ilimitado') {
+  if(cliente.franquia.tipo == 'pagina') {
     if(cliente.franquia.valor < cliente.impresso) {
-    cliente.excedentes = cliente.impresso - cliente.franquia.valor
-    } else {
-      cliente.excedentes = 0
+      cliente.excedentes = cliente.impresso - cliente.franquia.valor
     }
   }
 
@@ -655,14 +725,24 @@ const alterarListagemLeituraExpandida = cliente => {
     //define o total impresso
     expandida.querySelector('#impresso').innerHTML = cliente.impresso + ' págs'
     //define o valor dos excedentes
-    expandida.querySelector('#excedentes').innerHTML = cliente.excedentes + ' págs'
+    $('#excedenteValor').mask('0,00', {reverse: true})
+    if(cliente.franquia.preco > 0) {
+      expandida.querySelector('#excedenteValor').value = cliente.franquia.preco.toFixed(2)
+    }
+    var valor
+    if(cliente.franquia.tipo == 'ilimitado') {
+      valor = (cliente.franquia.preco * cliente.impresso).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+    } else {
+      valor = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+    }
+    expandida.querySelector('#excedentes').innerHTML = cliente.excedentes + ' págs - ' + valor
 
     var interfaces = new DocumentFragment()
     if(impressoras != undefined && impressoras != null) {
       for(var x = 0; x < Object.keys(impressoras).length; x++) {
         var impressora = impressoras[Object.keys(impressoras)[x]]
         if(impressora.ativa) {
-          interfaces.appendChild(criarInterfaceImpressora(impressora, false, listagem))
+          interfaces.appendChild(criarInterfaceImpressora(impressora, false, listagem, cliente))
         }
       }
       expandida.querySelector('#impressoras').appendChild(interfaces)
@@ -844,9 +924,9 @@ const salvarLeituras = cliente => {
   for(var x = 0; x < Object.keys(impressoras).length; x++) {
     var impressora = impressoras[Object.keys(impressoras)[x]]
     
-    if(impressora.ativa) {
-      var el = document.getElementById(impressora.serial)
-      if(el !== null && el !== undefined) {
+    var el = document.getElementById(impressora.serial)
+    if(el !== null && el !== undefined) {
+      if(impressora.ativa) {
         impressora.setor = el.querySelector('#setor').value
         if(el.querySelector('#capacidade').value == 'ilimitado') {
           impressora.tinta.capacidade = 'ilimitado'
@@ -858,6 +938,19 @@ const salvarLeituras = cliente => {
           impressora.franquia = parseInt(el.querySelector('#franquia').value.replace(/ págs/g , ''))
         } else {
           impressora.franquia = 0
+        }
+      }
+      if(el.querySelector('#trocaContainer').value !== 'nenhum') {
+        impressora.substituta = el.querySelector('#trocaContainer').value
+        impressora.trocada = true
+    
+        impressoras[impressora.substituta].substituindo = impressora.serial
+      } else {
+        impressora.trocada = false
+    
+        if(impressora.substituta !== undefined && impressora.substituta !== null) {
+          impressoras[impressora.substituta].substituindo = null
+          impressora.substituta = null
         }
       }
     }
@@ -964,7 +1057,6 @@ const dadosDoRelatorio = (cliente, el) => {
   doc.text(textOffset, line, msg)
   line = incrementLine(doc, line, 6, pdfImageAdded)
 
-  var valor = cliente.franquia.preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
   var valorTotal = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
   msg = 'Total de excedentes: ' + cliente.excedentes + ' páginass - Valor total: ' + valorTotal
   textWidth = doc.getStringUnitWidth(msg) * doc.internal.getFontSize() / doc.internal.scaleFactor
@@ -1081,15 +1173,15 @@ const gerarRelatorios = () => {
   for(var x = 0; x < Object.keys(clientes).length; x++) {
     var cliente = clientes[Object.keys(clientes)[x]]
     if(cliente.impressoras != undefined && Object.keys(cliente.impressoras).length > 0){
-      if(relatorioSelect == 'todos') {
+      if(relatorioSelect == 'todos' && cliente.impressoras != false && cliente.fornecedor != false) {
         salvar = true
         doc = dadosDoRelatorio(cliente, dataParaListagem)
         zip.file(cliente.nomefantasia + ' - ' + dataSplit[1] + '_' + dataSplit[0] + '.pdf', doc.output('blob'))
-      } else if(relatorioSelect == 'excedentes' && (cliente.excedentes > 0 || cliente.franquia.tipo == 'ilimitado')) {
+      } else if(relatorioSelect == 'excedentes' && (cliente.excedentes > 0 || cliente.franquia.tipo == 'ilimitado') && cliente.impressoras != false && cliente.fornecedor != false) {
         salvar = true
         doc = dadosDoRelatorio(cliente, dataParaListagem)
         zip.file(cliente.nomefantasia + ' - ' + dataSplit[1] + '_' + dataSplit[0] + '.pdf', doc.output('blob'))
-      } else if(relatorioSelect == 'interno' && (cliente.excedentes > 0 || cliente.franquia.tipo == 'ilimitado')) {
+      } else if(relatorioSelect == 'interno' && (cliente.excedentes > 0 || cliente.franquia.tipo == 'ilimitado') && cliente.impressoras != false && cliente.fornecedor != false) {
 
         var valor = cliente.franquia.preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
         salvar = true
