@@ -31,6 +31,10 @@ body {
   color: var(--erro) !important;
 }
 
+.yellow {
+  color: var(--alerta) !important;
+}
+
 .green {
   color: var(--resolvido) !important;
 }
@@ -1736,6 +1740,9 @@ suprimento span {
   color: var(--principal);
   position: absolute;
   top: 0;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
 suprimento section {
@@ -1747,6 +1754,9 @@ suprimento section {
   padding-top: 14px;
   cursor: default;
   margin-bottom: 6px;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
 suprimento section:nth-of-type(1) {
@@ -1792,6 +1802,9 @@ suprimento .simpleInput {
   text-transform: capitalize;
   margin: 0px;
   padding: 0px;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
 }
 
 suprimento i {
@@ -1822,6 +1835,11 @@ suprimento i:hover {
 
 .acabando {
   color: var(--erro)
+}
+
+.deletando {
+  background-color: var(--erro);
+  color: white
 }
 
 /*

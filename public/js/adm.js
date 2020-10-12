@@ -4,7 +4,6 @@ var feedbacks = 0
 
 //var dashboard
 var usuarios
-//var empresa
 var suprimentos
 var clientes
 var atendimentos
@@ -1058,7 +1057,7 @@ const dadosDoRelatorio = (cliente, el) => {
   line = incrementLine(doc, line, 6, pdfImageAdded)
 
   var valorTotal = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
-  msg = 'Total de excedentes: ' + cliente.excedentes + ' páginass - Valor total: ' + valorTotal
+  msg = 'Total de excedentes: ' + cliente.excedentes + ' páginass - Valor: ' + valorTotal
   textWidth = doc.getStringUnitWidth(msg) * doc.internal.getFontSize() / doc.internal.scaleFactor
   textOffset = (210 - textWidth) / 2
   doc.text(textOffset, line, msg)
@@ -1076,10 +1075,22 @@ const dadosDoRelatorio = (cliente, el) => {
         line = incrementLine(doc, line, 5, pdfImageAdded)
         doc.text(20, line, 'Setor: ' + impressora.setor + ' - IP: ' + impressora.ip)
         line = incrementLine(doc, line, 5, pdfImageAdded)
-        doc.text(20, line, 'Impressões contabilizadas: ' + impressora.impresso + ' páginas')
-        line = incrementLine(doc, line, 5, pdfImageAdded)
+        if(impressora.substituindo == undefined || impressora.substituindo == null) {
+          doc.text(20, line, 'Impressões contabilizadas: ' + impressora.impresso + ' páginas')
+          line = incrementLine(doc, line, 5, pdfImageAdded)
+        }
 
         if(impressora.leituras[dataInvertida] != undefined) {
+
+          if(impressora.substituindo !== undefined && impressora.substituindo !== null) {
+
+            var a = impressora.leituras[dataInvertida].final.valor
+            var b = impressora.leituras[dataInvertida].inicial.valor
+
+            doc.text(20, line, 'Impressões contabilizadas: ' + (a - b) + ' + ' + impressoras[impressora.substituindo].impresso + ' - ' + ((a - b) + impressoras[impressora.substituindo].impresso) + ' páginas' )
+            line = incrementLine(doc, line, 5, pdfImageAdded)
+          }
+
           var inicial = impressora.leituras[dataInvertida].inicial.dia + '/' + dataDeListagem + ' - ' + impressora.leituras[dataInvertida].inicial.valor + ' páginas'
           var final = impressora.leituras[dataInvertida].final.dia + '/' + dataDeListagem + ' - ' + impressora.leituras[dataInvertida].final.valor + ' páginas'
           doc.text(20, line, 'Contador inicial: ' + inicial)
@@ -1090,8 +1101,13 @@ const dadosDoRelatorio = (cliente, el) => {
         }
         line = incrementLine(doc, line, 5, pdfImageAdded)
 
-        doc.text(20, line, 'Franquia contratada: ' + impressora.franquia + ' páginas' + ' - Excedentes: ' + impressora.excedentes + ' páginas')
-        line = incrementLine(doc, line, 8, pdfImageAdded)
+        if(impressora.trocada) {
+          doc.text(20, line, 'Substituida por: ' + impressoras[impressora.substituta].modelo + ' - ' + impressora.substituta)
+          line = incrementLine(doc, line, 8, pdfImageAdded)
+        } else {
+          doc.text(20, line, 'Franquia contratada: ' + impressora.franquia + ' páginas' + ' - Excedentes: ' + impressora.excedentes + ' páginas')
+          line = incrementLine(doc, line, 8, pdfImageAdded)
+        }
       }
     }
   } else {
@@ -1317,6 +1333,10 @@ const listagemClientes = () => {
       return () => {excluirCliente(cliente)}
     })(cliente)
 
+    interface.querySelector('#deletar').onclick = ((cliente) => {
+      return () => {deletarCliente(cliente)}
+    })(cliente)
+
     interface.querySelector('.cliente').id = cliente.id
     interface.querySelector('#nome').innerHTML = cliente.nomefantasia
     interface.querySelector('#chave').innerHTML = 'Chave: ' + cliente.id
@@ -1408,6 +1428,19 @@ const excluirCliente = cliente => {
       cliente.ativo = true
       gravarCliente(cliente)
     }
+  }
+}
+
+const deletarCliente = cliente => {
+  if(confirm('Deseja deletar o cliente? Isso vai excluir todos os dados desse cadastro!')) {
+
+    var usuario = JSON.parse(localStorage.getItem('usuario'))
+      if(usuario.permissao.excluir) {
+        cliente.deletar = true
+        gravarCliente(cliente)
+      } else {
+        error('Usuário sem permissão para fazer isso!')
+      }
   }
 }
 
@@ -1561,7 +1594,7 @@ const gravarCliente = cliente => {
       }
     }
   }
-
+  
   feedbacks++
   feedback(true)
   var usuario = JSON.parse(localStorage.getItem('usuario'))
@@ -1591,6 +1624,9 @@ const gravarCliente = cliente => {
   //não espera a confirmação de gravação, o sistema atualiza mais rapido
   if(tela == 'clientes') {
     document.getElementById('listagem').innerHTML = ''
+    if(cliente.deletar) {
+      delete clientes[cliente.id]
+    }
     listagem(false)
   }
 }
@@ -2331,35 +2367,41 @@ const listagemSuprimentos = () => {
 
   for(var x = 0; x < Object.keys(suprimentos).length; x++) {
       var suprimento = suprimentos[Object.keys(suprimentos)[x]]
-      var interface = document.getElementById('tSurpimento').content.cloneNode(true)
 
-      if(suprimento.valor == undefined || suprimento.valor == null) {
-        suprimento.valor = 0
+      if(!suprimento.deletar) {
+        var interface = document.getElementById('tSurpimento').content.cloneNode(true)
+
+        if(suprimento.valor == undefined || suprimento.valor == null) {
+          suprimento.valor = 0
+        }
+
+        if(suprimento.ideal == undefined || suprimento.ideal == null) {
+          suprimento.ideal = 0
+        }
+
+        interface.querySelector('suprimento').id = suprimento.id
+        interface.querySelector('#modelo').innerHTML = '<span>Modelo</span>' + toTitleCase(suprimento.modelo)
+        interface.querySelector('#minimo').innerHTML = "<span>Quantidade Mínima</span><input class='simpleInput qtd' type='text' value='" + suprimento.minimo + "'></div>"
+        interface.querySelector('#quantidade').innerHTML = "<span>Quantidade Atual</span><input class='simpleInput qtd' type='text' value='" + suprimento.quantidade + "'></div>"
+        interface.querySelector('#ideal').innerHTML = "<span>Quantidade Ideal</span><input class='simpleInput qtd' type='text' value='" + suprimento.ideal + "'></div>"
+        interface.querySelector('#valor').innerHTML = "<span>Valor de venda</span><input class='simpleInput' type='text' value='" + suprimento.valor.toFixed(2) + "'></div>"
+
+        interface.querySelector('#excluir').onclick = (suprimento => {
+          return () => {excluirSuprimento(suprimento)}
+        })(suprimento)
+
+        if(suprimento.minimo >= suprimento.quantidade) {
+            interface.querySelector('#modelo').classList.add('acabando')
+            interface.querySelector('#quantidade input').classList.add('acabando')
+            interface.querySelector('#minimo input').classList.add('acabando')
+            interface.querySelector('#ideal input').classList.add('acabando')
+            interface.querySelector('#valor input').classList.add('acabando')
+        }
+        holder.appendChild(interface)
+      } else {
+        delete suprimentos[suprimento.id]
       }
-
-      if(suprimento.ideal == undefined || suprimento.ideal == null) {
-        suprimento.ideal = 0
-      }
-
-      interface.querySelector('#salvar').onclick = (suprimento => {
-          return () => {salvarSuprimento(suprimento)}
-      })(suprimento)
-      interface.querySelector('suprimento').id = suprimento.id
-      interface.querySelector('#modelo').innerHTML = '<span>Modelo</span>' + toTitleCase(suprimento.modelo)
-      interface.querySelector('#minimo').innerHTML = "<span>Quantidade Mínima</span><input onkeyup='conferirSuprimentos(this)' class='simpleInput qtd' type='text' value='" + suprimento.minimo + "'></div>"
-      interface.querySelector('#quantidade').innerHTML = "<span>Quantidade Atual</span><input onkeyup='conferirSuprimentos(this)' class='simpleInput qtd' type='text' value='" + suprimento.quantidade + "'></div>"
-      interface.querySelector('#ideal').innerHTML = "<span>Quantidade Ideal</span><input onkeyup='conferirSuprimentos(this)' class='simpleInput qtd' type='text' value='" + suprimento.ideal + "'></div>"
-      interface.querySelector('#valor').innerHTML = "<span>Valor de venda</span><input onkeyup='conferirSuprimentos(this)' class='simpleInput' type='text' value='" + suprimento.valor.toFixed(2) + "'></div>"
-
-      if(suprimento.minimo >= suprimento.quantidade) {
-          interface.querySelector('suprimento').classList.add('acabando')
-          interface.querySelector('#modelo').classList.add('acabando')
-          interface.querySelector('#minimo input').classList.add('acabando')
-          interface.querySelector('#quantidade input').classList.add('acabando')
-          interface.querySelector('#ideal input').classList.add('acabando')
-          interface.querySelector('#valor input').classList.add('acabando')
-      }
-      holder.appendChild(interface)
+      
   }
   container.querySelector('#suprimentos').appendChild(holder)
   document.getElementById('listagem').appendChild(container)
@@ -2376,35 +2418,6 @@ const adicionarSuprimento = () => {
   suprimento.querySelector('#ideal').innerHTML = "<span>Quantidade Ideal</span><input class='simpleInput qtd' type='text' value='0'></div>"
   suprimento.querySelector('#valor').innerHTML = "<span>Valor de venda</span><input class='simpleInput qtd' type='text' value='0,00'></div>"
 
-  suprimento.querySelector('#salvar').className = 'fas fa-save'
-  suprimento.querySelector('#salvar').onclick = (container => {
-      return () => {
-
-          var modelo = toTitleCase(container.querySelector('#modelo input').value)
-          var minimo = parseInt(container.querySelector('#minimo input').value)
-          var quantidade = parseInt(container.querySelector('#quantidade input').value)
-          var ideal = parseInt(container.querySelector('#ideal input').value)
-          var valor = container.querySelector('#valor input').value
-
-          var suprimento = {
-              id: new Date().getTime() + '',
-              modelo: modelo,
-              minimo: minimo,
-              quantidade: quantidade,
-              ideal: ideal,
-              valor: Number(valor.replace(/,/g, '.'))
-          }
-          if(modelo == '') {
-              error('Modelo não pode ficar em branco!')
-          } else if(minimo <= 0) {
-              error('Quantidade mínima igual a zero!')
-          } else {
-              container.id = suprimento.id
-              salvarSuprimento(suprimento)
-          }
-      }
-  })(suprimento.querySelector('#salvar').parentNode)
-
   document.getElementById('suprimentos').appendChild(suprimento)
   setTimeout(() => {
       container.style.opacity = '1'
@@ -2412,47 +2425,66 @@ const adicionarSuprimento = () => {
   }, 50)
 }
 
-const salvarSuprimento = suprimento => {
-  //se o suprimento já estiver na lista de suprimentos
-  var layout = document.getElementById(suprimento.id)
-  if(suprimentos[suprimento.id] != undefined) {
-
+const salvarSuprimentos = () => {
+  
+  var layouts = document.getElementsByTagName("suprimento")
+  for(var layout of layouts) {
+    
+    var suprimento = suprimentos[layout.id]
+    if(suprimento !== undefined) {
+      
+  
       var quantidade = parseInt(layout.querySelector('#quantidade input').value)
       var minimo = parseInt(layout.querySelector('#minimo input').value)
       var ideal = parseInt(layout.querySelector('#ideal input').value)
       var valor = Number(layout.querySelector('#valor input').value.replace(/,/g, '.'))
 
-      if(suprimento.quantidade == quantidade && suprimento.minimo == minimo && suprimento.ideal == ideal && suprimento.valor == valor) {
-          error('Nenhuma alteração para salvamento foi detectada')
-      } else {
-          suprimento.quantidade = quantidade
-          suprimento.minimo = minimo
-          suprimento.ideal = ideal
-          suprimento.valor = valor
+      if(suprimento.quantidade !== quantidade || suprimento.minimo !== minimo || suprimento.ideal !== ideal || suprimento.valor !== valor) {
+        suprimento.quantidade = quantidade
+        suprimento.minimo = minimo
+        suprimento.ideal = ideal
+        suprimento.valor = valor
 
-          if(suprimento.minimo < suprimento.quantidade) {
-              layout.classList.remove('acabando')
-              layout.querySelector('#modelo').classList.remove('acabando')
-              layout.querySelector('#minimo input').classList.remove('acabando')
-              layout.querySelector('#quantidade input').classList.remove('acabando')
-          }
-
-          layout.querySelector('#salvar').style.opacity = '0'
-          setTimeout(() => {
-              layout.querySelector('#salvar').className = 'fas fa-check'
-              layout.querySelector('#salvar').style.opacity = '1'
-          }, 100)
-          gravarSuprimentos()
+        if(suprimento.minimo < suprimento.quantidade) {
+          layout.querySelector('#modelo').classList.remove('acabando')
+          layout.querySelector('#quantidade input').classList.remove('acabando')
+          layout.querySelector('#minimo input').classList.remove('acabando')
+          layout.querySelector('#ideal input').classList.remove('acabando')
+          layout.querySelector('#valor input').classList.remove('acabando')
+        } else {
+          layout.querySelector('#modelo').classList.add('acabando')
+          layout.querySelector('#quantidade input').classList.add('acabando')
+          layout.querySelector('#minimo input').classList.add('acabando')
+          layout.querySelector('#ideal input').classList.add('acabando')
+          layout.querySelector('#valor input').classList.add('acabando')
+        }
       }
-  } else {
-      layout.querySelector('#salvar').style.opacity = '0'
-          setTimeout(() => {
-              layout.querySelector('#salvar').className = 'fas fa-check'
-              layout.querySelector('#salvar').style.opacity = '1'
-          }, 100)
-      suprimentos[suprimento.id] = suprimento
-      gravarSuprimentos()
+    } else {
+
+      var modelo = toTitleCase(layout.querySelector('#modelo input').value)
+      var minimo = parseInt(layout.querySelector('#minimo input').value)
+      var quantidade = parseInt(layout.querySelector('#quantidade input').value)
+      var ideal = parseInt(layout.querySelector('#ideal input').value)
+      var valor = layout.querySelector('#valor input').value
+
+      suprimento = {
+        id: new Date().getTime() + '',
+        modelo: modelo,
+        minimo: minimo,
+        quantidade: quantidade,
+        ideal: ideal,
+        valor: Number(valor.replace(/,/g, '.'))
+      }
+
+      if(modelo !== '') {
+        suprimentos[suprimento.id] = suprimento
+      }
+    }
   }
+
+  setTimeout(() => {
+    gravarSuprimentos()
+  }, 50)
 }
 
 const gravarSuprimentos = () => {
@@ -2481,25 +2513,10 @@ const gravarSuprimentos = () => {
       console.error(err)
       error('Erro ao gravar os dados. Alterações não foram salvas. Recarregue a página e tente novamente!')
   })
-}
 
-const conferirSuprimentos = el => {
-  var layout = el.parentNode.parentNode
-  var suprimento = suprimentos[layout.id]
-
-  var minimo = parseInt(layout.querySelector('#minimo input').value)
-  var quantidade = parseInt(layout.querySelector('#quantidade input').value)
-  var ideal = parseInt(layout.querySelector('#ideal input').value)
-  var valor = parseInt(layout.querySelector('#valor input').value)
-
-  if((suprimento.quantidade != quantidade || suprimento.minimo != minimo
-      || suprimento.ideal != ideal || suprimento.valor != valor) &&
-      !layout.querySelector('#salvar').classList.contains('fa-save')) {
-      layout.querySelector('#salvar').style.opacity = '0'
-      setTimeout(() => {
-          layout.querySelector('#salvar').className = 'fas fa-save'
-          layout.querySelector('#salvar').style.opacity = '1'
-      }, 100)
+  if(tela == 'suprimentos') {
+    document.getElementById('listagem').innerHTML = ''
+    listagem(false)
   }
 }
 
@@ -2514,6 +2531,46 @@ const conferirQuantidadeSuprimento = suprimento => {
           interface.querySelector('#minimo input').classList.add('acabando')
           interface.querySelector('#quantidade input').classList.add('acabando')
       }
+  }
+}
+
+const excluirSuprimento = suprimento => {
+
+  var layout = document.getElementById(suprimento.id)
+  if(suprimento.deletar) {
+    suprimento.deletar = undefined
+    layout.querySelector('#excluir').className = 'fas fa-trash'
+
+    layout.classList.remove('deletando')
+    layout.querySelector('#modelo').classList.remove('deletando')
+    layout.querySelector('#modelo span').classList.remove('deletando')
+    layout.querySelector('#quantidade input').classList.remove('deletando')
+    layout.querySelector('#quantidade span').classList.remove('deletando')
+    layout.querySelector('#minimo input').classList.remove('deletando')
+    layout.querySelector('#minimo span').classList.remove('deletando')
+    layout.querySelector('#ideal input').classList.remove('deletando')
+    layout.querySelector('#ideal span').classList.remove('deletando')
+    layout.querySelector('#valor input').classList.remove('deletando')
+    layout.querySelector('#valor span').classList.remove('deletando')
+    layout.querySelector('#excluir').classList.remove('deletando')
+    layout.classList.remove('deletando')
+
+  } else {
+    suprimento.deletar = true
+    layout.querySelector('#excluir').className = 'fas fa-trash-restore'
+
+    layout.querySelector('#modelo').classList.add('deletando')
+    layout.querySelector('#modelo span').classList.add('deletando')
+    layout.querySelector('#quantidade input').classList.add('deletando')
+    layout.querySelector('#quantidade span').classList.add('deletando')
+    layout.querySelector('#minimo input').classList.add('deletando')
+    layout.querySelector('#minimo span').classList.add('deletando')
+    layout.querySelector('#ideal input').classList.add('deletando')
+    layout.querySelector('#ideal span').classList.add('deletando')
+    layout.querySelector('#valor input').classList.add('deletando')
+    layout.querySelector('#valor span').classList.add('deletando')
+    layout.querySelector('#excluir').classList.add('deletando')
+    layout.classList.add('deletando')
   }
 }
 

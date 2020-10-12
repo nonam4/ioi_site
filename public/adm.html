@@ -278,8 +278,9 @@
 				<div class='cliente'>
 					<div id='nome'></div>
 					<div id='chave'></div>
-					<i id='expandir' class='fas fa-user-edit'></i>
-					<i id='excluir' class='fas fa-user-lock red'></i>
+					<i id='expandir' title='Editar' class='fas fa-user-edit'></i>
+					<i id='excluir' title='Desativar' class='fas fa-user-lock yellow'></i>
+					<i id='deletar' title='Deletar' class='fas fa-user-times red'></i>
 				</div>
 			</template>
 
@@ -639,6 +640,7 @@
 							<span>Suprimentos</span>
 							<i class='fas fa-plus' onclick='adicionarSuprimento()' title='Adicionar Novo Suprimento'></i>
 							<i class='fas fa-clipboard-list' onclick='gerarPedidos()' title='Gerar pedido'></i>
+							<i class='fas fa-save' onclick='salvarSuprimentos()' title='Salvar lista'></i>
 						</div>
 						<div class='pessoasListagem suprimentos' id='suprimentos'>
 						</div>
@@ -653,7 +655,7 @@
 					<section id='minimo'></section>
 					<section id='ideal'></section>
 					<section id='valor'></section>
-					<i id='salvar' class='fas fa-check'></i>
+					<i id='excluir' class='fas fa-trash' title='Excluir'></i>
 				</suprimento>
 			</template>
 
