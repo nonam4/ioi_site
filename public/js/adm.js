@@ -1436,8 +1436,12 @@ const deletarCliente = cliente => {
 
     var usuario = JSON.parse(localStorage.getItem('usuario'))
       if(usuario.permissao.excluir) {
-        cliente.deletar = true
-        gravarCliente(cliente)
+        if(!cliente.ativo) {
+          cliente.deletar = true
+          gravarCliente(cliente)
+        } else {
+          error('Impossível excluir. Esse cadastro ainda está ativo!')
+        }
       } else {
         error('Usuário sem permissão para fazer isso!')
       }
