@@ -1646,7 +1646,6 @@ const fecharCliente = () => {
 }
 
 const mostrarHorarios = element => {
-  var dia = element.id
   var layout = element.parentNode.parentNode
 
   if(element.checked) {
