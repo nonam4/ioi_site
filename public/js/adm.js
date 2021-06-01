@@ -1052,14 +1052,14 @@ const dadosDoRelatorio = (cliente, el) => {
     var line = 97
 
     doc.setFontSize(14)
-    var msg = 'Relatorio de páginas impressas - Mês de referência: ' + dataDeListagem
+    var msg = 'Relatório de páginas impressas - Mês de referência: ' + dataDeListagem
     textWidth = doc.getStringUnitWidth(msg) * doc.internal.getFontSize() / doc.internal.scaleFactor
     textOffset = (210 - textWidth) / 2
     doc.text(textOffset, line, msg)
     line = incrementLine(doc, line, 6, pdfImageAdded)
 
     var valorTotal = (cliente.franquia.preco * cliente.excedentes).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
-    msg = 'Total de excedentes: ' + cliente.excedentes + ' páginass - Valor: ' + valorTotal
+    msg = 'Total de excedentes: ' + cliente.excedentes + ' páginas - Valor: ' + valorTotal
     textWidth = doc.getStringUnitWidth(msg) * doc.internal.getFontSize() / doc.internal.scaleFactor
     textOffset = (210 - textWidth) / 2
     doc.text(textOffset, line, msg)
